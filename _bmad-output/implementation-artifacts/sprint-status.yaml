@@ -1,0 +1,101 @@
+# generated: 2026-02-06
+# project: TP-FOS
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-06
+project: TP-FOS
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Project Foundation & App Shell
+  epic-1: backlog
+  1-1-project-scaffold-development-environment: backlog
+  1-2-design-system-tokens-global-styles: backlog
+  1-3-authentication-route-protection: backlog
+  1-4-app-shell-responsive-navigation: backlog
+  1-5-internationalization-rtl-support: backlog
+  1-6-core-shared-ui-components-currency-utilities: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Work Orders & Manual Financial Tracking
+  epic-2: backlog
+  2-1-work-order-data-model-crud: backlog
+  2-2-work-order-status-lifecycle-list-view: backlog
+  2-3-manual-transaction-entry-cost-revenue-linkage: backlog
+  2-4-nutrition-label-margin-calculations: backlog
+  2-5-work-order-detail-page: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Dashboard & Project Health
+  epic-3: backlog
+  3-1-hero-stat-kpi-cards: backlog
+  3-2-project-health-table: backlog
+  3-3-real-time-dashboard-data-layer: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Email Ingestion & AI Document Processing
+  epic-4: backlog
+  4-1-gmail-api-integration-email-detection: backlog
+  4-2-paperless-auto-forward: backlog
+  4-3-ai-document-processing-gemini: backlog
+  4-4-transaction-classification-confidence-scoring: backlog
+  4-5-error-handling-retry-pipeline-resilience: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Ghost Text Review & Transaction Approval
+  epic-5: backlog
+  5-1-review-queue-pending-items-list: backlog
+  5-2-ghost-text-card-core-confirmation-flow: backlog
+  5-3-ghost-text-field-editing-rejection: backlog
+  5-4-post-approval-side-effects-real-time-updates: backlog
+  5-5-batch-approval-approve-all-mobile-review: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Inventory Management & WAC Engine
+  epic-6: backlog
+  6-1-inventory-data-model-item-management: backlog
+  6-2-restock-wac-recalculation: backlog
+  6-3-scoop-action-consume-inventory-work-orders: backlog
+  6-4-audit-log-waste-tracking: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Overhead, Tax Intelligence & Forward Projections
+  epic-7: backlog
+  7-1-overhead-data-model-expense-management: backlog
+  7-2-monthly-overhead-burn-rate-trends: backlog
+  7-3-tax-jar-configuration-osek-patur-alert: backlog
+  7-4-forward-financial-projection: backlog
+  epic-7-retrospective: optional
