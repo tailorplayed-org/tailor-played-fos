@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="https://unpkg.com/@phosphor-icons/webcomponents@2.1"></script>
   <style>
     /* ================================================================
        TOKENS
@@ -70,6 +71,8 @@
     ::-webkit-scrollbar-thumb:hover{background:rgba(252,183,0,0.25);}
     a{color:inherit;text-decoration:none;}
     button{font-family:var(--font);cursor:pointer;border:none;background:none;}
+    ph-game-controller,ph-ring,ph-cake,ph-file-text,ph-chart-bar,
+    ph-clipboard-text,ph-tray,ph-gear-six,ph-warning,ph-lightbulb,ph-check-circle{color:inherit;display:inline-flex;vertical-align:middle;}
 
     /* ================================================================
        PAGE PICKER (for Desktop vs Mobile vs Ghost)
@@ -532,7 +535,7 @@
       <div class="section-label">Active Projects</div>
       <div class="projects">
         <div class="project">
-          <div class="project-icon" style="background:var(--success-bg);">🎲</div>
+          <div class="project-icon" style="background:var(--success-bg);"><ph-game-controller size="18" weight="regular"></ph-game-controller></div>
           <div class="project-info">
             <div class="project-name">David's Game</div>
             <div class="project-meta">Production · 3 costs tracked</div>
@@ -544,7 +547,7 @@
           </div>
         </div>
         <div class="project warn">
-          <div class="project-icon" style="background:var(--error-bg);">💍</div>
+          <div class="project-icon" style="background:var(--error-bg);"><ph-ring size="18" weight="regular"></ph-ring></div>
           <div class="project-info">
             <div class="project-name">Rina's Wedding Game</div>
             <div class="project-meta">Production · 5 costs tracked</div>
@@ -556,7 +559,7 @@
           </div>
         </div>
         <div class="project">
-          <div class="project-icon" style="background:rgba(77,166,255,0.08);">🎂</div>
+          <div class="project-icon" style="background:rgba(77,166,255,0.08);"><ph-cake size="18" weight="regular"></ph-cake></div>
           <div class="project-info">
             <div class="project-name">Yoni's Birthday</div>
             <div class="project-meta">Design phase · 1 cost tracked</div>
@@ -585,7 +588,7 @@
       <div class="ghost-wrap">
         <div class="ghost-card">
           <div class="ghost-header">
-            <div class="ghost-doc-icon">📄</div>
+            <div class="ghost-doc-icon"><ph-file-text size="20" weight="regular"></ph-file-text></div>
             <div>
               <div class="ghost-vendor">Game Crafter</div>
               <div class="ghost-date">February 5, 2026</div>
@@ -610,7 +613,7 @@
               <span class="conf-pct" style="color:var(--success);">94%</span>
             </div>
             <div class="ghost-reasoning">
-              💡 Matched to <strong>David's Game</strong> — vendor "Game Crafter" linked to this project 3 times previously.
+              <ph-lightbulb size="14" weight="regular"></ph-lightbulb> Matched to <strong>David's Game</strong> — vendor "Game Crafter" linked to this project 3 times previously.
             </div>
             <div class="ghost-actions">
               <button class="gbtn primary">Confirm <span class="shortcut">Enter</span></button>
@@ -640,7 +643,7 @@
             <span class="conf-pct" style="color:var(--warning);">72%</span>
           </div>
           <div class="ghost-reasoning" style="border-color:rgba(245,166,35,0.25);">
-            ⚠️ New vendor — no previous matches. Suggested based on recent project activity.
+            <ph-warning size="14" weight="regular"></ph-warning> New vendor — no previous matches. Suggested based on recent project activity.
           </div>
         </div>
         <div class="state-card">
@@ -709,10 +712,10 @@
               </div>
             </div>
             <div class="phone-bottom-nav">
-              <div class="bnav on"><span class="bi">📊</span>Home</div>
-              <div class="bnav"><span class="bi">📋</span>Orders</div>
-              <div class="bnav"><span class="bi">📥</span>Review</div>
-              <div class="bnav"><span class="bi">⚙️</span>More</div>
+              <div class="bnav on"><span class="bi"><ph-chart-bar size="18" weight="regular"></ph-chart-bar></span>Home</div>
+              <div class="bnav"><span class="bi"><ph-clipboard-text size="18" weight="regular"></ph-clipboard-text></span>Orders</div>
+              <div class="bnav"><span class="bi"><ph-tray size="18" weight="regular"></ph-tray></span>Review</div>
+              <div class="bnav"><span class="bi"><ph-gear-six size="18" weight="regular"></ph-gear-six></span>More</div>
             </div>
           </div>
           <div class="phone-label">Dashboard</div>
@@ -726,7 +729,7 @@
               <div class="mg-back">← <span>Review 1 of 3</span></div>
 
               <div class="mg-header">
-                <div class="mg-icon">📄</div>
+                <div class="mg-icon"><ph-file-text size="18" weight="regular"></ph-file-text></div>
                 <div>
                   <div class="mg-vendor">Game Crafter</div>
                   <div class="mg-date">Feb 5, 2026</div>
@@ -749,7 +752,7 @@
                 <span class="mg-conf-pct" style="color:var(--success);">94%</span>
               </div>
 
-              <div class="mg-reason">💡 Vendor matched 3 times to <strong>David's Game</strong>.</div>
+              <div class="mg-reason"><ph-lightbulb size="14" weight="regular"></ph-lightbulb> Vendor matched 3 times to <strong>David's Game</strong>.</div>
 
               <div class="mg-actions">
                 <button class="mg-btn-primary">Confirm ✓</button>

@@ -402,6 +402,41 @@ Components specific to TP-FOS that don't exist in the TailorPlayed website will 
 - `prefers-reduced-motion: reduce` disables all Tier 2/3 animations
 - Fredoka is the sole typeface — no secondary fonts except monospace for IDs/codes
 
+### Icon Library
+
+**Official Library:** Phosphor Icons (`@phosphor-icons/react`)
+
+TP-FOS uses Phosphor Icons exclusively for all iconography. No emojis. Phosphor provides 9,000+ icons in 6 weights (thin, light, regular, bold, fill, duotone), with tree-shaking support for minimal bundle size.
+
+**Package:** `@phosphor-icons/react` (latest)
+**Default weight:** `regular`
+**Icon sizing:** Inherits from font-size or explicit `size` prop. Default 24px for inline, 20px for navigation, 18px for badges.
+**Color:** Inherits `currentColor` by default — works seamlessly with design system token colors.
+
+**Icon Mapping (project-specific):**
+
+| Context | Icon | Phosphor Name |
+|---|---|---|
+| Project icon (game) | Game controller | `GameController` |
+| Project icon (wedding) | Ring | `Ring` |
+| Project icon (birthday) | Cake | `Cake` |
+| Document / invoice | File with text | `FileText` |
+| Warning / caution | Warning triangle | `Warning` |
+| AI reasoning | Lightbulb | `Lightbulb` |
+| Confirmed / success | Checkmark circle | `CheckCircle` |
+| Nav: Home | Bar chart | `ChartBar` |
+| Nav: Orders | Clipboard | `ClipboardText` |
+| Nav: Review | Tray | `Tray` |
+| Nav: More/Settings | Gear | `GearSix` |
+| Margin caution (20-29%) | Warning circle | `WarningCircle` |
+| Margin danger (< 20%) | Warning triangle | `Warning` (weight: bold) |
+| Settings / config | Gear | `GearSix` |
+| Restock (audit log) | Arrow up | `ArrowFatUp` |
+| Consume/Scoop (audit log) | Arrow bend | `ArrowBendDownRight` |
+| Waste (audit log) | Trash | `Trash` |
+
+**RTL:** Directional icons (arrows, chevrons) flip via `mirrored` prop or `transform: scaleX(-1)`.
+
 ## Defining Experience
 
 ### The Defining Interaction
@@ -695,7 +730,7 @@ Desktop (1024px+):
 | **Keyboard Navigation** | All interactive elements reachable via Tab, arrow keys for grids/lists | Built into component patterns |
 
 **Financial Accessibility Additions:**
-- Color is never the *only* indicator of margin health — red rows also include a warning icon and text label
+- Color is never the *only* indicator of margin health — red rows also include a Phosphor Warning icon and text label
 - Currency amounts always include the currency symbol (₪, $, €) — never rely on column context alone
 - Confidence percentages shown as both progress bar AND number — two modalities for the same data
 
@@ -726,14 +761,14 @@ Desktop (1024px+):
 
 ### Project List: Icon Cards with Margin Bars
 
-- Each project row: emoji icon (in tinted background), project name + phase + cost count, revenue amount, margin percentage (color-coded), and a mini progress bar
+- Each project row: Phosphor icon (in tinted background), project name + phase + cost count, revenue amount, margin percentage (color-coded), and a mini progress bar
 - At-risk projects (< 20% margin) get a subtle red-tinted border
 - Rationale: Bit's icon+info style for warmth, Portfolio's margin bar for at-a-glance health. No dense tables
 
 ### Ghost Text Review: Polished Confirmation Card
 
 - **Accessed from:** Clicking "Pending Review" KPI card or top-bar badge
-- **Card structure:** Header with gradient background (doc icon + vendor + date + amount with "Estimated" badge), body with dashed-border AI-suggested fields (italic, muted gold), confidence bar, AI reasoning bubble, and Confirm/Edit/Reject buttons with keyboard shortcuts
+- **Card structure:** Header with gradient background (Phosphor FileText icon + vendor + date + amount with "Estimated" badge), body with dashed-border AI-suggested fields (italic, muted gold), confidence bar, AI reasoning bubble, and Confirm/Edit/Reject buttons with keyboard shortcuts
 - **Visual language:** Dashed border = AI suggestion (untouched). Solid gold border = user-edited field. Muted italic text → bright solid text on edit
 - **States:** High confidence (green bar), Low confidence with "Check Me" warning (orange bar), and post-edit confirmed (gold solid border + checkmark)
 
@@ -906,13 +941,13 @@ Built from scratch using TailorPlayed SCSS Modules + CSS Custom Properties. No t
 | **Input / Select** | Foundation | `--bg-primary`, dashed/solid border states |
 | **Badge / Tag** | Foundation | Pill shape, semantic color bg + text |
 | **Card** | Foundation | `--bg-secondary`, `--border-subtle`, `--radius`, hover lift |
-| **Icon Container** | Foundation | Tinted background circle/rounded-rect for emojis |
+| **Icon Container** | Foundation | Tinted background circle/rounded-rect for Phosphor icons |
 
 ### Custom Components
 
 #### Ghost Text Card
 - **Purpose:** Core interaction — review and confirm AI-classified transactions
-- **Anatomy:** Header (doc icon + vendor + date + amount + est. badge) → Body (Ghost Text Fields + Confidence Bar + Reasoning) → Actions (Confirm/Edit/Reject) → Footer (view original)
+- **Anatomy:** Header (Phosphor FileText icon + vendor + date + amount + est. badge) → Body (Ghost Text Fields + Confidence Bar + Reasoning) → Actions (Confirm/Edit/Reject) → Footer (view original)
 - **States:** Loading (skeleton), Default (high confidence), Warning (low confidence, yellow accents), Editing (gold borders), Confirmed (success → slides away), Rejected (red flash → removed)
 - **Keyboard:** Enter = Confirm, E = Edit, Del = Reject, Tab = navigate fields
 - **Accessibility:** Each field labeled. Focus ring gold. Screen reader: "AI suggested: [value], Enter to accept or type to edit"
@@ -931,7 +966,7 @@ Built from scratch using TailorPlayed SCSS Modules + CSS Custom Properties. No t
 
 #### Project Row
 - **Purpose:** Scannable project health in list format
-- **Anatomy:** Icon (emoji in tinted rounded rect) + Info (name + phase) + Revenue + Margin (% + mini bar)
+- **Anatomy:** Icon (Phosphor icon in tinted rounded rect) + Info (name + phase) + Revenue + Margin (% + mini bar)
 - **States:** Default, Hover (bg shift + border), At-risk (red border for < 20%), Selected
 - **Color Logic:** Margin ≥ 40% = green, 20-39% = yellow, < 20% = red. Color on percentage text + bar fill
 
