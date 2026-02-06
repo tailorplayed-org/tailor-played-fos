@@ -15,7 +15,7 @@ const googleProvider = new GoogleAuthProvider();
 // IMPORTANT: Replace with actual UIDs in .env.local via VITE_WHITELISTED_UIDS
 const WHITELISTED_UIDS: string[] = import.meta.env.VITE_WHITELISTED_UIDS
   ? (import.meta.env.VITE_WHITELISTED_UIDS as string).split(',').map((s) => s.trim())
-  : ['REPLACE_WITH_GAL_UID', 'REPLACE_WITH_BEN_UID'];
+  : ['MKeVSMwPzAVSUg8VGy9EG2L72ha2', '3lO30cF0OtNBsfTiNWZ35YqdI7l2'];
 
 export async function signInWithGoogle(): Promise<User> {
   const result = await signInWithPopup(auth, googleProvider);
