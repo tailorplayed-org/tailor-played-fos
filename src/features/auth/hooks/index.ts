@@ -1,2 +1,2 @@
 // Auth hooks barrel export
-export {};
+export { useAuth } from './useAuth';

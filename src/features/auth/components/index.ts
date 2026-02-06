@@ -1,2 +1,2 @@
 // Auth components barrel export
-export {};
+export { LoginScreen } from './LoginScreen';

@@ -1,2 +1,2 @@
 // Firebase Storage service layer
-export {};
+export { storage } from './firebase';

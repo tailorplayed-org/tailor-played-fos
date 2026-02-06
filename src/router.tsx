@@ -1,11 +1,25 @@
 // Application router configuration
-// Routes will be added as features are implemented
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
+import { AuthGuard, LoginScreen } from '@/features/auth';
 import App from './App';
 
 export const router = createBrowserRouter([
   {
+    path: '/login',
+    Component: LoginScreen,
+  },
+  {
     path: '/',
-    Component: App,
+    Component: AuthGuard,
+    children: [
+      {
+        index: true,
+        Component: App,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/" replace />,
   },
 ]);

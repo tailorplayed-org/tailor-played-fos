@@ -1,3 +1,4 @@
 // Auth feature barrel export
-export * from './components';
-export * from './hooks';
+export { AuthGuard } from './AuthGuard';
+export { LoginScreen } from './components';
+export { useAuth } from './hooks';

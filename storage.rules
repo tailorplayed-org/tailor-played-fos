@@ -2,7 +2,7 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function isAdmin() {
-      return request.auth != null && request.auth.uid in ['UID_1', 'UID_2'];
+      return request.auth != null && request.auth.uid in ['MKeVSMwPzAVSUg8VGy9EG2L72ha2', 'BEN_UID_HERE'];
     }
     match /{allPaths=**} {
       allow read, write: if isAdmin();

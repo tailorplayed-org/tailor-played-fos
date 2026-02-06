@@ -1,2 +1,2 @@
 // Firestore service layer
-export {};
+export { db } from './firebase';
