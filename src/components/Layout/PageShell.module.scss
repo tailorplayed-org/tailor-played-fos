@@ -1,0 +1,42 @@
+// ─────────────────────────────────────────────
+// PageShell — Main layout wrapper with content area
+// ─────────────────────────────────────────────
+
+.pageShell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  // TopNav height (60px) is handled by sticky — no offset needed
+  // BottomNav height (64px + safe area) — add bottom padding on mobile
+  padding-block-start: $space-md;
+  padding-block-end: calc(64px + $space-md + env(safe-area-inset-bottom));
+  padding-inline: $space-md;
+}
+
+// Tablet and up: remove bottom nav padding
+@include md {
+  .main {
+    padding-block-end: $space-md;
+  }
+}
+
+// Desktop: wider inline padding
+@include lg {
+  .main {
+    padding-inline: $space-2xl;
+  }
+}
+
+// Wide screens: constrain max width
+@include xl {
+  .main {
+    max-width: 1080px;
+  }
+}

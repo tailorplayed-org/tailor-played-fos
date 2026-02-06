@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.17.14",
     "@phosphor-icons/react": "^2.1.10",
     "firebase": "^12.9.0",
     "i18next": "^25.8.4",

@@ -1,0 +1,148 @@
+// ─────────────────────────────────────────────
+// TopNav — Desktop segmented pill nav + mobile simplified
+// ─────────────────────────────────────────────
+
+.topNav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding-inline: $space-md;
+  background-color: $bg-secondary;
+  border-block-end: 1px solid $border-subtle;
+}
+
+@include lg {
+  .topNav {
+    padding-inline: $space-xl;
+  }
+}
+
+// ─── Logo ─────────────────────────────────────
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: $radius-md;
+  }
+}
+
+.logoImg {
+  height: 36px;
+  width: auto;
+}
+
+.logoText {
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-secondary;
+}
+
+// ─── Segmented Pill Nav ───────────────────────
+
+.navTabs {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background-color: $bg-primary;
+  border-radius: $radius-full;
+}
+
+@include md {
+  .navTabs {
+    display: flex;
+  }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-sm $space-md;
+  min-height: 44px;
+  border-radius: $radius-full;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  color: $text-secondary;
+  background-color: transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @include motion-safe {
+    transition: background-color $transition-fast, color $transition-fast;
+  }
+
+  &:hover {
+    background-color: $bg-tertiary;
+    color: $text-primary;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@include lg {
+  .tab {
+    padding-inline: $space-lg;
+    font-size: $text-sm;
+  }
+}
+
+.tabActive {
+  background-color: $bg-elevated;
+  color: $gold;
+
+  &:hover {
+    background-color: $bg-elevated;
+    color: $gold;
+  }
+}
+
+// ─── Pending Badge ────────────────────────────
+
+.pendingBadge {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  padding: $space-xs $space-sm;
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+  border-radius: $radius-full;
+  font-size: $text-xs;
+  font-weight: $font-semibold;
+  // Dark text on $warning (amber) badge — $bg-primary (#120022) provides
+  // maximum contrast. No dedicated text-on-warning token exists in the design system.
+  color: $bg-primary;
+  background-color: $warning;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  @include motion-safe {
+    transition: opacity $transition-fast;
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.pendingBadgeHidden {
+  visibility: hidden;
+}

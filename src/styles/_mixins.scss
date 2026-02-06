@@ -154,3 +154,30 @@
     @content;
   }
 }
+
+// ═══════════════════════════════════════════════
+// PLACEHOLDER PAGE PATTERNS (temporary — until real features built)
+// ═══════════════════════════════════════════════
+
+@mixin placeholder-page {
+  @include flex-column-center;
+  gap: $space-md;
+  padding-block: $space-3xl;
+  text-align: center;
+}
+
+@mixin placeholder-icon {
+  color: $text-muted;
+}
+
+@mixin placeholder-title {
+  color: $gold;
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+}
+
+@mixin placeholder-description {
+  color: $text-secondary;
+  font-size: $text-base;
+  max-width: 400px;
+}

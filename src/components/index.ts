@@ -7,4 +7,5 @@ export * from './Table';
 export * from './Toast';
 export * from './Skeleton';
 export * from './Layout';
+export * from './Loader';
 export * from './ErrorBoundary';

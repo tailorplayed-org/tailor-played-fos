@@ -1,0 +1,25 @@
+// ─────────────────────────────────────────────
+// Placeholder page styling
+// ─────────────────────────────────────────────
+
+.placeholder {
+  @include placeholder-page;
+}
+
+.icon {
+  @include placeholder-icon;
+}
+
+.title {
+  @include placeholder-title;
+}
+
+.description {
+  @include placeholder-description;
+}
+
+.orderId {
+  color: $gold-light;
+  font-weight: $font-medium;
+  font-family: $font-mono;
+}

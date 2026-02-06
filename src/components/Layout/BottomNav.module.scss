@@ -1,0 +1,56 @@
+// ─────────────────────────────────────────────
+// BottomNav — Mobile-only fixed bottom navigation
+// ─────────────────────────────────────────────
+
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 64px;
+  padding-block-end: env(safe-area-inset-bottom);
+  background-color: $bg-secondary;
+  border-block-start: 1px solid $border-subtle;
+}
+
+// Hide on tablet and above
+@include md {
+  .bottomNav {
+    display: none;
+  }
+}
+
+// ─── Nav Item ─────────────────────────────────
+
+.navItem {
+  @include flex-column-center;
+  gap: 2px;
+  flex: 1;
+  min-height: 44px;
+  min-width: 44px;
+  padding: $space-xs;
+  text-decoration: none;
+  color: $text-muted;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+
+  @include motion-safe {
+    transition: color $transition-fast;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.navItemActive {
+  color: $gold;
+}
+
+.navLabel {
+  font-size: $text-xs;
+  line-height: $leading-tight;
+}
