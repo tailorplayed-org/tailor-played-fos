@@ -29,6 +29,10 @@ classification:
   complexity: medium
   projectContext: greenfield
 workflowType: 'prd'
+lastEdited: '2026-02-06'
+editHistory:
+  - date: '2026-02-06'
+    changes: 'Post-validation improvements: Added FR50 (manual transaction fallback), fixed FR measurability (FR6/FR8/FR10/FR15/FR29/FR31), abstracted tech names from FR17/FR45'
 ---
 
 # Product Requirements Document — TP-FOS
@@ -356,24 +360,24 @@ Optimized for early validation of riskiest components:
 - **FR3:** Gal/Ben can view a count of active projects (Work Orders in Production status)
 - **FR4:** Gal/Ben can view a Project Health Table with client name, status, revenue, cost, and margin percentage
 - **FR5:** Gal/Ben can identify at-risk projects through color-coded margin indicators (green/yellow/red at < 20%)
-- **FR6:** Gal can view a forward financial projection showing cash flow impact of a potential purchase over upcoming months
+- **FR6:** Gal can view a forward financial projection showing cash flow impact of a potential purchase over the next 3–6 months
 - **FR7:** Gal/Ben can view monthly overhead burn by category (subscriptions, software, meals, office)
-- **FR8:** Gal/Ben can receive an alert when annual revenue approaches the ₪120,000 Osek Patur threshold
+- **FR8:** Gal/Ben can receive an alert when annual revenue reaches 80% of the ₪120,000 Osek Patur threshold
 - **FR9:** Gal can configure the Tax Jar calculation method (flat rate vs. bracket-based)
 
 ### 2. Work Order Management
 
-- **FR10:** Gal can create a Work Order with client name, project details, and status
+- **FR10:** Gal can create a Work Order with client name, project description, deadline, and status
 - **FR11:** Gal can update Work Order status (Lead → Design → Production → Shipped)
 - **FR12:** Gal can view the Nutrition Label: Revenue, Direct Costs, Inventory Costs (Scoops), Overhead Allocation, Unforeseen Buffer (5%), Net Profit
 - **FR13:** Gal can link revenue (Summit receipts) to a Work Order
 - **FR14:** Gal can link direct costs (vendor invoices) to a Work Order
-- **FR15:** Gal can view margin calculations that update immediately when costs or revenue change
+- **FR15:** Gal can view margin calculations that update within 2 seconds when costs or revenue change
 
 ### 3. Document Ingestion & AI Processing
 
 - **FR16:** The system detects new emails in designated mailboxes (`orders@`, `supplies@`, `developing@`, `expenses@`)
-- **FR17:** The system processes email attachments (PDF, JPG, PNG) and HTML content through Gemini 2.5 Pro
+- **FR17:** The system processes email attachments (PDF, JPG, PNG) and HTML content through AI document processing
 - **FR18:** The system extracts structured data from Hebrew and English documents (vendor, date, amount, currency, line items)
 - **FR19:** The system classifies transactions into categories (Direct Cost, Inventory Restock, Overhead, Personal) with confidence scores
 - **FR20:** The system suggests Work Order or Inventory item associations for classified transactions
@@ -388,9 +392,10 @@ Optimized for early validation of riskiest components:
 - **FR26:** Gal can edit any field before confirming (vendor, amount, category, project)
 - **FR27:** Gal can reject a transaction (irrelevant / personal)
 - **FR28:** Gal can view confidence indicators — green (≥ 85%) or yellow (< 85% "Check Me")
-- **FR29:** Gal can batch-approve multiple high-confidence items ("Approve All")
+- **FR29:** Gal can batch-approve all high-confidence items ("Approve All")
 - **FR30:** Gal can browse pending items before batch-approving
-- **FR31:** The system updates all financial data (Nutrition Labels, KPIs, Tax Jar) immediately upon approval
+- **FR31:** The system updates all financial data (Nutrition Labels, KPIs, Tax Jar) within 2 seconds of approval
+- **FR50:** Gal can manually create a transaction (expense or income) with vendor, amount, date, currency, category, and optional Work Order linkage — bypassing the AI pipeline for ad-hoc entries or pipeline failures
 
 ### 5. Inventory Management
 
@@ -416,7 +421,7 @@ Optimized for early validation of riskiest components:
 
 ### 8. System & User Management
 
-- **FR45:** Gal and Ben authenticate via Google Sign-in
+- **FR45:** Gal and Ben authenticate via SSO (single sign-on)
 - **FR46:** Only 2 whitelisted accounts can access the system
 - **FR47:** Full system available in Hebrew (RTL) or English (LTR)
 - **FR48:** All actions available on desktop and mobile with full feature parity
