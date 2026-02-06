@@ -1,0 +1,2 @@
+// Inventory store placeholder
+export {};

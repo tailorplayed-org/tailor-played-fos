@@ -1,0 +1,2 @@
+// Firebase app initialization
+export {};
