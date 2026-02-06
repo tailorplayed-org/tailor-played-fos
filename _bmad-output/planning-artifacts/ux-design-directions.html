@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TP-FOS — Unified Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ================================================================
+       TOKENS
+       ================================================================ */
+    :root {
+      --bg-base:      #0c0016;
+      --bg-primary:   #120022;
+      --bg-secondary: #1a0030;
+      --bg-tertiary:  #24004a;
+      --bg-elevated:  #2e005c;
+      --bg-hover:     #380070;
+
+      --gold:         #fcb700;
+      --gold-light:   #ffd54f;
+      --gold-soft:    rgba(252,183,0,0.08);
+      --gold-border:  rgba(252,183,0,0.12);
+      --gold-border-h:rgba(252,183,0,0.25);
+      --gold-glow:    0 0 24px rgba(252,183,0,0.15);
+
+      --success:      #00c781;
+      --success-bg:   rgba(0,199,129,0.08);
+      --warning:      #f5a623;
+      --warning-bg:   rgba(245,166,35,0.08);
+      --error:        #ff4d6d;
+      --error-bg:     rgba(255,77,109,0.08);
+      --info:         #4da6ff;
+
+      --text-bright:  #fff;
+      --text-primary: #ffd54f;
+      --text-secondary:rgba(255,213,79,0.6);
+      --text-muted:   rgba(255,213,79,0.35);
+      --text-faint:   rgba(255,213,79,0.2);
+
+      --border:       rgba(255,213,79,0.08);
+      --border-subtle:rgba(255,213,79,0.05);
+      --border-hover: rgba(255,213,79,0.18);
+
+      --font: 'Fredoka', sans-serif;
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --radius-lg: 16px;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --radius-xs: 5px;
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 1px var(--border);
+      --shadow-elevated: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px var(--border);
+      --shadow-overlay: 0 24px 80px rgba(0,0,0,0.6);
+    }
+
+    /* ================================================================
+       RESET & BASE
+       ================================================================ */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:var(--font);background:var(--bg-base);color:var(--text-primary);
+      -webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;
+    }
+    ::selection{background:var(--gold);color:var(--bg-primary);}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:rgba(252,183,0,0.15);border-radius:10px;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(252,183,0,0.25);}
+    a{color:inherit;text-decoration:none;}
+    button{font-family:var(--font);cursor:pointer;border:none;background:none;}
+
+    /* ================================================================
+       PAGE PICKER (for Desktop vs Mobile vs Ghost)
+       ================================================================ */
+    .picker{
+      position:fixed;top:0;left:0;right:0;z-index:9999;
+      background:rgba(12,0,22,0.88);backdrop-filter:blur(24px);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;padding:10px 32px;gap:8px;
+    }
+    .picker-title{font-size:14px;font-weight:600;color:var(--gold);margin-right:auto;letter-spacing:0.01em;}
+    .picker-title span{color:var(--text-muted);font-weight:400;font-size:12px;margin-left:6px;}
+    .pick{
+      font-family:var(--font);font-size:12px;font-weight:500;
+      padding:6px 16px;border-radius:var(--radius-sm);
+      color:var(--text-muted);transition:all 150ms var(--ease);
+    }
+    .pick:hover{color:var(--text-secondary);background:var(--gold-soft);}
+    .pick.on{background:rgba(252,183,0,0.1);border:1px solid rgba(252,183,0,0.2);color:var(--gold);}
+    .view{display:none;padding-top:48px;min-height:100vh;}
+    .view.on{display:block;}
+
+    /* ================================================================
+       TOPBAR (inside the app)
+       ================================================================ */
+    .topbar{
+      display:flex;align-items:center;
+      padding:16px 0;margin-bottom:4px;
+    }
+    .logo{display:flex;align-items:center;gap:10px;margin-right:auto;}
+    .logo-mark{
+      width:32px;height:32px;border-radius:var(--radius-sm);
+      background:linear-gradient(135deg,var(--gold),#e6a300);
+      display:flex;align-items:center;justify-content:center;
+      font-size:14px;font-weight:700;color:var(--bg-primary);
+      box-shadow:0 2px 8px rgba(252,183,0,0.2);
+    }
+    .logo-text{font-size:16px;font-weight:600;color:var(--gold);}
+    .logo-sub{font-size:12px;color:var(--text-muted);font-weight:400;margin-left:2px;}
+
+    .topbar-nav{display:flex;gap:2px;background:var(--bg-secondary);border-radius:var(--radius);padding:3px;margin-right:16px;}
+    .topbar-nav button{
+      font-size:13px;font-weight:500;padding:8px 20px;border-radius:var(--radius-sm);
+      color:var(--text-muted);transition:all 150ms var(--ease);
+    }
+    .topbar-nav button:hover{color:var(--text-secondary);}
+    .topbar-nav button.on{background:var(--bg-tertiary);color:var(--gold);box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+
+    .topbar-pending{
+      font-size:12px;font-weight:500;padding:7px 16px;
+      border-radius:var(--radius);
+      background:var(--warning-bg);border:1px solid rgba(245,166,35,0.2);
+      color:var(--warning);display:flex;align-items:center;gap:8px;
+      transition:all 150ms var(--ease);
+    }
+    .topbar-pending:hover{border-color:rgba(245,166,35,0.4);background:rgba(245,166,35,0.12);}
+    .pulse-dot{
+      width:7px;height:7px;border-radius:50%;background:var(--warning);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+    /* ================================================================
+       DESKTOP LAYOUT
+       ================================================================ */
+    .app{max-width:1080px;margin:0 auto;padding:0 40px;}
+
+    /* --- Hero --- */
+    .hero{text-align:center;padding:36px 0 28px;}
+    .hero-greeting{font-size:14px;color:var(--text-secondary);font-weight:400;margin-bottom:4px;}
+    .hero-amount{font-size:52px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-1.5px;}
+    .hero-label{font-size:12px;color:var(--text-muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.08em;font-weight:500;}
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      margin-top:10px;font-size:12px;font-weight:500;
+      padding:4px 14px;border-radius:20px;
+      background:var(--success-bg);color:var(--success);
+    }
+
+    /* --- KPI row --- */
+    .kpis{display:flex;gap:12px;margin-bottom:28px;}
+    .kpi{
+      flex:1;padding:20px 22px;
+      background:var(--bg-secondary);border:1px solid var(--border);
+      border-radius:var(--radius);
+      transition:all 200ms var(--ease);
+    }
+    .kpi:hover{border-color:var(--border-hover);transform:translateY(-1px);}
+    .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
+    .kpi-badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:12px;}
+    .kpi-val{font-size:26px;font-weight:600;color:var(--gold);line-height:1;}
+    .kpi-sub{font-size:11px;color:var(--text-muted);margin-top:5px;}
+
+    .kpi.pending-card{
+      border-color:rgba(245,166,35,0.15);
+      background:linear-gradient(135deg,var(--bg-secondary) 60%,rgba(245,166,35,0.03));
+      cursor:pointer;
+    }
+    .kpi.pending-card:hover{border-color:rgba(245,166,35,0.3);box-shadow:0 0 20px rgba(245,166,35,0.06);}
+
+    /* --- Section sub-nav (tabs inside content) --- */
+    .section-tabs{
+      display:flex;gap:2px;background:var(--bg-secondary);border-radius:var(--radius);
+      padding:3px;margin-bottom:20px;width:fit-content;
+    }
+    .section-tab{
+      font-size:12px;font-weight:500;padding:7px 18px;border-radius:var(--radius-sm);
+      color:var(--text-muted);transition:all 150ms var(--ease);
+    }
+    .section-tab:hover{color:var(--text-secondary);}
+    .section-tab.on{background:var(--bg-tertiary);color:var(--text-primary);box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+
+    /* --- Projects --- */
+    .section-label{
+      font-size:11px;font-weight:600;color:var(--text-muted);
+      text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;
+    }
+    .projects{display:flex;flex-direction:column;gap:8px;margin-bottom:48px;}
+
+    .project{
+      display:flex;align-items:center;gap:16px;
+      padding:16px 22px;
+      background:var(--bg-secondary);border:1px solid var(--border);
+      border-radius:var(--radius);
+      cursor:pointer;transition:all 200ms var(--ease);
+    }
+    .project:hover{border-color:var(--border-hover);background:var(--bg-tertiary);}
+
+    .project-icon{
+      width:42px;height:42px;border-radius:var(--radius-sm);
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;flex-shrink:0;
+    }
+    .project-info{flex:1;}
+    .project-name{font-size:15px;font-weight:500;color:var(--text-primary);}
+    .project-meta{font-size:12px;color:var(--text-muted);margin-top:1px;}
+
+    .project-revenue{font-size:13px;color:var(--text-secondary);text-align:right;margin-right:8px;min-width:60px;}
+
+    .project-margin-wrap{display:flex;align-items:center;gap:12px;min-width:120px;justify-content:flex-end;}
+    .project-margin{font-size:20px;font-weight:600;min-width:46px;text-align:right;}
+
+    .margin-bar{width:64px;height:5px;border-radius:10px;background:rgba(255,213,79,0.06);overflow:hidden;}
+    .margin-bar-fill{height:100%;border-radius:10px;transition:width 600ms var(--ease);}
+
+    .project.warn{border-color:rgba(255,77,109,0.1);}
+    .project.warn:hover{border-color:rgba(255,77,109,0.2);}
+
+    /* ================================================================
+       GHOST TEXT OVERLAY
+       ================================================================ */
+    .ghost-view{max-width:860px;margin:0 auto;padding:0 40px 80px;}
+    .ghost-intro{text-align:center;margin-bottom:40px;}
+    .ghost-intro h2{font-size:28px;margin-bottom:6px;}
+    .ghost-intro p{font-size:14px;color:var(--text-secondary);max-width:500px;margin:0 auto;}
+
+    .ghost-wrap{display:flex;justify-content:center;margin-bottom:56px;}
+    .ghost-card{
+      width:500px;
+      background:var(--bg-secondary);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-overlay);
+      overflow:hidden;
+    }
+    .ghost-header{
+      padding:24px 28px;
+      background:linear-gradient(180deg,var(--bg-tertiary),var(--bg-secondary));
+      border-bottom:1px solid var(--border);
+      display:flex;gap:16px;align-items:flex-start;
+    }
+    .ghost-doc-icon{
+      width:50px;height:50px;border-radius:var(--radius);
+      background:var(--gold-soft);border:1px solid var(--gold-border);
+      display:flex;align-items:center;justify-content:center;font-size:20px;
+      flex-shrink:0;
+    }
+    .ghost-vendor{font-size:17px;font-weight:600;color:var(--gold);}
+    .ghost-date{font-size:11px;color:var(--text-muted);margin-top:1px;}
+    .ghost-amount-row{display:flex;align-items:baseline;gap:8px;margin-top:6px;}
+    .ghost-amount{font-size:22px;font-weight:600;color:var(--gold);}
+    .ghost-est{
+      font-size:10px;font-weight:500;color:var(--warning);
+      background:var(--warning-bg);border:1px solid rgba(245,166,35,0.15);
+      padding:2px 8px;border-radius:12px;
+    }
+
+    .ghost-body{padding:24px 28px;}
+
+    .gf{margin-bottom:14px;}
+    .gf-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;}
+    .gf-input{
+      width:100%;padding:11px 16px;
+      background:var(--bg-primary);
+      border:1px dashed var(--text-faint);
+      border-radius:var(--radius-sm);
+      font-size:14px;color:var(--text-muted);font-style:italic;
+      display:flex;align-items:center;justify-content:space-between;
+      transition:all 200ms var(--ease);
+    }
+    .gf-input:hover{border-color:var(--gold-border-h);}
+    .gf-input .chev{font-size:10px;opacity:0.3;}
+    .gf-input.user-edited{
+      border:1.5px solid var(--gold);border-style:solid;
+      color:var(--text-primary);font-style:normal;
+    }
+
+    .confidence{
+      display:flex;align-items:center;gap:12px;
+      padding:11px 16px;margin-bottom:14px;
+      background:var(--bg-primary);border-radius:var(--radius-sm);
+    }
+    .conf-label{font-size:10px;font-weight:600;color:var(--text-muted);min-width:65px;text-transform:uppercase;letter-spacing:0.04em;}
+    .conf-track{flex:1;height:5px;border-radius:10px;background:rgba(255,213,79,0.05);overflow:hidden;}
+    .conf-fill{height:100%;border-radius:10px;transition:width 800ms var(--ease);}
+    .conf-pct{font-size:14px;font-weight:600;min-width:34px;text-align:right;}
+
+    .ghost-reasoning{
+      padding:12px 16px;margin-bottom:20px;
+      background:rgba(252,183,0,0.03);
+      border-left:2px solid rgba(252,183,0,0.25);
+      border-radius:0 var(--radius-xs) var(--radius-xs) 0;
+      font-size:12px;color:var(--text-secondary);line-height:1.6;
+    }
+
+    .ghost-actions{display:flex;gap:8px;}
+    .gbtn{
+      font-size:13px;font-weight:500;padding:11px 20px;
+      border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;
+      transition:all 150ms var(--ease);
+    }
+    .gbtn:hover{transform:translateY(-1px);}
+    .gbtn.primary{flex:1;background:var(--gold);color:var(--bg-primary);justify-content:center;}
+    .gbtn.primary:hover{box-shadow:var(--gold-glow);}
+    .gbtn.secondary{border:1px solid var(--border);color:var(--text-secondary);}
+    .gbtn.secondary:hover{border-color:var(--border-hover);color:var(--text-primary);}
+    .gbtn.danger{border:1px solid rgba(255,77,109,0.2);color:var(--error);}
+    .gbtn.danger:hover{background:var(--error-bg);border-color:rgba(255,77,109,0.35);}
+    .shortcut{font-size:9px;opacity:0.5;padding:2px 5px;border-radius:3px;background:rgba(0,0,0,0.15);}
+    .gbtn.secondary .shortcut,.gbtn.danger .shortcut{background:rgba(255,213,79,0.08);}
+
+    .ghost-footer{
+      padding:10px 28px;border-top:1px solid var(--border);text-align:center;
+    }
+    .ghost-footer a{font-size:11px;color:var(--text-muted);transition:color 150ms;}
+    .ghost-footer a:hover{color:var(--gold);}
+
+    /* States */
+    .ghost-states{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .state-card{
+      background:var(--bg-secondary);border:1px solid var(--border);
+      border-radius:var(--radius);padding:24px;
+    }
+    .state-card h4{font-size:13px;font-weight:600;margin-bottom:14px;}
+
+    /* ================================================================
+       MOBILE
+       ================================================================ */
+    .mobile-view{max-width:900px;margin:0 auto;padding:0 40px 80px;}
+    .mobile-intro{text-align:center;margin-bottom:40px;}
+    .mobile-intro h2{font-size:28px;margin-bottom:6px;}
+    .mobile-intro p{font-size:14px;color:var(--text-secondary);max-width:500px;margin:0 auto;}
+
+    .phones{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;}
+
+    .phone{
+      width:375px;background:var(--bg-base);
+      border:1.5px solid rgba(255,213,79,0.08);
+      border-radius:32px;overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,213,79,0.04);
+    }
+    .phone-notch-area{height:52px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;}
+    .phone-notch{width:110px;height:26px;background:var(--bg-base);border-radius:0 0 14px 14px;}
+    .phone-screen{padding:12px 16px;min-height:580px;display:flex;flex-direction:column;}
+    .phone-bottom-nav{
+      display:flex;justify-content:space-around;
+      padding:8px 0 22px;
+      border-top:1px solid var(--border);
+      background:var(--bg-secondary);
+    }
+    .bnav{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text-muted);font-weight:500;}
+    .bnav.on{color:var(--gold);}
+    .bnav .bi{font-size:18px;}
+
+    /* Mobile dashboard content */
+    .m-greet{font-size:13px;color:var(--text-secondary);margin-bottom:2px;}
+    .m-amount{font-size:34px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-1px;}
+    .m-label{font-size:11px;color:var(--text-muted);margin-bottom:12px;}
+
+    .m-alert{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 14px;margin-bottom:14px;
+      background:var(--warning-bg);border:1px solid rgba(245,166,35,0.15);
+      border-radius:var(--radius-sm);
+    }
+    .m-alert-text{font-size:12px;font-weight:500;color:var(--warning);}
+    .m-alert-hint{font-size:10px;color:var(--text-muted);}
+    .m-alert-num{font-size:22px;font-weight:600;color:var(--warning);}
+
+    .m-kpis{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;}
+    .m-kpi{
+      flex-shrink:0;width:110px;padding:12px;
+      background:var(--bg-secondary);border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+    }
+    .m-kpi-label{font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;}
+    .m-kpi-val{font-size:18px;font-weight:600;color:var(--gold);line-height:1;}
+
+    .m-sec{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+    .m-proj{
+      display:flex;align-items:center;gap:10px;
+      padding:11px 12px;margin-bottom:5px;
+      background:var(--bg-secondary);border:1px solid var(--border);
+      border-radius:var(--radius-sm);
+    }
+    .m-proj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .m-proj-info{flex:1;}
+    .m-proj-name{font-size:13px;font-weight:500;color:var(--text-primary);}
+    .m-proj-sub{font-size:10px;color:var(--text-muted);}
+    .m-proj-margin{font-size:15px;font-weight:600;}
+
+    /* Mobile ghost */
+    .mg-back{display:flex;align-items:center;gap:8px;margin-bottom:16px;color:var(--text-muted);font-size:13px;}
+    .mg-header{
+      display:flex;gap:12px;padding-bottom:14px;margin-bottom:14px;
+      border-bottom:1px solid var(--border);
+    }
+    .mg-icon{
+      width:44px;height:44px;border-radius:var(--radius-sm);
+      background:var(--gold-soft);border:1px solid var(--gold-border);
+      display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+    }
+    .mg-vendor{font-size:15px;font-weight:600;color:var(--gold);}
+    .mg-date{font-size:10px;color:var(--text-muted);}
+    .mg-amount{font-size:18px;font-weight:600;color:var(--gold);margin-top:3px;}
+
+    .mg-field{margin-bottom:10px;}
+    .mg-field-label{font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;}
+    .mg-field-input{
+      width:100%;padding:10px 12px;
+      background:var(--bg-primary);border:1px dashed var(--text-faint);
+      border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);font-style:italic;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+
+    .mg-conf{
+      display:flex;align-items:center;gap:8px;
+      padding:9px 12px;margin-bottom:10px;
+      background:var(--bg-primary);border-radius:var(--radius-sm);
+    }
+    .mg-conf-label{font-size:9px;font-weight:600;color:var(--text-muted);min-width:55px;}
+    .mg-conf-track{flex:1;height:4px;border-radius:10px;background:rgba(255,213,79,0.05);overflow:hidden;}
+    .mg-conf-fill{height:100%;border-radius:10px;}
+    .mg-conf-pct{font-size:12px;font-weight:600;min-width:30px;text-align:right;}
+
+    .mg-reason{
+      padding:10px 12px;margin-bottom:16px;
+      background:rgba(252,183,0,0.03);border-left:2px solid rgba(252,183,0,0.2);
+      border-radius:0 var(--radius-xs) var(--radius-xs) 0;
+      font-size:11px;color:var(--text-secondary);line-height:1.5;
+    }
+
+    .mg-actions{margin-top:auto;}
+    .mg-btn-primary{
+      width:100%;padding:13px;border-radius:var(--radius-sm);
+      background:var(--gold);color:var(--bg-primary);
+      font-size:14px;font-weight:600;text-align:center;
+      margin-bottom:8px;transition:all 150ms var(--ease);
+    }
+    .mg-btn-primary:hover{box-shadow:var(--gold-glow);}
+    .mg-btn-row{display:flex;gap:8px;}
+    .mg-btn-sec{
+      flex:1;padding:11px;border-radius:var(--radius-sm);
+      border:1px solid var(--border);color:var(--text-secondary);
+      font-size:12px;font-weight:500;text-align:center;
+      transition:all 150ms var(--ease);
+    }
+    .mg-btn-sec:hover{border-color:var(--border-hover);}
+    .mg-btn-sec.del{border-color:rgba(255,77,109,0.15);color:var(--error);}
+
+    .phone-label{text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);}
+  </style>
+</head>
+<body>
+
+  <!-- ================================================================
+       PICKER BAR
+       ================================================================ -->
+  <nav class="picker">
+    <div class="picker-title">TP-FOS <span>Unified Design</span></div>
+    <button class="pick on" onclick="show('desktop')">Desktop</button>
+    <button class="pick" onclick="show('ghost')">Ghost Text</button>
+    <button class="pick" onclick="show('mobile')">Mobile</button>
+  </nav>
+
+  <!-- ================================================================
+       DESKTOP — THE UNIFIED DASHBOARD
+       ================================================================ -->
+  <section id="desktop" class="view on">
+    <div class="app">
+      <!-- Topbar: Logo + Segmented Nav (Bit) + Pending badge (Blink) -->
+      <div class="topbar">
+        <div class="logo">
+          <div class="logo-mark">TP</div>
+          <div><span class="logo-text">TP-FOS</span><span class="logo-sub"> Tailor Played</span></div>
+        </div>
+        <nav class="topbar-nav">
+          <button class="on">Dashboard</button>
+          <button>Work Orders</button>
+          <button>Inventory</button>
+          <button>Overhead</button>
+        </nav>
+        <button class="topbar-pending"><span class="pulse-dot"></span> 3 Pending</button>
+      </div>
+
+      <!-- Hero: Big number, centered (Blink portfolio feel) -->
+      <div class="hero">
+        <div class="hero-greeting">Good morning, Gal</div>
+        <div class="hero-amount">₪8,200</div>
+        <div class="hero-label">Net Profit — February 2026</div>
+        <span class="hero-badge">▲ 14% from January</span>
+      </div>
+
+      <!-- KPIs: Clean card row (Command grid cards, Portfolio spacing) -->
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Tax Jar (35%)</span>
+          </div>
+          <div class="kpi-val">₪2,870</div>
+          <div class="kpi-sub">Set aside from net profit</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Active Projects</span>
+          </div>
+          <div class="kpi-val">3</div>
+          <div class="kpi-sub">2 production · 1 design</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-top">
+            <span class="kpi-label">Monthly Overhead</span>
+            <span class="kpi-badge" style="background:var(--success-bg);color:var(--success);">↓ ₪180</span>
+          </div>
+          <div class="kpi-val">₪3,200</div>
+          <div class="kpi-sub">Software · Office · Subscriptions</div>
+        </div>
+        <div class="kpi pending-card" onclick="show('ghost')">
+          <div class="kpi-top">
+            <span class="kpi-label">Pending Review</span>
+            <span class="kpi-badge" style="background:var(--warning-bg);color:var(--warning);">Action</span>
+          </div>
+          <div class="kpi-val" style="color:var(--warning);">3</div>
+          <div class="kpi-sub">2 high confidence · 1 check</div>
+        </div>
+      </div>
+
+      <!-- Projects: Icon list (Bit) + Margin bar (Portfolio) -->
+      <div class="section-label">Active Projects</div>
+      <div class="projects">
+        <div class="project">
+          <div class="project-icon" style="background:var(--success-bg);">🎲</div>
+          <div class="project-info">
+            <div class="project-name">David's Game</div>
+            <div class="project-meta">Production · 3 costs tracked</div>
+          </div>
+          <div class="project-revenue">₪4,500</div>
+          <div class="project-margin-wrap">
+            <div class="project-margin" style="color:var(--success);">42%</div>
+            <div class="margin-bar"><div class="margin-bar-fill" style="width:42%;background:var(--success);"></div></div>
+          </div>
+        </div>
+        <div class="project warn">
+          <div class="project-icon" style="background:var(--error-bg);">💍</div>
+          <div class="project-info">
+            <div class="project-name">Rina's Wedding Game</div>
+            <div class="project-meta">Production · 5 costs tracked</div>
+          </div>
+          <div class="project-revenue">₪3,200</div>
+          <div class="project-margin-wrap">
+            <div class="project-margin" style="color:var(--error);">18%</div>
+            <div class="margin-bar"><div class="margin-bar-fill" style="width:18%;background:var(--error);"></div></div>
+          </div>
+        </div>
+        <div class="project">
+          <div class="project-icon" style="background:rgba(77,166,255,0.08);">🎂</div>
+          <div class="project-info">
+            <div class="project-name">Yoni's Birthday</div>
+            <div class="project-meta">Design phase · 1 cost tracked</div>
+          </div>
+          <div class="project-revenue">₪2,800</div>
+          <div class="project-margin-wrap">
+            <div class="project-margin" style="color:var(--success);">70%</div>
+            <div class="margin-bar"><div class="margin-bar-fill" style="width:70%;background:var(--success);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       GHOST TEXT — POLISHED REVIEW CARD
+       ================================================================ -->
+  <section id="ghost" class="view">
+    <div class="ghost-view">
+      <div class="ghost-intro">
+        <h2>Ghost Text Review</h2>
+        <p>AI fills, you confirm. Dashed borders = suggested. Gold solid = you edited. Enter to approve.</p>
+      </div>
+
+      <!-- Main card: high confidence -->
+      <div class="ghost-wrap">
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <div class="ghost-doc-icon">📄</div>
+            <div>
+              <div class="ghost-vendor">Game Crafter</div>
+              <div class="ghost-date">February 5, 2026</div>
+              <div class="ghost-amount-row">
+                <span class="ghost-amount">$142.50</span>
+                <span class="ghost-est">Estimated</span>
+              </div>
+            </div>
+          </div>
+          <div class="ghost-body">
+            <div class="gf">
+              <div class="gf-label">Category</div>
+              <div class="gf-input">Direct Cost <span class="chev">▾</span></div>
+            </div>
+            <div class="gf">
+              <div class="gf-label">Project</div>
+              <div class="gf-input">David's Game <span class="chev">▾</span></div>
+            </div>
+            <div class="confidence">
+              <span class="conf-label">Confidence</span>
+              <div class="conf-track"><div class="conf-fill" style="width:94%;background:var(--success);"></div></div>
+              <span class="conf-pct" style="color:var(--success);">94%</span>
+            </div>
+            <div class="ghost-reasoning">
+              💡 Matched to <strong>David's Game</strong> — vendor "Game Crafter" linked to this project 3 times previously.
+            </div>
+            <div class="ghost-actions">
+              <button class="gbtn primary">Confirm <span class="shortcut">Enter</span></button>
+              <button class="gbtn secondary">Edit <span class="shortcut">E</span></button>
+              <button class="gbtn danger">Reject <span class="shortcut">Del</span></button>
+            </div>
+          </div>
+          <div class="ghost-footer">
+            <a href="#">View original document →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- States -->
+      <div class="ghost-states">
+        <div class="state-card">
+          <h4 style="color:var(--warning);">Low Confidence — "Check Me"</h4>
+          <div class="gf">
+            <div class="gf-label">Project</div>
+            <div class="gf-input" style="border-color:rgba(245,166,35,0.3);">
+              Rina's Wedding <span style="font-size:10px;color:var(--warning);margin-left:6px;">⚠ Check</span> <span class="chev">▾</span>
+            </div>
+          </div>
+          <div class="confidence">
+            <span class="conf-label">Confidence</span>
+            <div class="conf-track"><div class="conf-fill" style="width:72%;background:var(--warning);"></div></div>
+            <span class="conf-pct" style="color:var(--warning);">72%</span>
+          </div>
+          <div class="ghost-reasoning" style="border-color:rgba(245,166,35,0.25);">
+            ⚠️ New vendor — no previous matches. Suggested based on recent project activity.
+          </div>
+        </div>
+        <div class="state-card">
+          <h4>After Edit — Confirmed</h4>
+          <div class="gf">
+            <div class="gf-label">Project</div>
+            <div class="gf-input user-edited">David's Game ✓ <span class="chev">▾</span></div>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.5;">
+            User corrected project. Dashed border becomes solid gold. Text shifts from muted italic to bright solid — visual proof you reviewed it.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       MOBILE
+       ================================================================ -->
+  <section id="mobile" class="view">
+    <div class="mobile-view">
+      <div class="mobile-intro">
+        <h2>Mobile</h2>
+        <p>Same app at 375px. Bottom nav. Horizontal scroll KPIs. Full-screen ghost text review.</p>
+      </div>
+
+      <div class="phones">
+        <!-- Phone 1: Dashboard -->
+        <div>
+          <div class="phone">
+            <div class="phone-notch-area"><div class="phone-notch"></div></div>
+            <div class="phone-screen">
+              <div class="m-greet">Good morning, Gal</div>
+              <div class="m-amount">₪8,200</div>
+              <div class="m-label">Net Profit — February</div>
+
+              <div class="m-alert">
+                <div>
+                  <div class="m-alert-text">3 pending reviews</div>
+                  <div class="m-alert-hint">Tap to review</div>
+                </div>
+                <div class="m-alert-num">3</div>
+              </div>
+
+              <div class="m-kpis">
+                <div class="m-kpi"><div class="m-kpi-label">Tax Jar</div><div class="m-kpi-val">₪2,870</div></div>
+                <div class="m-kpi"><div class="m-kpi-label">Active</div><div class="m-kpi-val">3</div></div>
+                <div class="m-kpi"><div class="m-kpi-label">Overhead</div><div class="m-kpi-val">₪3.2K</div></div>
+              </div>
+
+              <div class="m-sec">Projects</div>
+              <div class="m-proj">
+                <div class="m-proj-dot" style="background:var(--success);"></div>
+                <div class="m-proj-info"><div class="m-proj-name">David's Game</div><div class="m-proj-sub">Production · ₪4,500</div></div>
+                <div class="m-proj-margin" style="color:var(--success);">42%</div>
+              </div>
+              <div class="m-proj" style="border-color:rgba(255,77,109,0.1);">
+                <div class="m-proj-dot" style="background:var(--error);"></div>
+                <div class="m-proj-info"><div class="m-proj-name">Rina's Wedding</div><div class="m-proj-sub">Production · ₪3,200</div></div>
+                <div class="m-proj-margin" style="color:var(--error);">18%</div>
+              </div>
+              <div class="m-proj">
+                <div class="m-proj-dot" style="background:var(--success);"></div>
+                <div class="m-proj-info"><div class="m-proj-name">Yoni's Birthday</div><div class="m-proj-sub">Design · ₪2,800</div></div>
+                <div class="m-proj-margin" style="color:var(--success);">70%</div>
+              </div>
+            </div>
+            <div class="phone-bottom-nav">
+              <div class="bnav on"><span class="bi">📊</span>Home</div>
+              <div class="bnav"><span class="bi">📋</span>Orders</div>
+              <div class="bnav"><span class="bi">📥</span>Review</div>
+              <div class="bnav"><span class="bi">⚙️</span>More</div>
+            </div>
+          </div>
+          <div class="phone-label">Dashboard</div>
+        </div>
+
+        <!-- Phone 2: Ghost Text Review -->
+        <div>
+          <div class="phone">
+            <div class="phone-notch-area"><div class="phone-notch"></div></div>
+            <div class="phone-screen">
+              <div class="mg-back">← <span>Review 1 of 3</span></div>
+
+              <div class="mg-header">
+                <div class="mg-icon">📄</div>
+                <div>
+                  <div class="mg-vendor">Game Crafter</div>
+                  <div class="mg-date">Feb 5, 2026</div>
+                  <div class="mg-amount">$142.50 <span style="font-size:9px;font-weight:500;color:var(--warning);background:var(--warning-bg);padding:2px 6px;border-radius:10px;margin-left:4px;">Est.</span></div>
+                </div>
+              </div>
+
+              <div class="mg-field">
+                <div class="mg-field-label">Category</div>
+                <div class="mg-field-input">Direct Cost <span style="font-size:10px;opacity:0.3;">▾</span></div>
+              </div>
+              <div class="mg-field">
+                <div class="mg-field-label">Project</div>
+                <div class="mg-field-input">David's Game <span style="font-size:10px;opacity:0.3;">▾</span></div>
+              </div>
+
+              <div class="mg-conf">
+                <span class="mg-conf-label">Confidence</span>
+                <div class="mg-conf-track"><div class="mg-conf-fill" style="width:94%;background:var(--success);"></div></div>
+                <span class="mg-conf-pct" style="color:var(--success);">94%</span>
+              </div>
+
+              <div class="mg-reason">💡 Vendor matched 3 times to <strong>David's Game</strong>.</div>
+
+              <div class="mg-actions">
+                <button class="mg-btn-primary">Confirm ✓</button>
+                <div class="mg-btn-row">
+                  <button class="mg-btn-sec">Edit</button>
+                  <button class="mg-btn-sec del">Reject</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">Ghost Text Review</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function show(id){
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+      document.querySelectorAll('.pick').forEach(b=>b.classList.remove('on'));
+      document.getElementById(id).classList.add('on');
+      event.target.classList.add('on');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+  </script>
+</body>
+</html>
