@@ -109,6 +109,9 @@ jspm_packages/
 dist/
 build/
 out/
+
+# Auto-generated SCSS module type declarations (vite-plugin-sass-dts)
+*.d.scss.ts
 .next/
 .nuxt/
 .cache/

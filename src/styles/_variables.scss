@@ -1,5 +1,117 @@
-// Design system variables
-// Colors, spacing, typography tokens will be defined in Story 1.2
+// ─────────────────────────────────────────────
+// TailorPlayed Design System — Variables & Tokens
+// ─────────────────────────────────────────────
+// CRITICAL: This file is auto-imported via Vite additionalData.
+// DO NOT use @use/@forward here — it would cause circular imports.
 
-// Placeholder to prevent @use import errors
-$placeholder: true;
+// ═══════════════════════════════════════════════
+// COLORS — Backgrounds (Dark-to-Light Elevation)
+// ═══════════════════════════════════════════════
+$bg-primary: #120022;
+$bg-secondary: #1e0038;
+$bg-tertiary: #2d0052;
+$bg-elevated: #3d006d;
+
+// ═══════════════════════════════════════════════
+// COLORS — Brand & Accent
+// ═══════════════════════════════════════════════
+$gold: #fcb700;
+$gold-light: #ffd54f;
+$brand-purple: #3c0366;
+
+// ═══════════════════════════════════════════════
+// COLORS — Semantic (Financial)
+// ═══════════════════════════════════════════════
+$success: #00ba7b;
+$warning: #fa9700;
+$error: #ff4d6d;
+$info: #2a7eff;
+
+// ═══════════════════════════════════════════════
+// COLORS — Text Hierarchy
+// ═══════════════════════════════════════════════
+$text-primary: #ffd54f;
+$text-secondary: rgba(255, 213, 79, 0.7);
+$text-muted: rgba(255, 213, 79, 0.5);
+
+// ═══════════════════════════════════════════════
+// COLORS — Borders
+// ═══════════════════════════════════════════════
+$border-subtle: rgba(255, 213, 79, 0.2);
+
+// ═══════════════════════════════════════════════
+// TYPOGRAPHY — Font Family
+// ═══════════════════════════════════════════════
+$font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-mono: 'Courier New', Courier, monospace;
+
+// ═══════════════════════════════════════════════
+// TYPOGRAPHY — Font Sizes
+// ═══════════════════════════════════════════════
+$text-2xl: 2.5rem;   // 40px
+$text-xl: 1.875rem;  // 30px
+$text-lg: 1.25rem;   // 20px
+$text-base: 1.125rem; // 18px
+$text-sm: 1rem;       // 16px
+$text-xs: 0.875rem;   // 14px
+
+// ═══════════════════════════════════════════════
+// TYPOGRAPHY — Font Weights
+// ═══════════════════════════════════════════════
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+
+// ═══════════════════════════════════════════════
+// TYPOGRAPHY — Line Heights
+// ═══════════════════════════════════════════════
+$leading-tight: 1.2;
+$leading-normal: 1.5;
+$leading-relaxed: 1.75;
+
+// ═══════════════════════════════════════════════
+// SPACING SCALE
+// ═══════════════════════════════════════════════
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-2xl: 48px;
+$space-3xl: 64px;
+
+// ═══════════════════════════════════════════════
+// BORDER RADIUS
+// ═══════════════════════════════════════════════
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// ═══════════════════════════════════════════════
+// SHADOWS
+// ═══════════════════════════════════════════════
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.45);
+$shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.55);
+$shadow-glow: 0 0 25px rgba(252, 183, 0, 0.25);
+
+// ═══════════════════════════════════════════════
+// TRANSITIONS
+// ═══════════════════════════════════════════════
+$transition-fast: 150ms ease;
+$transition-normal: 300ms ease;
+$transition-slow: 500ms ease-out;
+
+// ═══════════════════════════════════════════════
+// BREAKPOINTS
+// ═══════════════════════════════════════════════
+$bp-sm: 640px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+
+// NOTE: CSS Custom Properties (:root block) is defined in global.scss
+// to prevent duplication when _variables.scss is auto-imported via
+// Vite additionalData into every .module.scss file.

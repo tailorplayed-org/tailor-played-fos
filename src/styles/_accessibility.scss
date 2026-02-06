@@ -1,3 +1,76 @@
-// Accessibility utilities
-// Focus styles, screen-reader helpers, reduced-motion queries
-// Will be defined as features are implemented
+// ─────────────────────────────────────────────
+// TailorPlayed Design System — Accessibility
+// ─────────────────────────────────────────────
+// Screen-reader helpers, focus styles, high contrast, reduced motion
+// NOTE: This file is NOT auto-imported via additionalData.
+// It must @use variables for token access.
+
+@use 'variables' as *;
+
+// ═══════════════════════════════════════════════
+// SCREEN READER ONLY
+// ═══════════════════════════════════════════════
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ═══════════════════════════════════════════════
+// FOCUS VISIBLE — Global focus ring
+// ═══════════════════════════════════════════════
+
+:focus-visible {
+  outline: 2px solid $gold;
+  outline-offset: 2px;
+}
+
+// ═══════════════════════════════════════════════
+// HIGH CONTRAST — Forced Colors Mode
+// ═══════════════════════════════════════════════
+
+@media (forced-colors: active) {
+  // Ensure interactive elements remain visible in high contrast
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  // Buttons and interactive elements
+  button,
+  [role="button"],
+  a {
+    border: 1px solid ButtonText;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// REDUCED MOTION — Disable decorative animations
+// ═══════════════════════════════════════════════
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  // Preserve Tier 1 animations (focus, validation, spinners)
+  .motion-essential,
+  .motion-essential *,
+  .motion-essential *::before,
+  .motion-essential *::after {
+    animation-duration: revert !important;
+    animation-iteration-count: revert !important;
+    transition-duration: revert !important;
+  }
+}

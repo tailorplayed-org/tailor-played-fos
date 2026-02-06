@@ -1,0 +1,29 @@
+// Smoke test: verify tokens and mixins are accessible via additionalData
+// without explicit @use statements. This file is used for verification only.
+
+.smokeTest {
+  // Variables from _variables.scss
+  color: $gold;
+  background-color: $bg-tertiary;
+  font-size: $text-lg;
+  padding: $space-md;
+  border-radius: $radius-md;
+  font-family: $font-family;
+
+  // Mixins from _mixins.scss
+  @include card-surface;
+  @include truncate;
+  @include smooth-transition(opacity, transform);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include md {
+    font-size: $text-xl;
+  }
+}
+
+.smokeTestHidden {
+  @include visually-hidden;
+}

@@ -1,2 +1,129 @@
-// Animation keyframes and transitions
-// Will be defined as features are implemented
+// ─────────────────────────────────────────────
+// TailorPlayed Design System — Animations
+// ─────────────────────────────────────────────
+// Tier 1: Focus rings, validation, spinners — always active
+// Tier 2/3: Decorative animations — disabled under prefers-reduced-motion
+
+// ═══════════════════════════════════════════════
+// KEYFRAMES — Tier 1 (Always Active)
+// ═══════════════════════════════════════════════
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// KEYFRAMES — Tier 2/3 (Decorative)
+// ═══════════════════════════════════════════════
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// STAGGER DELAY UTILITIES
+// ═══════════════════════════════════════════════
+
+.animate-delay-1 {
+  animation-delay: 50ms;
+}
+
+.animate-delay-2 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-3 {
+  animation-delay: 150ms;
+}
+
+.animate-delay-4 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-5 {
+  animation-delay: 250ms;
+}
+
+// NOTE: prefers-reduced-motion handling is consolidated in _accessibility.scss
+// to avoid duplicate CSS output. Do NOT add a reduced-motion block here.
