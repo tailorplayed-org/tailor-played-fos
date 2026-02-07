@@ -1,0 +1,106 @@
+// ─────────────────────────────────────────────
+// StatusStepper — Work Order Lifecycle Indicator
+// ─────────────────────────────────────────────
+
+.stepper {
+  display: flex;
+  align-items: flex-start;
+  padding: $space-sm $space-xs;
+}
+
+.stepWrapper {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  position: relative;
+}
+
+.connector {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  block-size: 2px;
+  background-color: $text-muted;
+  opacity: 0.3;
+}
+
+.connectorCompleted {
+  background-color: $success;
+  opacity: 1;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-xs;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: $space-xs;
+  border-radius: $radius-sm;
+  inline-size: 100%;
+  transition: opacity 0.15s ease;
+
+  @include focus-ring;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:not(:disabled):hover {
+    opacity: 0.8;
+  }
+}
+
+.stepIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  position: relative;
+  z-index: 1;
+}
+
+.stepLabel {
+  font-size: $text-xs;
+  color: $text-muted;
+  white-space: nowrap;
+  text-align: center;
+}
+
+// Completed step
+.stepCompleted .stepIcon {
+  color: $success;
+}
+
+.stepCompleted .stepLabel {
+  color: $success;
+}
+
+// Current step
+.stepCurrent .stepIcon {
+  color: $gold;
+}
+
+.stepCurrent .stepLabel {
+  color: $gold;
+  font-weight: 700;
+}
+
+// Mobile
+@media (max-width: $bp-sm) {
+  .stepper {
+    padding: $space-xs 0;
+  }
+
+  .step {
+    min-block-size: 44px;
+  }
+
+  .stepLabel {
+    font-size: 10px;
+  }
+}

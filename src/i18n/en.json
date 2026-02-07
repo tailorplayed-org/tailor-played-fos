@@ -103,11 +103,27 @@
       "created": "Work Order created successfully",
       "updated": "Work Order updated successfully",
       "createError": "Failed to create Work Order",
-      "updateError": "Failed to update Work Order"
+      "updateError": "Failed to update Work Order",
+      "statusChanged": "Status updated to {{status}}"
+    },
+    "statusStepper": {
+      "label": "Work order status progression",
+      "advance": "Change status"
+    },
+    "margin": {
+      "label": "Margin",
+      "noRevenue": "—",
+      "healthy": "Healthy",
+      "watch": "Watch",
+      "danger": "At risk"
     },
     "card": {
       "edit": "Edit",
-      "noDescription": "No description"
+      "noDescription": "No description",
+      "revenue": "Revenue",
+      "costs": "Costs",
+      "transactions": "transactions",
+      "changeStatus": "Change Status"
     },
     "error": {
       "title": "Failed to load Work Orders"

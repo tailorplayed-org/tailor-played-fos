@@ -26,13 +26,13 @@ export function useWorkOrderActions() {
     }
   };
 
-  const updateWorkOrder = async (id: string, data: Partial<CreateWorkOrderInput>) => {
+  const updateWorkOrder = async (id: string, data: Partial<CreateWorkOrderInput>, successMessage?: string) => {
     try {
       await updateDoc(doc(db, 'work_orders', id), {
         ...data,
         updatedAt: serverTimestamp(),
       });
-      toast.success(t('workOrders.toast.updated'));
+      toast.success(successMessage ?? t('workOrders.toast.updated'));
     } catch (error) {
       toast.error(t('workOrders.toast.updateError'));
       throw error;

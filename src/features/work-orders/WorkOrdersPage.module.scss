@@ -49,10 +49,60 @@
   padding: $space-md;
 }
 
+.cardShipped {
+  opacity: 0.6;
+
+  .clientName,
+  .description,
+  .deadline,
+  .revenue,
+  .marginValue {
+    color: $text-muted;
+  }
+}
+
+.cardDanger {
+  border: 1px solid rgba($error, 0.25);
+}
+
+.cardContent {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: start;
+  gap: $space-md;
+
+  @media (max-width: $bp-sm) {
+    grid-template-columns: auto 1fr auto auto;
+    gap: $space-sm;
+  }
+}
+
+// Icon box
+.iconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: $radius-sm;
+  background-color: rgba($gold, 0.15);
+  color: $gold;
+  flex-shrink: 0;
+
+  @media (max-width: $bp-sm) {
+    inline-size: 32px;
+    block-size: 32px;
+  }
+}
+
+// Card info
+.cardInfo {
+  min-inline-size: 0;
+}
+
 .cardHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: $space-sm;
   margin-block-end: $space-xs;
 }
@@ -62,6 +112,19 @@
   color: $gold;
   margin: 0;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusArea {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+
+  @include focus-ring;
 }
 
 .description {
@@ -75,12 +138,108 @@
   display: block;
   font-size: $text-xs;
   color: $text-muted;
-  margin-block-end: $space-sm;
 }
 
+// Financials
+.cardFinancials {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-xs;
+  flex-shrink: 0;
+
+  @media (max-width: $bp-sm) {
+    .revenue,
+    .costCount {
+      display: none;
+    }
+  }
+}
+
+.revenue {
+  font-size: $text-sm;
+  color: $text-secondary;
+  white-space: nowrap;
+}
+
+.costCount {
+  font-size: $text-xs;
+  color: $text-muted;
+  white-space: nowrap;
+}
+
+.marginArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-inline-size: 60px;
+}
+
+.marginValue {
+  font-size: $text-sm;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.marginHealthy {
+  color: $success;
+}
+
+.marginWatch {
+  color: $warning;
+}
+
+.marginDanger {
+  color: $error;
+}
+
+// Margin bar
+.marginBar {
+  inline-size: 100%;
+  block-size: 4px;
+  background-color: rgba($text-muted, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.marginBarFill {
+  block-size: 100%;
+  border-radius: 2px;
+  transition: inline-size 0.3s ease;
+
+  &.marginHealthy {
+    background-color: $success;
+  }
+
+  &.marginWatch {
+    background-color: $warning;
+  }
+
+  &.marginDanger {
+    background-color: $error;
+  }
+}
+
+// Card actions
 .cardActions {
   display: flex;
-  justify-content: flex-end;
+  align-items: start;
+  flex-shrink: 0;
+}
+
+.editLabel {
+  @media (max-width: $bp-sm) {
+    display: none;
+  }
+}
+
+// StatusStepper container
+.stepperContainer {
+  margin-block-start: $space-sm;
+  padding-block-start: $space-sm;
+  border-block-start: 1px solid rgba($text-muted, 0.15);
+  animation: slideDown 0.15s ease-out;
 }
 
 // Error

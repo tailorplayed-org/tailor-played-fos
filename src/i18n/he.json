@@ -103,11 +103,27 @@
       "created": "הזמנת העבודה נוצרה בהצלחה",
       "updated": "הזמנת העבודה עודכנה בהצלחה",
       "createError": "יצירת הזמנת העבודה נכשלה",
-      "updateError": "עדכון הזמנת העבודה נכשל"
+      "updateError": "עדכון הזמנת העבודה נכשל",
+      "statusChanged": "הסטטוס עודכן ל-{{status}}"
+    },
+    "statusStepper": {
+      "label": "מצב התקדמות הזמנת עבודה",
+      "advance": "שנה סטטוס"
+    },
+    "margin": {
+      "label": "מרווח",
+      "noRevenue": "—",
+      "healthy": "בריא",
+      "watch": "לעקוב",
+      "danger": "בסיכון"
     },
     "card": {
       "edit": "עריכה",
-      "noDescription": "אין תיאור"
+      "noDescription": "אין תיאור",
+      "revenue": "הכנסות",
+      "costs": "עלויות",
+      "transactions": "עסקאות",
+      "changeStatus": "שנה סטטוס"
     },
     "error": {
       "title": "טעינת הזמנות העבודה נכשלה"

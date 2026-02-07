@@ -1,11 +1,27 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardText, Plus, PencilSimple, WarningCircle } from '@phosphor-icons/react';
+import { ClipboardText, Plus, PencilSimple, WarningCircle, GameController } from '@phosphor-icons/react';
 import { Button, Card, StatusBadge, Skeleton } from '@/components';
 import { useWorkOrders, useWorkOrderActions } from './hooks';
-import { WorkOrderForm } from './components';
-import type { WorkOrder, CreateWorkOrderInput } from '@/types';
+import { WorkOrderForm, StatusStepper } from './components';
+import { calculateMargin, getMarginStatus, formatCurrency } from '@/lib';
+import type { WorkOrder, WorkOrderStatus, CreateWorkOrderInput } from '@/types';
 import styles from './WorkOrdersPage.module.scss';
+
+const STATUS_PRIORITY: Record<WorkOrderStatus, number> = {
+  Production: 0,
+  Design: 1,
+  Lead: 2,
+  Shipped: 3,
+};
+
+function sortWorkOrders(orders: WorkOrder[]): WorkOrder[] {
+  return [...orders].sort((a, b) => {
+    const priorityDiff = STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status];
+    if (priorityDiff !== 0) return priorityDiff;
+    return b.updatedAt.getTime() - a.updatedAt.getTime();
+  });
+}
 
 export function WorkOrdersPage() {
   const { t } = useTranslation();
@@ -14,6 +30,7 @@ export function WorkOrdersPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [editingOrder, setEditingOrder] = useState<WorkOrder | null>(null);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   const handleCreate = async (data: CreateWorkOrderInput) => {
     try {
@@ -37,6 +54,7 @@ export function WorkOrdersPage() {
   const handleEdit = (order: WorkOrder) => {
     setEditingOrder(order);
     setShowForm(false);
+    setExpandedOrderId(null);
   };
 
   const handleCancel = () => {
@@ -44,7 +62,25 @@ export function WorkOrdersPage() {
     setEditingOrder(null);
   };
 
+  const handleStatusChange = async (orderId: string, newStatus: WorkOrderStatus) => {
+    try {
+      await updateWorkOrder(
+        orderId,
+        { status: newStatus },
+        t('workOrders.toast.statusChanged', { status: t(`workOrders.status.${newStatus}`) }),
+      );
+      setExpandedOrderId(null);
+    } catch {
+      // Error toast already shown by useWorkOrderActions — status reverts via Firestore listener
+    }
+  };
+
+  const toggleStepper = (orderId: string) => {
+    setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
+  };
+
   const isFormVisible = showForm || editingOrder !== null;
+  const sortedOrders = useMemo(() => sortWorkOrders(workOrders), [workOrders]);
 
   if (error) {
     return (
@@ -94,11 +130,17 @@ export function WorkOrdersPage() {
 
       {!loading && workOrders.length === 0 && <EmptyState onCreateClick={() => setShowForm(true)} />}
 
-      {!loading && workOrders.length > 0 && (
+      {!loading && sortedOrders.length > 0 && (
         <ul className={styles.list} role="list">
-          {workOrders.map((order) => (
+          {sortedOrders.map((order) => (
             <li key={order.id}>
-              <WorkOrderCard order={order} onEdit={() => handleEdit(order)} />
+              <WorkOrderCard
+                order={order}
+                onEdit={() => handleEdit(order)}
+                isExpanded={expandedOrderId === order.id}
+                onToggleStepper={() => toggleStepper(order.id)}
+                onStatusChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+              />
             </li>
           ))}
         </ul>
@@ -122,29 +164,103 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
   );
 }
 
-function WorkOrderCard({ order, onEdit }: { order: WorkOrder; onEdit: () => void }) {
+interface WorkOrderCardProps {
+  order: WorkOrder;
+  onEdit: () => void;
+  isExpanded: boolean;
+  onToggleStepper: () => void;
+  onStatusChange: (newStatus: WorkOrderStatus) => void;
+}
+
+function WorkOrderCard({ order, onEdit, isExpanded, onToggleStepper, onStatusChange }: WorkOrderCardProps) {
   const { t } = useTranslation();
 
+  const totalCost = order.directCostAgora + order.inventoryCostAgora + order.overheadAllocationAgora;
+  const margin = calculateMargin(order.revenueTotalAgora, totalCost);
+  const marginStatus = getMarginStatus(margin);
+  const isShipped = order.status === 'Shipped';
+  const hasRevenue = order.revenueTotalAgora > 0;
+  const clampedMargin = Math.max(0, Math.min(100, margin));
+
+  const cardClassName = [
+    styles.card,
+    isShipped ? styles.cardShipped : '',
+    !isShipped && marginStatus === 'danger' && hasRevenue ? styles.cardDanger : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const marginColorClass =
+    marginStatus === 'healthy'
+      ? styles.marginHealthy
+      : marginStatus === 'watch'
+        ? styles.marginWatch
+        : styles.marginDanger;
+
   return (
-    <Card className={styles.card}>
-      <div className={styles.cardHeader}>
-        <h3 className={styles.clientName}>{order.clientName}</h3>
-        <StatusBadge status={order.status} />
+    <Card className={cardClassName}>
+      <div className={styles.cardContent}>
+        <div className={styles.iconBox}>
+          <GameController size={24} weight="fill" />
+        </div>
+
+        <div className={styles.cardInfo}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.clientName}>{order.clientName}</h3>
+            <button
+              type="button"
+              className={styles.statusArea}
+              onClick={onToggleStepper}
+              aria-expanded={isExpanded}
+              aria-label={t('workOrders.card.changeStatus')}
+            >
+              <StatusBadge status={order.status} />
+            </button>
+          </div>
+          <p className={styles.description}>
+            {order.projectDescription || t('workOrders.card.noDescription')}
+          </p>
+          {order.deadline && (
+            <time className={styles.deadline} dateTime={order.deadline.toISOString()}>
+              {order.deadline.toLocaleDateString()}
+            </time>
+          )}
+        </div>
+
+        <div className={styles.cardFinancials}>
+          <span className={styles.revenue}>{formatCurrency(order.revenueTotalAgora)}</span>
+          <span className={styles.costCount}>0 {t('workOrders.card.transactions')}</span>
+          <div className={styles.marginArea}>
+            <span className={`${styles.marginValue} ${marginColorClass}`}>
+              {hasRevenue ? `${Math.round(margin)}%` : t('workOrders.margin.noRevenue')}
+            </span>
+            {hasRevenue && (
+              <div className={styles.marginBar}>
+                <div
+                  className={`${styles.marginBarFill} ${marginColorClass}`}
+                  style={{ inlineSize: `${clampedMargin}%` }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.cardActions}>
+          <Button variant="ghost" size="sm" onClick={onEdit} aria-label={`${t('workOrders.card.edit')} ${order.clientName}`}>
+            <PencilSimple size={18} />
+            <span className={styles.editLabel}>{t('workOrders.card.edit')}</span>
+          </Button>
+        </div>
       </div>
-      <p className={styles.description}>
-        {order.projectDescription || t('workOrders.card.noDescription')}
-      </p>
-      {order.deadline && (
-        <time className={styles.deadline} dateTime={order.deadline.toISOString()}>
-          {order.deadline.toLocaleDateString()}
-        </time>
+
+      {isExpanded && (
+        <div className={styles.stepperContainer}>
+          <StatusStepper
+            currentStatus={order.status}
+            onStatusChange={onStatusChange}
+          />
+        </div>
       )}
-      <div className={styles.cardActions}>
-        <Button variant="ghost" size="sm" onClick={onEdit} aria-label={`${t('workOrders.card.edit')} ${order.clientName}`}>
-          <PencilSimple size={18} />
-          <span>{t('workOrders.card.edit')}</span>
-        </Button>
-      </div>
     </Card>
   );
 }
