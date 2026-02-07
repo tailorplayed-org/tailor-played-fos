@@ -335,7 +335,7 @@ describe('onEmailReceived', () => {
       createPubSubEvent('orders@tailorplayed.com', 12345),
     );
 
-    // Verify email_log document was created
+    // Verify email_log document was created with paperlessForwarded
     expect(mockAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         messageId: 'msg-new-1',
@@ -345,6 +345,7 @@ describe('onEmailReceived', () => {
         from: 'vendor@example.com',
         transactionId: null,
         errorMessage: null,
+        paperlessForwarded: true,
       }),
     );
   });
@@ -386,11 +387,12 @@ describe('onEmailReceived', () => {
       contentType: 'application/pdf',
     });
 
-    // Verify email_log includes attachment paths
+    // Verify email_log includes attachment paths and paperlessForwarded
     expect(mockAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         attachmentUrls: ['documents/msg-att-1/invoice.pdf'],
         mailbox: 'supplies',
+        paperlessForwarded: true,
       }),
     );
   });
@@ -437,12 +439,13 @@ describe('onEmailReceived', () => {
       handler(createPubSubEvent('orders@tailorplayed.com', 12348)),
     ).rejects.toThrow();
 
-    // Verify error email_log was created with 'failed' status and error message
+    // Verify error email_log was created with 'failed' status, error message, and paperlessForwarded
     expect(mockAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         messageId: 'msg-error',
         status: 'failed',
         errorMessage: expect.stringContaining('Gmail API down'),
+        paperlessForwarded: true,
       }),
     );
   });
@@ -463,6 +466,66 @@ describe('onEmailReceived', () => {
     // No email_log created, no errors
     expect(mockAdd).not.toHaveBeenCalled();
     expect(mockMessagesGet).not.toHaveBeenCalled();
+  });
+
+  it('includes paperlessForwarded: true in success-path email_log (FR42)', async () => {
+    mockMessagesList.mockResolvedValueOnce({
+      data: { messages: [{ id: 'msg-pf-success' }] },
+    });
+
+    const mockMessage = createMockGmailMessage(
+      'msg-pf-success',
+      'orders@tailorplayed.com',
+      'Paperless test',
+      'vendor@example.com',
+      false,
+    );
+    mockMessagesGet.mockResolvedValueOnce(mockMessage);
+    mockMessagesModify.mockResolvedValueOnce({});
+
+    const { onEmailReceived } = await import(
+      '../src/email/onEmailReceived.js'
+    );
+    const handler = onEmailReceived as unknown as (
+      event: unknown,
+    ) => Promise<void>;
+    await handler(createPubSubEvent('orders@tailorplayed.com', 50001));
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        messageId: 'msg-pf-success',
+        status: 'received',
+        paperlessForwarded: true,
+      }),
+    );
+  });
+
+  it('includes paperlessForwarded: true in error-path email_log (FR43)', async () => {
+    mockMessagesList.mockResolvedValueOnce({
+      data: { messages: [{ id: 'msg-pf-error' }] },
+    });
+
+    mockMessagesGet.mockRejectedValueOnce(new Error('API failure'));
+
+    const { onEmailReceived } = await import(
+      '../src/email/onEmailReceived.js'
+    );
+    const handler = onEmailReceived as unknown as (
+      event: unknown,
+    ) => Promise<void>;
+
+    await expect(
+      handler(createPubSubEvent('orders@tailorplayed.com', 50002)),
+    ).rejects.toThrow();
+
+    // Gmail filter still forwards even when FOS fails
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        messageId: 'msg-pf-error',
+        status: 'failed',
+        paperlessForwarded: true,
+      }),
+    );
   });
 
   it('detects mailbox from To header correctly', async () => {
@@ -563,6 +626,7 @@ describe('emailLogSchema (server-side)', () => {
       from: 'vendor@example.com',
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true,
     };
 
     const result = emailLogSchema.safeParse(validDoc);
@@ -582,6 +646,7 @@ describe('emailLogSchema (server-side)', () => {
       from: 'test@test.com',
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true,
     };
 
     const result = emailLogSchema.safeParse(invalidDoc);
@@ -601,10 +666,43 @@ describe('emailLogSchema (server-side)', () => {
       from: 'test@test.com',
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true,
     };
 
     const result = emailLogSchema.safeParse(invalidDoc);
     expect(result.success).toBe(false);
+  });
+
+  it('validates paperlessForwarded boolean field', async () => {
+    const { emailLogSchema } = await import('../src/shared/schemas.js');
+
+    const validDoc = {
+      messageId: 'msg-pf',
+      mailbox: 'orders',
+      receivedAt: new Date(),
+      status: 'received',
+      attachmentUrls: [],
+      subject: 'Test',
+      from: 'test@test.com',
+      transactionId: null,
+      errorMessage: null,
+      paperlessForwarded: true,
+    };
+
+    const result = emailLogSchema.safeParse(validDoc);
+    expect(result.success).toBe(true);
+
+    // Rejects non-boolean
+    const invalidResult = emailLogSchema.safeParse({
+      ...validDoc,
+      paperlessForwarded: 'yes',
+    });
+    expect(invalidResult.success).toBe(false);
+
+    // Rejects missing field
+    const { paperlessForwarded, ...withoutField } = validDoc;
+    const missingResult = emailLogSchema.safeParse(withoutField);
+    expect(missingResult.success).toBe(false);
   });
 
   it('accepts Firestore Timestamp for receivedAt (z.any)', async () => {
@@ -626,6 +724,7 @@ describe('emailLogSchema (server-side)', () => {
       from: 'vendor@example.com',
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true,
     };
 
     const result = emailLogSchema.safeParse(validDoc);

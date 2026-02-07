@@ -9,3 +9,9 @@ export const gmailRefreshToken = defineSecret('GMAIL_REFRESH_TOKEN');
 export const gmailUserEmail = defineString('GMAIL_USER_EMAIL', {
   default: 'orders@tailorplayed.com',
 });
+
+// Paperless accountant email address — used by Gmail filter forwarding (Story 4.2)
+// Actual forwarding handled by Gmail filters — this parameter is for documentation/reference
+export const paperlessEmail = defineString('PAPERLESS_EMAIL', {
+  default: '',
+});

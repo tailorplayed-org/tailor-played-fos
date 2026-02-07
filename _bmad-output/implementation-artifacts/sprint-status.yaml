@@ -69,7 +69,7 @@ development_status:
   # Epic 4: Email Ingestion & AI Document Processing
   epic-4: in-progress
   4-1-gmail-api-integration-email-detection: review
-  4-2-paperless-auto-forward: backlog
+  4-2-paperless-auto-forward: done
   4-3-ai-document-processing-gemini: backlog
   4-4-transaction-classification-confidence-scoring: backlog
   4-5-error-handling-retry-pipeline-resilience: backlog

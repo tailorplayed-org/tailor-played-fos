@@ -27,6 +27,7 @@ export const emailLogSchema = z.object({
   from: z.string(),
   transactionId: z.string().nullable(),
   errorMessage: z.string().nullable(),
+  paperlessForwarded: z.boolean(), // Tracks Paperless forwarding status (FR42/FR43/FR44)
 });
 
 export type EmailLog = z.infer<typeof emailLogSchema>;

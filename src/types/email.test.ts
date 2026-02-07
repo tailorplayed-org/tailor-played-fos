@@ -20,6 +20,7 @@ describe('EmailLog Schema', () => {
     from: 'vendor@example.com',
     transactionId: null,
     errorMessage: null,
+    paperlessForwarded: true,
   };
 
   it('validates a correct EmailLog object', () => {
@@ -117,6 +118,42 @@ describe('EmailLog Schema', () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it('validates paperlessForwarded as true', () => {
+    const result = emailLogSchema.safeParse({
+      ...validEmailLog,
+      paperlessForwarded: true,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.paperlessForwarded).toBe(true);
+    }
+  });
+
+  it('validates paperlessForwarded as false', () => {
+    const result = emailLogSchema.safeParse({
+      ...validEmailLog,
+      paperlessForwarded: false,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.paperlessForwarded).toBe(false);
+    }
+  });
+
+  it('rejects non-boolean paperlessForwarded', () => {
+    const result = emailLogSchema.safeParse({
+      ...validEmailLog,
+      paperlessForwarded: 'yes',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing paperlessForwarded field', () => {
+    const { paperlessForwarded, ...withoutPaperless } = validEmailLog;
+    const result = emailLogSchema.safeParse(withoutPaperless);
+    expect(result.success).toBe(false);
+  });
 });
 
 describe('EmailLog Constants', () => {
@@ -151,6 +188,7 @@ describe('EmailLog Type', () => {
       from: 'test@example.com',
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true,
     };
     expect(log.mailbox).toBe('supplies');
   });

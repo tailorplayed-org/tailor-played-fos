@@ -126,6 +126,7 @@ async function processMessage(messageId: string): Promise<void> {
       from,
       transactionId: null,
       errorMessage: null,
+      paperlessForwarded: true, // Gmail filter forwards to Paperless independently (FR42)
     });
 
     // Mark email as read after successful processing
@@ -152,6 +153,7 @@ async function processMessage(messageId: string): Promise<void> {
         transactionId: null,
         errorMessage:
           error instanceof Error ? error.message : String(error),
+        paperlessForwarded: true, // Gmail filter still forwards even when FOS fails (FR43)
       });
     } catch (logError) {
       logger.error('CRITICAL: Failed to create error email_log entry', {
