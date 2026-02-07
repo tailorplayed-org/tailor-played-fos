@@ -55,7 +55,7 @@ development_status:
   2-1-work-order-data-model-crud: done
   2-2-work-order-status-lifecycle-list-view: done
   2-3-manual-transaction-entry-cost-revenue-linkage: done
-  2-4-nutrition-label-margin-calculations: backlog
+  2-4-nutrition-label-margin-calculations: done
   2-5-work-order-detail-page: backlog
   epic-2-retrospective: optional
 

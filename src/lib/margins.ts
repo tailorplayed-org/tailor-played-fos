@@ -2,14 +2,33 @@
 
 export type MarginStatus = 'healthy' | 'watch' | 'danger';
 
+/** 5% unforeseen buffer constant */
+export const BUFFER_PERCENTAGE = 0.05;
+
 /**
- * Calculate margin percentage from revenue and total costs.
- * Returns 0 if revenue is 0 (prevents division by zero).
+ * Calculate the unforeseen buffer amount (5% of total costs).
  * All amounts in agora (integer).
  */
-export function calculateMargin(revenueAgora: number, totalCostAgora: number): number {
+export function calculateBuffer(totalCostAgora: number): number {
+  return Math.round(totalCostAgora * BUFFER_PERCENTAGE);
+}
+
+/**
+ * Calculate margin percentage from revenue, total costs, and optional buffer.
+ * Returns 0 if revenue is 0 (prevents division by zero).
+ * All amounts in agora (integer).
+ *
+ * Formula: (revenue - totalCost - buffer) / revenue × 100
+ *
+ * Backward compatible: bufferAgora defaults to 0.
+ */
+export function calculateMargin(
+  revenueAgora: number,
+  totalCostAgora: number,
+  bufferAgora: number = 0,
+): number {
   if (revenueAgora === 0) return 0;
-  return ((revenueAgora - totalCostAgora) / revenueAgora) * 100;
+  return ((revenueAgora - totalCostAgora - bufferAgora) / revenueAgora) * 100;
 }
 
 /**

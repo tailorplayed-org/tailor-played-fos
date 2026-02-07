@@ -163,6 +163,24 @@
       "createError": "שמירת העסקה נכשלה"
     }
   },
+  "nutritionLabel": {
+    "title": "תווית תזונה",
+    "revenue": "הכנסות",
+    "directCosts": "עלויות ישירות",
+    "inventoryCosts": "עלויות מלאי (סקופים)",
+    "overheadAllocation": "הקצאת תקורה",
+    "buffer": "חיץ בלתי צפוי (5%)",
+    "totalCosts": "סה\"כ עלויות",
+    "netProfit": "רווח נקי",
+    "margin": "מרווח",
+    "noTransactions": "אין עלויות ישירות עדיין",
+    "noScoops": "אין סקופים עדיין",
+    "expand": "הרחב {{section}}",
+    "collapse": "כווץ {{section}}",
+    "vendor": "ספק",
+    "amount": "סכום",
+    "date": "תאריך"
+  },
   "components": {
     "errorBoundary": {
       "title": "משהו השתבש",

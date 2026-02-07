@@ -1,0 +1,250 @@
+.container {
+  @include card-surface;
+  padding: $space-md;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  margin-block-end: $space-md;
+}
+
+.title {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $gold;
+  margin: 0;
+}
+
+// Financial rows
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: $space-sm;
+  min-block-size: 36px;
+}
+
+.expandableRow {
+  @include interactive-reset;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  inline-size: 100%;
+  padding-block: $space-sm;
+  padding-inline: $space-xs;
+  min-block-size: 44px;
+  border-radius: $radius-sm;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($gold, 0.05);
+  }
+
+  @include focus-ring;
+}
+
+.label {
+  font-size: $text-sm;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.amount {
+  font-size: $text-sm;
+  color: $text-primary;
+  font-weight: $font-medium;
+  font-variant-numeric: tabular-nums;
+}
+
+// Shimmer on amounts
+.shimmer {
+  display: inline-block;
+  inline-size: 80px;
+  block-size: 16px;
+  border-radius: $radius-sm;
+  background-color: $bg-tertiary;
+  background-image: linear-gradient(90deg, $bg-tertiary 25%, $bg-elevated 50%, $bg-tertiary 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+    background-color: $bg-tertiary;
+  }
+}
+
+// Chevron for expandable sections
+.chevron {
+  transition: transform $transition-fast;
+  color: $text-muted;
+}
+
+.chevronExpanded {
+  transform: rotate(90deg);
+}
+
+// Expanded transaction list
+.transactionList {
+  padding-inline-start: $space-lg;
+  margin-block-end: $space-sm;
+}
+
+.transactionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: $space-xs;
+  font-size: $text-xs;
+  color: $text-muted;
+  border-block-end: 1px solid rgba($border-subtle, 0.3);
+
+  &:last-child {
+    border-block-end: none;
+  }
+}
+
+.transactionVendor {
+  flex: 1;
+  @include truncate;
+}
+
+.transactionDate {
+  margin-inline: $space-sm;
+  white-space: nowrap;
+}
+
+.transactionAmount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.placeholder {
+  padding-inline-start: $space-lg;
+  padding-block: $space-xs;
+  font-size: $text-xs;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// Dividers
+.divider {
+  block-size: 1px;
+  background-color: $border-subtle;
+  margin-block: $space-xs;
+}
+
+// Net profit row (emphasized)
+.netProfitRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: $space-sm;
+}
+
+.netProfitLabel {
+  font-size: $text-base;
+  font-weight: $font-semibold;
+  color: $gold;
+}
+
+.netProfitAmount {
+  font-size: $text-base;
+  font-weight: $font-semibold;
+  color: $gold;
+  font-variant-numeric: tabular-nums;
+
+  &.netProfitNegative {
+    color: $error;
+  }
+}
+
+// Margin display
+.marginSection {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding-block-start: $space-sm;
+}
+
+.marginRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.marginLabel {
+  font-size: $text-sm;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.marginValue {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+}
+
+.marginHealthy {
+  color: $success;
+}
+
+.marginWatch {
+  color: $warning;
+}
+
+.marginDanger {
+  color: $error;
+}
+
+.marginBar {
+  inline-size: 100%;
+  block-size: 6px;
+  background-color: rgba($text-muted, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.marginBarFill {
+  block-size: 100%;
+  border-radius: 3px;
+  transition: inline-size $transition-normal;
+
+  &.marginHealthy {
+    background-color: $success;
+  }
+
+  &.marginWatch {
+    background-color: $warning;
+  }
+
+  &.marginDanger {
+    background-color: $error;
+  }
+}
+
+// Mobile responsive
+@media (max-width: $bp-sm) {
+  .container {
+    padding: $space-sm;
+  }
+
+  .row,
+  .netProfitRow,
+  .marginRow {
+    gap: $space-xs;
+  }
+
+  .transactionItem {
+    flex-wrap: wrap;
+  }
+
+  .transactionDate {
+    display: none;
+  }
+}

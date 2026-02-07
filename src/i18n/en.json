@@ -163,6 +163,24 @@
       "createError": "Failed to save transaction"
     }
   },
+  "nutritionLabel": {
+    "title": "Nutrition Label",
+    "revenue": "Revenue",
+    "directCosts": "Direct Costs",
+    "inventoryCosts": "Inventory Costs (Scoops)",
+    "overheadAllocation": "Overhead Allocation",
+    "buffer": "Unforeseen Buffer (5%)",
+    "totalCosts": "Total Costs",
+    "netProfit": "Net Profit",
+    "margin": "Margin",
+    "noTransactions": "No direct costs yet",
+    "noScoops": "No scoops yet",
+    "expand": "Expand {{section}}",
+    "collapse": "Collapse {{section}}",
+    "vendor": "Vendor",
+    "amount": "Amount",
+    "date": "Date"
+  },
   "components": {
     "errorBoundary": {
       "title": "Something went wrong",
