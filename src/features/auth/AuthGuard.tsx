@@ -1,18 +1,12 @@
 import { Navigate, Outlet } from 'react-router';
 import { useAuth } from './hooks/useAuth';
-import styles from './AuthGuard.module.scss';
+import { Loader } from '@/components/Loader';
 
 export function AuthGuard() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner} role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!user) {

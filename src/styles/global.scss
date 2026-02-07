@@ -277,3 +277,13 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+// ═══════════════════════════════════════════════
+// NUMERIC LTR — Always render numbers left-to-right
+// ═══════════════════════════════════════════════
+// Apply to currency amounts, percentages, and numeric displays in RTL context.
+
+.numericLtr {
+  direction: ltr;
+  unicode-bidi: embed;
+}

@@ -4,7 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { LoginScreen } from './LoginScreen';
 
-// Mock the useAuth hook
+// react-i18next and .module.scss handled by vitest resolve aliases
+
 const mockSignIn = vi.fn();
 const mockSignOut = vi.fn();
 const mockUseAuth = vi.fn();
@@ -13,18 +14,8 @@ vi.mock('../hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-// Mock the SCSS module
-vi.mock('./LoginScreen.module.scss', () => ({
-  default: {
-    container: 'container',
-    card: 'card',
-    title: 'title',
-    subtitle: 'subtitle',
-    signInButton: 'signInButton',
-    buttonSpinner: 'buttonSpinner',
-    error: 'error',
-    spinner: 'spinner',
-  },
+vi.mock('@/components/Loader', () => ({
+  Loader: () => <div role="status">Loading...</div>,
 }));
 
 function renderLoginScreen(initialEntry = '/login') {
@@ -49,17 +40,17 @@ describe('LoginScreen', () => {
     });
   });
 
-  it('renders the sign-in button', () => {
+  it('renders the sign-in button with translation key', () => {
     renderLoginScreen();
 
-    expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /auth\.signIn/i })).toBeInTheDocument();
   });
 
-  it('renders the branding title and subtitle', () => {
+  it('renders the branding logo and translated subtitle', () => {
     renderLoginScreen();
 
-    expect(screen.getByText('TailorPlayed')).toBeInTheDocument();
-    expect(screen.getByText('Financial Operations System')).toBeInTheDocument();
+    expect(screen.getByAltText('TailorPlayed')).toBeInTheDocument();
+    expect(screen.getByText('auth.appTitle')).toBeInTheDocument();
   });
 
   it('shows loading spinner while auth state is loading', () => {
@@ -73,7 +64,7 @@ describe('LoginScreen', () => {
     renderLoginScreen();
 
     expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /sign in/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /auth\.signIn/i })).not.toBeInTheDocument();
   });
 
   it('redirects to dashboard if user is already authenticated', () => {
@@ -87,7 +78,7 @@ describe('LoginScreen', () => {
     renderLoginScreen();
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /sign in/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /auth\.signIn/i })).not.toBeInTheDocument();
   });
 
   it('calls signIn when the sign-in button is clicked', async () => {
@@ -96,24 +87,24 @@ describe('LoginScreen', () => {
 
     renderLoginScreen();
 
-    await user.click(screen.getByRole('button', { name: /sign in with google/i }));
+    await user.click(screen.getByRole('button', { name: /auth\.signIn/i }));
 
     expect(mockSignIn).toHaveBeenCalledOnce();
   });
 
-  it('shows error message when sign-in is rejected', async () => {
+  it('shows translated error message when sign-in is rejected', async () => {
     mockSignIn.mockRejectedValue(new Error('Access restricted to authorized users'));
     const user = userEvent.setup();
 
     renderLoginScreen();
 
-    await user.click(screen.getByRole('button', { name: /sign in with google/i }));
+    await user.click(screen.getByRole('button', { name: /auth\.signIn/i }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Access restricted to authorized users');
+    // Always shows translated generic error, not raw Firebase SDK message
+    expect(screen.getByRole('alert')).toHaveTextContent('auth.signInFailed');
   });
 
   it('disables the button during sign-in flow', async () => {
-    // Make signIn hang so we can check the button state mid-flow
     let resolveSignIn: () => void;
     mockSignIn.mockImplementation(
       () => new Promise<void>((resolve) => { resolveSignIn = resolve; }),
@@ -122,13 +113,11 @@ describe('LoginScreen', () => {
 
     renderLoginScreen();
 
-    const button = screen.getByRole('button', { name: /sign in with google/i });
+    const button = screen.getByRole('button', { name: /auth\.signIn/i });
     await user.click(button);
 
-    // Button should now be disabled with loading text
-    expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /auth\.signingIn/i })).toBeDisabled();
 
-    // Resolve the promise to clean up and avoid act() warning
     await act(async () => {
       resolveSignIn!();
     });

@@ -1,2 +1,1 @@
-// Hooks barrel export
-export {};
+export { useDirection } from './useDirection';

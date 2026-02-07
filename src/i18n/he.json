@@ -1,3 +1,76 @@
 {
-  "translation": {}
+  "nav": {
+    "dashboard": "לוח בקרה",
+    "workOrders": "הזמנות עבודה",
+    "inventory": "מלאי",
+    "overhead": "הוצאות קבועות",
+    "review": "סקירה",
+    "home": "בית",
+    "orders": "הזמנות",
+    "more": "עוד",
+    "mainNavigation": "ניווט ראשי",
+    "mobileNavigation": "ניווט נייד",
+    "pendingReviews": "{{count}} פריטים ממתינים",
+    "tailorPlayedHome": "דף הבית של TailorPlayed"
+  },
+  "actions": {
+    "confirm": "אישור",
+    "edit": "עריכה",
+    "reject": "דחייה",
+    "cancel": "ביטול",
+    "save": "שמירה",
+    "delete": "מחיקה",
+    "approveAll": "אשר הכל"
+  },
+  "auth": {
+    "signIn": "התחבר עם Google",
+    "signingIn": "מתחבר...",
+    "signOut": "התנתק",
+    "accessRestricted": "הגישה מוגבלת",
+    "signInFailed": "ההתחברות נכשלה. נסה שוב.",
+    "appTitle": "מערכת תפעול פיננסי"
+  },
+  "labels": {
+    "netProfit": "רווח נקי",
+    "taxJar": "קופת מס",
+    "activeProjects": "פרויקטים פעילים",
+    "pending": "ממתין",
+    "fos": "FOS"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "לוח בקרה",
+      "placeholder": "לוח הבקרה הפיננסי שלך בקרוב."
+    },
+    "workOrders": {
+      "title": "הזמנות עבודה",
+      "placeholder": "עקוב ונהל את הזמנות הייצור שלך כאן."
+    },
+    "workOrderDetail": {
+      "title": "פרטי הזמנת עבודה",
+      "placeholder": "תצוגה מפורטת להזמנה {{id}} בקרוב."
+    },
+    "inventory": {
+      "title": "מלאי",
+      "placeholder": "נהל את המרכיבים ורמות המלאי שלך כאן."
+    },
+    "overhead": {
+      "title": "הוצאות קבועות",
+      "placeholder": "עקוב אחר הוצאות חודשיות ועלויות קבועות כאן."
+    },
+    "review": {
+      "title": "סקירה",
+      "placeholder": "עסקאות הממתינות לאישורך יופיעו כאן."
+    }
+  },
+  "empty": {
+    "allCaughtUp": "הכל מעודכן!",
+    "createFirstWorkOrder": "צור את הזמנת העבודה הראשונה שלך",
+    "noData": "אין נתונים זמינים עדיין."
+  },
+  "language": {
+    "toggle": "החלף שפה",
+    "hebrew": "עברית",
+    "english": "English"
+  }
 }

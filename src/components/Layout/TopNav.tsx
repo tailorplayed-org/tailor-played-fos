@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { Bell } from '@phosphor-icons/react';
 import styles from './TopNav.module.scss';
 
@@ -7,24 +8,31 @@ interface TopNavProps {
   pendingCount?: number;
 }
 
-const navItems = [
-  { to: '/', label: 'Dashboard', end: true },
-  { to: '/work-orders', label: 'Work Orders', end: false },
-  { to: '/inventory', label: 'Inventory', end: false },
-  { to: '/overhead', label: 'Overhead', end: false },
-] as const;
-
 export function TopNav({ pendingCount = 0 }: TopNavProps) {
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const nextLang = i18n.language === 'he' ? 'en' : 'he';
+    i18n.changeLanguage(nextLang);
+  };
+
+  const navItems = [
+    { to: '/', label: t('nav.dashboard'), end: true },
+    { to: '/work-orders', label: t('nav.workOrders'), end: false },
+    { to: '/inventory', label: t('nav.inventory'), end: false },
+    { to: '/overhead', label: t('nav.overhead'), end: false },
+  ];
+
   return (
-    <nav className={styles.topNav} aria-label="Main navigation">
+    <nav className={styles.topNav} aria-label={t('nav.mainNavigation')}>
       {/* Logo */}
-      <NavLink to="/" className={styles.logo} aria-label="TailorPlayed home">
+      <NavLink to="/" className={styles.logo} aria-label={t('nav.tailorPlayedHome')}>
         <img
           src="/images/logo.svg"
           alt="TailorPlayed"
           className={styles.logoImg}
         />
-        <span className={styles.logoText}>FOS</span>
+        <span className={styles.logoText}>{t('labels.fos')}</span>
       </NavLink>
 
       {/* Segmented Pill Tabs — hidden on mobile via CSS */}
@@ -43,11 +51,21 @@ export function TopNav({ pendingCount = 0 }: TopNavProps) {
         ))}
       </div>
 
+      {/* Language Toggle */}
+      <button
+        onClick={toggleLanguage}
+        className={styles.langToggle}
+        aria-label={t('language.toggle')}
+        type="button"
+      >
+        {i18n.language === 'he' ? 'EN' : 'עב'}
+      </button>
+
       {/* Pending Review Badge */}
       <NavLink
         to="/review"
         className={`${styles.pendingBadge} ${pendingCount === 0 ? styles.pendingBadgeHidden : ''}`}
-        aria-label={`${pendingCount} pending reviews`}
+        aria-label={t('nav.pendingReviews', { count: pendingCount })}
       >
         <Bell size={18} weight="bold" />
         {pendingCount}

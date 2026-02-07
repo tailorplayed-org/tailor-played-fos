@@ -10,12 +10,9 @@ vi.mock('./hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
-// Mock the SCSS module
-vi.mock('./AuthGuard.module.scss', () => ({
-  default: {
-    loadingContainer: 'loadingContainer',
-    spinner: 'spinner',
-  },
+// Mock the Loader component (uses Lottie which doesn't work in jsdom)
+vi.mock('@/components/Loader', () => ({
+  Loader: () => <div role="status">Loading...</div>,
 }));
 
 function renderWithRouter(initialEntry = '/') {

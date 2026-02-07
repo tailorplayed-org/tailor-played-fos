@@ -1,3 +1,76 @@
 {
-  "translation": {}
+  "nav": {
+    "dashboard": "Dashboard",
+    "workOrders": "Work Orders",
+    "inventory": "Inventory",
+    "overhead": "Overhead",
+    "review": "Review",
+    "home": "Home",
+    "orders": "Orders",
+    "more": "More",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation",
+    "pendingReviews": "{{count}} pending reviews",
+    "tailorPlayedHome": "TailorPlayed home"
+  },
+  "actions": {
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "reject": "Reject",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "approveAll": "Approve All"
+  },
+  "auth": {
+    "signIn": "Sign in with Google",
+    "signingIn": "Signing in...",
+    "signOut": "Sign out",
+    "accessRestricted": "Access restricted",
+    "signInFailed": "Sign-in failed. Please try again.",
+    "appTitle": "Financial Operations System"
+  },
+  "labels": {
+    "netProfit": "Net Profit",
+    "taxJar": "Tax Jar",
+    "activeProjects": "Active Projects",
+    "pending": "Pending",
+    "fos": "FOS"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Dashboard",
+      "placeholder": "Your financial cockpit is coming soon."
+    },
+    "workOrders": {
+      "title": "Work Orders",
+      "placeholder": "Track and manage your production orders here."
+    },
+    "workOrderDetail": {
+      "title": "Work Order Detail",
+      "placeholder": "Detailed view for order {{id}} is coming soon."
+    },
+    "inventory": {
+      "title": "Inventory",
+      "placeholder": "Manage your ingredients and stock levels here."
+    },
+    "overhead": {
+      "title": "Overhead",
+      "placeholder": "Track monthly expenses and overhead costs here."
+    },
+    "review": {
+      "title": "Review",
+      "placeholder": "Pending transactions awaiting your approval will appear here."
+    }
+  },
+  "empty": {
+    "allCaughtUp": "You're all caught up!",
+    "createFirstWorkOrder": "Create your first Work Order",
+    "noData": "No data available yet."
+  },
+  "language": {
+    "toggle": "Switch language",
+    "hebrew": "עברית",
+    "english": "English"
+  }
 }

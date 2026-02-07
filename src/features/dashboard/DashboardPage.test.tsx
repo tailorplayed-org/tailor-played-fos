@@ -1,19 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+// react-i18next and .module.scss handled by vitest resolve aliases
+
 vi.mock('@phosphor-icons/react', () => ({
   ChartBar: ({ className }: { size?: number; className?: string }) => (
     <svg data-testid="icon-ChartBar" className={className} />
   ),
-}));
-
-vi.mock('./DashboardPage.module.scss', () => ({
-  default: {
-    placeholder: 'placeholder',
-    icon: 'icon',
-    title: 'title',
-    description: 'description',
-  },
 }));
 
 const { DashboardPage } = await import('./DashboardPage');
@@ -21,12 +14,12 @@ const { DashboardPage } = await import('./DashboardPage');
 describe('DashboardPage', () => {
   it('renders without crashing', () => {
     render(<DashboardPage />);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('pages.dashboard.title')).toBeInTheDocument();
   });
 
-  it('displays placeholder message', () => {
+  it('displays translated placeholder message', () => {
     render(<DashboardPage />);
-    expect(screen.getByText('Your financial cockpit is coming soon.')).toBeInTheDocument();
+    expect(screen.getByText('pages.dashboard.placeholder')).toBeInTheDocument();
   });
 
   it('renders an icon', () => {

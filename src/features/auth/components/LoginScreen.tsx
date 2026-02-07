@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { Loader } from '@/components/Loader';
 import styles from './LoginScreen.module.scss';
 
 export function LoginScreen() {
   const { user, loading, signIn } = useAuth();
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [signingIn, setSigningIn] = useState(false);
 
   if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.spinner} role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (user) {
@@ -28,9 +25,12 @@ export function LoginScreen() {
     try {
       await signIn();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Sign-in failed. Please try again.';
-      setError(message);
+      // Always show translated generic error to the user — Firebase SDK
+      // errors are English-only and would break i18n in Hebrew mode.
+      if (err instanceof Error) {
+        console.error('Sign-in error:', err.message);
+      }
+      setError(t('auth.signInFailed'));
     } finally {
       setSigningIn(false);
     }
@@ -39,8 +39,12 @@ export function LoginScreen() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>TailorPlayed</h1>
-        <p className={styles.subtitle}>Financial Operations System</p>
+        <img
+          src="/images/full-logo.svg"
+          alt="TailorPlayed"
+          className={styles.logo}
+        />
+        <p className={styles.subtitle}>{t('auth.appTitle')}</p>
 
         <button
           className={styles.signInButton}
@@ -51,7 +55,7 @@ export function LoginScreen() {
           {signingIn ? (
             <span className={styles.buttonSpinner} aria-hidden="true" />
           ) : null}
-          {signingIn ? 'Signing in...' : 'Sign in with Google'}
+          {signingIn ? t('auth.signingIn') : t('auth.signIn')}
         </button>
 
         {error ? (

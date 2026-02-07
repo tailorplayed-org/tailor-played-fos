@@ -110,6 +110,38 @@
   }
 }
 
+// ─── Language Toggle ──────────────────────────
+
+.langToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: $space-xs;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  background-color: transparent;
+  color: $text-secondary;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  @include motion-safe {
+    transition: background-color $transition-fast, color $transition-fast;
+  }
+
+  &:hover {
+    background-color: $bg-tertiary;
+    color: $text-primary;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
 // ─── Pending Badge ────────────────────────────
 
 .pendingBadge {
