@@ -85,10 +85,10 @@ describe('i18n translations', () => {
     expect(i18n.t('nav.pendingReviews', { count: 3 })).toBe('3 pending reviews');
   });
 
-  it('handles interpolation with id', async () => {
+  it('handles interpolation with date in workOrderDetail', async () => {
     await i18n.changeLanguage('en');
-    expect(i18n.t('pages.workOrderDetail.placeholder', { id: 'WO-42' })).toBe(
-      'Detailed view for order WO-42 is coming soon.',
+    expect(i18n.t('workOrderDetail.deadline', { date: '07/02/2026' })).toBe(
+      'Deadline: 07/02/2026',
     );
   });
 

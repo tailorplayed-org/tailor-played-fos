@@ -47,8 +47,7 @@
       "placeholder": "עקוב ונהל את הזמנות הייצור שלך כאן."
     },
     "workOrderDetail": {
-      "title": "פרטי הזמנת עבודה",
-      "placeholder": "תצוגה מפורטת להזמנה {{id}} בקרוב."
+      "title": "פרטי הזמנת עבודה"
     },
     "inventory": {
       "title": "מלאי",
@@ -162,6 +161,18 @@
       "created": "העסקה נשמרה",
       "createError": "שמירת העסקה נכשלה"
     }
+  },
+  "workOrderDetail": {
+    "backToList": "הזמנות עבודה",
+    "editWorkOrder": "ערוך הזמנת עבודה",
+    "deadline": "תאריך יעד: {{date}}",
+    "transactionsTitle": "תנועות",
+    "noTransactions": "אין עלויות או הכנסות שנרשמו עדיין",
+    "noTransactionsHint": "הוסף תנועות ידנית כדי לעקוב אחר הכספים של הפרויקט",
+    "addTransaction": "הוסף תנועה",
+    "notFound": "הזמנת עבודה לא נמצאה",
+    "notFoundDescription": "הזמנת העבודה שחיפשת לא קיימת או שהוסרה.",
+    "backToWorkOrders": "חזרה להזמנות עבודה"
   },
   "nutritionLabel": {
     "title": "תווית תזונה",

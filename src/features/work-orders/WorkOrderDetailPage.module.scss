@@ -1,25 +1,251 @@
 // ─────────────────────────────────────────────
-// Placeholder page styling
+// Work Order Detail Page
 // ─────────────────────────────────────────────
 
-.placeholder {
-  @include placeholder-page;
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+  max-inline-size: 800px;
+  margin-inline: auto;
+  padding: $space-lg;
 }
 
-.icon {
-  @include placeholder-icon;
+// Back navigation
+.backNav {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  color: $text-secondary;
+  font-size: $text-sm;
+  padding: $space-xs $space-sm;
+  border-radius: $radius-sm;
+  min-block-size: 44px;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $gold;
+  }
 }
 
-.title {
-  @include placeholder-title;
+// Header section
+.headerSection {
+  @include card-surface;
+  padding: $space-md;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-md;
+}
+
+.headerInfo {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.clientName {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
+  margin: 0;
+  margin-block-end: $space-xs;
 }
 
 .description {
-  @include placeholder-description;
+  font-size: $text-base;
+  color: $text-primary;
+  margin: 0;
+  margin-block-end: $space-xs;
 }
 
-.orderId {
-  color: $gold-light;
+.deadline {
+  font-size: $text-sm;
+  color: $text-muted;
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+// Transactions section
+.transactionsSection {
+  @include card-surface;
+  padding: $space-md;
+}
+
+.transactionsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-block-end: $space-md;
+}
+
+.transactionsTitle {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.transactionsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.transactionRow {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  padding-block: $space-sm;
+  border-block-end: 1px solid $border-subtle;
+
+  &:last-child {
+    border-block-end: none;
+  }
+}
+
+.transactionDate {
+  font-size: $text-sm;
+  color: $text-muted;
+  white-space: nowrap;
+  min-inline-size: 80px;
+}
+
+.transactionVendor {
+  flex: 1;
+  font-size: $text-sm;
+  color: $text-primary;
+  @include truncate;
+}
+
+.transactionAmount {
+  font-size: $text-sm;
   font-weight: $font-medium;
-  font-family: $font-mono;
+  color: $text-primary;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.transactionBadge {
+  flex-shrink: 0;
+}
+
+// Empty state
+.emptyTransactions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-xl;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $text-muted;
+}
+
+.emptyText {
+  font-size: $text-base;
+  color: $text-muted;
+  margin: 0;
+}
+
+.emptyHint {
+  font-size: $text-sm;
+  color: $text-muted;
+  margin: 0;
+}
+
+// Error / Not Found state
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-2xl $space-lg;
+  text-align: center;
+}
+
+.errorIcon {
+  color: $error;
+}
+
+.errorTitle {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.errorDescription {
+  font-size: $text-base;
+  color: $text-muted;
+  margin: 0;
+}
+
+.errorLink {
+  @include interactive-reset;
+  color: $gold;
+  font-size: $text-sm;
+  text-decoration: underline;
+  min-block-size: 44px;
+  display: inline-flex;
+  align-items: center;
+
+  &:hover {
+    color: $gold-light;
+  }
+}
+
+// Loading skeleton
+.skeletonPage {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+}
+
+.skeletonHeader {
+  @include card-surface;
+  padding: $space-md;
+}
+
+.skeletonTransactions {
+  @include card-surface;
+  padding: $space-md;
+}
+
+// Form section
+.formSection {
+  @include card-surface;
+  padding: $space-md;
+}
+
+// Mobile responsive
+@media (max-width: $bp-sm) {
+  .page {
+    padding: $space-md;
+    gap: $space-md;
+  }
+
+  .headerTop {
+    flex-direction: column;
+  }
+
+  .transactionRow {
+    flex-wrap: wrap;
+    gap: $space-xs;
+  }
+
+  .transactionDate {
+    min-inline-size: auto;
+  }
+
+  .transactionBadge {
+    inline-size: 100%;
+    margin-block-start: $space-xs;
+  }
 }

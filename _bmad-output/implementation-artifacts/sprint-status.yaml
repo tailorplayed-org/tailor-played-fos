@@ -56,7 +56,7 @@ development_status:
   2-2-work-order-status-lifecycle-list-view: done
   2-3-manual-transaction-entry-cost-revenue-linkage: done
   2-4-nutrition-label-margin-calculations: done
-  2-5-work-order-detail-page: backlog
+  2-5-work-order-detail-page: done
   epic-2-retrospective: optional
 
   # Epic 3: Dashboard & Project Health

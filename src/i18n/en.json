@@ -47,8 +47,7 @@
       "placeholder": "Track and manage your production orders here."
     },
     "workOrderDetail": {
-      "title": "Work Order Detail",
-      "placeholder": "Detailed view for order {{id}} is coming soon."
+      "title": "Work Order Detail"
     },
     "inventory": {
       "title": "Inventory",
@@ -162,6 +161,18 @@
       "created": "Transaction saved",
       "createError": "Failed to save transaction"
     }
+  },
+  "workOrderDetail": {
+    "backToList": "Work Orders",
+    "editWorkOrder": "Edit Work Order",
+    "deadline": "Deadline: {{date}}",
+    "transactionsTitle": "Transactions",
+    "noTransactions": "No costs or revenue tracked yet",
+    "noTransactionsHint": "Add transactions manually to track your project finances",
+    "addTransaction": "Add Transaction",
+    "notFound": "Work Order not found",
+    "notFoundDescription": "The Work Order you're looking for doesn't exist or may have been removed.",
+    "backToWorkOrders": "Back to Work Orders"
   },
   "nutritionLabel": {
     "title": "Nutrition Label",
