@@ -109,6 +109,7 @@ jspm_packages/
 dist/
 build/
 out/
+functions/lib/
 
 # Auto-generated SCSS module type declarations (vite-plugin-sass-dts)
 *.d.scss.ts
