@@ -28,6 +28,7 @@ export const transactionSchema = z.object({
   aiConfidence: z.number().nullable(),
   originalFileUrl: z.string().nullable(),
   source: z.enum(TRANSACTION_SOURCES),
+  sourceEmailRef: z.string().nullable(),
   notes: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),

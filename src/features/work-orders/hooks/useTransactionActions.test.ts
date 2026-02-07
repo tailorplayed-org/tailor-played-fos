@@ -74,6 +74,7 @@ describe('useTransactionActions', () => {
           inventoryItemId: null,
           aiConfidence: null,
           originalFileUrl: null,
+          sourceEmailRef: null,
           notes: null,
           createdAt: 'server-timestamp',
           updatedAt: 'server-timestamp',

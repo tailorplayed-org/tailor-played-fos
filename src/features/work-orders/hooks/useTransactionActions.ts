@@ -28,6 +28,7 @@ export function useTransactionActions() {
         aiConfidence: null,
         originalFileUrl: null,
         source: 'manual',
+        sourceEmailRef: null,
         notes: data.notes || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

@@ -44,6 +44,7 @@ const mockTxnStore = {
     aiConfidence: number | null;
     originalFileUrl: string | null;
     source: 'manual' | 'ai';
+    sourceEmailRef: string | null;
     notes: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -102,6 +103,7 @@ function createTransaction(overrides: Partial<typeof mockTxnStore.transactions[0
     aiConfidence: null,
     originalFileUrl: null,
     source: 'manual' as const,
+    sourceEmailRef: null,
     notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),

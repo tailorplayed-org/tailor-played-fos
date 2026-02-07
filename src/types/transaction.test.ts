@@ -21,6 +21,7 @@ describe('transactionSchema', () => {
     aiConfidence: null,
     originalFileUrl: null,
     source: 'manual' as const,
+    sourceEmailRef: null,
     notes: 'Test transaction',
     createdAt: new Date('2026-02-01'),
     updatedAt: new Date('2026-02-01'),
@@ -91,12 +92,14 @@ describe('transactionSchema', () => {
       inventoryItemId: null,
       aiConfidence: null,
       originalFileUrl: null,
+      sourceEmailRef: null,
       notes: null,
     });
     expect(result.workOrderId).toBeNull();
     expect(result.inventoryItemId).toBeNull();
     expect(result.aiConfidence).toBeNull();
     expect(result.originalFileUrl).toBeNull();
+    expect(result.sourceEmailRef).toBeNull();
     expect(result.notes).toBeNull();
   });
 
@@ -115,6 +118,16 @@ describe('transactionSchema', () => {
   it('accepts numeric aiConfidence', () => {
     const result = transactionSchema.parse({ ...validTransaction, aiConfidence: 0.95 });
     expect(result.aiConfidence).toBe(0.95);
+  });
+
+  it('accepts nullable sourceEmailRef', () => {
+    const result = transactionSchema.parse({ ...validTransaction, sourceEmailRef: null });
+    expect(result.sourceEmailRef).toBeNull();
+  });
+
+  it('accepts string sourceEmailRef (links to email_log)', () => {
+    const result = transactionSchema.parse({ ...validTransaction, sourceEmailRef: 'email-log-123' });
+    expect(result.sourceEmailRef).toBe('email-log-123');
   });
 });
 

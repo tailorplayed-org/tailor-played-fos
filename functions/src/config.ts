@@ -15,3 +15,6 @@ export const gmailUserEmail = defineString('GMAIL_USER_EMAIL', {
 export const paperlessEmail = defineString('PAPERLESS_EMAIL', {
   default: '',
 });
+
+// Gemini AI config — used by processDocument Cloud Function (Story 4.3)
+export const geminiApiKey = defineSecret('GEMINI_API_KEY');
