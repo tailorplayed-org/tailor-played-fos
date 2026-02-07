@@ -52,7 +52,7 @@ export function useFirestoreCollection<T>(
       (snapshot) => {
         const items: T[] = [];
         snapshot.forEach((doc) => {
-          const raw = doc.data();
+          const raw = doc.data({ serverTimestamps: 'estimate' });
           const converted = {
             ...convertTimestamps(raw),
             id: doc.id,
