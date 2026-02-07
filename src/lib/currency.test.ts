@@ -147,6 +147,30 @@ describe('toIlsAgora', () => {
   it('handles zero amount', () => {
     expect(toIlsAgora(0, 'USD')).toBe(0);
   });
+
+  it('uses custom rates when provided', () => {
+    // Custom rate: 1 USD = 4.0 ILS (instead of default 3.5)
+    expect(toIlsAgora(10000, 'USD', { USD: 4.0 })).toBe(40000);
+  });
+
+  it('uses custom EUR rate when provided', () => {
+    // Custom rate: 1 EUR = 4.2 ILS (instead of default 3.8)
+    expect(toIlsAgora(10000, 'EUR', { EUR: 4.2 })).toBe(42000);
+  });
+
+  it('falls back to default rate when custom rates lack the currency', () => {
+    // Provide rates without USD — should fall back to DEFAULT_CONVERSION_RATES.USD (3.5)
+    expect(toIlsAgora(10000, 'USD', { EUR: 4.2 })).toBe(35000);
+  });
+
+  it('returns ILS as-is even when custom rates provided', () => {
+    expect(toIlsAgora(8200, 'ILS', { ILS: 1, USD: 4.0, EUR: 4.2 })).toBe(8200);
+  });
+
+  it('rounds with custom rates', () => {
+    // 333 USD cents * 4.1 = 1365.3 → 1365
+    expect(toIlsAgora(333, 'USD', { USD: 4.1 })).toBe(1365);
+  });
 });
 
 describe('isEstimatedCurrency', () => {

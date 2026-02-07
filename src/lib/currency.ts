@@ -39,10 +39,15 @@ export const DEFAULT_CONVERSION_RATES: Record<Currency, number> = {
 /**
  * Convert minor units in any currency to ILS agora.
  * For ILS, returns as-is. For USD/EUR, multiplies by conversion rate.
+ * Optionally accepts custom rates from system_config; falls back to DEFAULT_CONVERSION_RATES.
  */
-export function toIlsAgora(amountAgora: number, currency: Currency): number {
+export function toIlsAgora(
+  amountAgora: number,
+  currency: Currency,
+  rates?: Partial<Record<Currency, number>>,
+): number {
   if (currency === 'ILS') return amountAgora;
-  const rate = DEFAULT_CONVERSION_RATES[currency];
+  const rate = rates?.[currency] ?? DEFAULT_CONVERSION_RATES[currency];
   return Math.round(amountAgora * rate);
 }
 

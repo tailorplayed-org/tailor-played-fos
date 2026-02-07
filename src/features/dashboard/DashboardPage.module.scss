@@ -7,6 +7,10 @@
   padding: $space-lg;
 }
 
+.fadeIn {
+  animation: fadeIn $transition-normal both;
+}
+
 .kpiRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

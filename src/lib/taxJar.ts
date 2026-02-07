@@ -1,16 +1,16 @@
 /**
- * Israeli 2025 progressive income tax brackets (annual amounts in agora).
+ * Israeli 2026 progressive income tax brackets (annual amounts in agora).
  * Brackets are indexed to inflation annually.
- * Source: Israel Tax Authority, 2025 tax year.
+ * Source: Israel Tax Authority, 2026 tax year (CPI-adjusted from 2025).
  */
 const ISRAELI_TAX_BRACKETS: ReadonlyArray<{ upToAgora: number; rate: number }> = [
-  { upToAgora: 8_412_000, rate: 0.10 },   // 0 – ₪84,120
-  { upToAgora: 12_072_000, rate: 0.14 },   // ₪84,121 – ₪120,720
-  { upToAgora: 19_380_000, rate: 0.20 },   // ₪120,721 – ₪193,800
-  { upToAgora: 26_928_000, rate: 0.31 },   // ₪193,801 – ₪269,280
-  { upToAgora: 56_028_000, rate: 0.35 },   // ₪269,281 – ₪560,280
-  { upToAgora: 72_156_000, rate: 0.47 },   // ₪560,281 – ₪721,560
-  { upToAgora: Infinity, rate: 0.50 },      // ₪721,561+
+  { upToAgora: 8_622_000, rate: 0.10 },   // 0 – ₪86,220
+  { upToAgora: 12_374_000, rate: 0.14 },   // ₪86,221 – ₪123,740
+  { upToAgora: 19_864_000, rate: 0.20 },   // ₪123,741 – ₪198,640
+  { upToAgora: 27_601_000, rate: 0.31 },   // ₪198,641 – ₪276,010
+  { upToAgora: 57_429_000, rate: 0.35 },   // ₪276,011 – ₪574,290
+  { upToAgora: 73_960_000, rate: 0.47 },   // ₪574,291 – ₪739,600
+  { upToAgora: Infinity, rate: 0.50 },      // ₪739,601+
 ];
 
 const DEFAULT_FLAT_RATE = 0.35;

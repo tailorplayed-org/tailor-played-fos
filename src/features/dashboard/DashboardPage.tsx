@@ -27,6 +27,7 @@ export function DashboardPage() {
     pendingCheckCount,
     workOrders,
     loading,
+    loaded,
   } = useDashboardData();
 
   const userName = auth.currentUser?.displayName ?? '';
@@ -43,48 +44,54 @@ export function DashboardPage() {
 
   return (
     <div className={styles.page}>
-      <HeroStat
-        netProfitAgora={netProfitAgora}
-        previousMonthNetProfitAgora={previousMonthNetProfitAgora}
-        userName={userName}
-        loading={loading}
-      />
-
-      <div className={styles.kpiRow}>
-        <KpiCard
-          label={t('dashboard.kpi.taxJar')}
-          value={formatCurrency(taxJarAgora, 'ILS')}
-          subtitle={t('dashboard.kpi.taxJarSubtitle')}
-          icon={<CurrencyCircleDollar size={20} />}
+      <div className={loaded ? styles.fadeIn : undefined}>
+        <HeroStat
+          netProfitAgora={netProfitAgora}
+          previousMonthNetProfitAgora={previousMonthNetProfitAgora}
+          userName={userName}
           loading={loading}
-        />
-        <KpiCard
-          label={t('dashboard.kpi.activeProjects')}
-          value={String(activeProjectCount)}
-          subtitle={t('dashboard.kpi.activeProjectsSubtitle')}
-          icon={<Briefcase size={20} />}
-          loading={loading}
-        />
-        <KpiCard
-          label={t('dashboard.kpi.monthlyOverhead')}
-          value={formatCurrency(monthlyOverheadAgora, 'ILS')}
-          delta={overheadDelta}
-          icon={<Receipt size={20} />}
-          loading={loading}
-        />
-        <KpiCard
-          label={t('dashboard.kpi.pendingReview')}
-          value={String(pendingReviewCount)}
-          subtitle={pendingSubtitle}
-          icon={<Tray size={20} />}
-          onClick={pendingReviewCount > 0 ? () => navigate('/review') : undefined}
-          glowOnHover={pendingReviewCount > 0}
-          loading={loading}
-          ariaLabel={pendingReviewCount > 0 ? t('dashboard.kpi.pendingReviewAction') : undefined}
         />
       </div>
 
-      <ProjectList workOrders={workOrders} loading={loading} />
+      <div className={loaded ? styles.fadeIn : undefined}>
+        <div className={styles.kpiRow}>
+          <KpiCard
+            label={t('dashboard.kpi.taxJar')}
+            value={formatCurrency(taxJarAgora, 'ILS')}
+            subtitle={t('dashboard.kpi.taxJarSubtitle')}
+            icon={<CurrencyCircleDollar size={20} />}
+            loading={loading}
+          />
+          <KpiCard
+            label={t('dashboard.kpi.activeProjects')}
+            value={String(activeProjectCount)}
+            subtitle={t('dashboard.kpi.activeProjectsSubtitle')}
+            icon={<Briefcase size={20} />}
+            loading={loading}
+          />
+          <KpiCard
+            label={t('dashboard.kpi.monthlyOverhead')}
+            value={formatCurrency(monthlyOverheadAgora, 'ILS')}
+            delta={overheadDelta}
+            icon={<Receipt size={20} />}
+            loading={loading}
+          />
+          <KpiCard
+            label={t('dashboard.kpi.pendingReview')}
+            value={String(pendingReviewCount)}
+            subtitle={pendingSubtitle}
+            icon={<Tray size={20} />}
+            onClick={pendingReviewCount > 0 ? () => navigate('/review') : undefined}
+            glowOnHover={pendingReviewCount > 0}
+            loading={loading}
+            ariaLabel={pendingReviewCount > 0 ? t('dashboard.kpi.pendingReviewAction') : undefined}
+          />
+        </div>
+      </div>
+
+      <div className={loaded ? styles.fadeIn : undefined}>
+        <ProjectList workOrders={workOrders} loading={loading} />
+      </div>
     </div>
   );
 }

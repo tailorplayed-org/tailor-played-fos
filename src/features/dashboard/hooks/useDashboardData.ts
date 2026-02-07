@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useFirestoreCollection } from '@/hooks';
-import { useWorkOrderStore, useTransactionStore } from '@/stores';
-import { workOrderSchema, transactionSchema } from '@/types';
+import { useFirestoreCollection, useFirestoreDoc } from '@/hooks';
+import { useWorkOrderStore, useTransactionStore, useSystemConfigStore } from '@/stores';
+import { workOrderSchema, transactionSchema, systemConfigSchema } from '@/types';
 import type { Transaction } from '@/types';
 import { toIlsAgora, calculateTaxReserve } from '@/lib';
 
@@ -17,6 +17,7 @@ export function useDashboardData() {
   // Full store access — single call per store to avoid dual-subscription issues
   const woStore = useWorkOrderStore();
   const txnStore = useTransactionStore();
+  const configStore = useSystemConfigStore();
 
   // Subscribe to Firestore collections (same pattern as useWorkOrders/useTransactions)
   useFirestoreCollection('work_orders', workOrderSchema, {
@@ -29,6 +30,13 @@ export function useDashboardData() {
     onData: txnStore.setTransactions,
     onError: txnStore.setError,
     onLoading: txnStore.setLoading,
+  });
+
+  // Subscribe to system_config/app document for dynamic tax and currency settings
+  useFirestoreDoc('system_config', 'app', systemConfigSchema, {
+    onData: configStore.setConfig,
+    onError: configStore.setError,
+    onLoading: configStore.setLoading,
   });
 
   // Compute current month/year outside useMemo so the memo recomputes
@@ -49,29 +57,36 @@ export function useDashboardData() {
 
     const approved = txnStore.transactions.filter((t) => t.status === 'approved');
 
+    // Dynamic currency rates from system_config (fallback to defaults)
+    const rates = configStore.config?.currencyRates;
+
     // Net Profit: Revenue - (DirectCost + Overhead) for current month
     const currentMonthApproved = approved.filter(isCurrentMonth);
     const currentRevenue = currentMonthApproved
       .filter((t) => t.category === 'Revenue')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
     const currentCosts = currentMonthApproved
       .filter((t) => t.category === 'DirectCost' || t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
     const netProfitAgora = currentRevenue - currentCosts;
 
     // Previous month Net Profit for delta
     const prevMonthApproved = approved.filter(isPrevMonth);
     const prevRevenue = prevMonthApproved
       .filter((t) => t.category === 'Revenue')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
     const prevCosts = prevMonthApproved
       .filter((t) => t.category === 'DirectCost' || t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
     const prevNetProfitAgora = prevRevenue - prevCosts;
     const hasPreviousMonth = prevMonthApproved.length > 0;
 
-    // Tax Jar — 35% flat rate of net profit (only if positive)
-    const taxJarAgora = netProfitAgora > 0 ? calculateTaxReserve(netProfitAgora, 'flat', 0.35) : 0;
+    // Tax Jar — dynamic from system_config, defensive fallback to flat 35%
+    const taxMethod = configStore.config?.taxMethod ?? 'flat';
+    const flatRate = configStore.config?.flatRate ?? 0.35;
+    const taxJarAgora = netProfitAgora > 0
+      ? calculateTaxReserve(netProfitAgora, taxMethod, flatRate)
+      : 0;
 
     // Active Projects — work orders with status Production
     const activeProjectCount = woStore.workOrders.filter(
@@ -81,10 +96,10 @@ export function useDashboardData() {
     // Monthly Overhead — sum of Overhead category for current month
     const monthlyOverheadAgora = currentMonthApproved
       .filter((t) => t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
     const previousMonthOverheadAgora = prevMonthApproved
       .filter((t) => t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency), 0);
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
 
     // Pending Review breakdown
     const pendingReview = txnStore.transactions.filter(
@@ -95,22 +110,30 @@ export function useDashboardData() {
     ).length;
     const pendingCheckCount = pendingReview.length - pendingGreenCount;
 
+    // Osek Patur threshold alert — warn at 80% of annual threshold
+    const threshold = configStore.config?.osPaturThresholdAgora ?? 12_000_000;
+    const annualRevenueEstimate = currentRevenue * 12;
+    const osPaturWarning = annualRevenueEstimate >= threshold * 0.8;
+
     return {
       netProfitAgora,
       previousMonthNetProfitAgora: hasPreviousMonth ? prevNetProfitAgora : null,
       taxJarAgora,
+      taxMethod,
       activeProjectCount,
       monthlyOverheadAgora,
       previousMonthOverheadAgora: hasPreviousMonth ? previousMonthOverheadAgora : null,
       pendingReviewCount: pendingReview.length,
       pendingGreenCount,
       pendingCheckCount,
+      osPaturWarning,
     };
-  }, [woStore.workOrders, txnStore.transactions, currentMonth, currentYear]);
+  }, [woStore.workOrders, txnStore.transactions, configStore.config, currentMonth, currentYear]);
 
   return {
     ...metrics,
     workOrders: woStore.workOrders,
-    loading: woStore.loading || txnStore.loading,
+    loading: woStore.loading || txnStore.loading || configStore.loading,
+    loaded: !woStore.loading && !txnStore.loading && !configStore.loading,
   };
 }

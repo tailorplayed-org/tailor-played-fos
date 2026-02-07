@@ -71,12 +71,14 @@ const mockDashboardData = {
   netProfitAgora: 820_000,
   previousMonthNetProfitAgora: 720_000,
   taxJarAgora: 287_000,
+  taxMethod: 'flat' as const,
   activeProjectCount: 3,
   monthlyOverheadAgora: 150_000,
   previousMonthOverheadAgora: 140_000,
   pendingReviewCount: 5,
   pendingGreenCount: 3,
   pendingCheckCount: 2,
+  osPaturWarning: false,
   workOrders: [
     {
       id: 'wo-1',
@@ -106,6 +108,7 @@ const mockDashboardData = {
     },
   ],
   loading: false,
+  loaded: true,
 };
 
 vi.mock('./hooks', () => ({
@@ -123,12 +126,14 @@ describe('DashboardPage', () => {
       netProfitAgora: 820_000,
       previousMonthNetProfitAgora: 720_000,
       taxJarAgora: 287_000,
+      taxMethod: 'flat',
       activeProjectCount: 3,
       monthlyOverheadAgora: 150_000,
       previousMonthOverheadAgora: 140_000,
       pendingReviewCount: 5,
       pendingGreenCount: 3,
       pendingCheckCount: 2,
+      osPaturWarning: false,
       workOrders: [
         {
           id: 'wo-1',
@@ -158,6 +163,7 @@ describe('DashboardPage', () => {
         },
       ],
       loading: false,
+      loaded: true,
     });
   });
 
@@ -281,8 +287,25 @@ describe('DashboardPage', () => {
 
   it('renders skeleton rows for Project Health when loading', () => {
     mockDashboardData.loading = true;
+    mockDashboardData.loaded = false;
     render(<DashboardPage />);
     const skeletonRows = screen.getAllByTestId('project-row-skeleton');
     expect(skeletonRows).toHaveLength(3);
+  });
+
+  it('applies fadeIn class when loaded is true', () => {
+    mockDashboardData.loaded = true;
+    const { container } = render(<DashboardPage />);
+    const fadeInElements = container.querySelectorAll('.fadeIn');
+    // 3 fadeIn wrappers: HeroStat, KPI row, ProjectList
+    expect(fadeInElements.length).toBe(3);
+  });
+
+  it('does not apply fadeIn class when loaded is false', () => {
+    mockDashboardData.loading = true;
+    mockDashboardData.loaded = false;
+    const { container } = render(<DashboardPage />);
+    const fadeInElements = container.querySelectorAll('.fadeIn');
+    expect(fadeInElements.length).toBe(0);
   });
 });

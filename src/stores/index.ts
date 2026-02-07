@@ -4,3 +4,4 @@ export * from './useWorkOrderStore';
 export * from './useInventoryStore';
 export * from './useOverheadStore';
 export * from './useUIStore';
+export * from './useSystemConfigStore';
