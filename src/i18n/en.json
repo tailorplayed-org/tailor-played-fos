@@ -72,5 +72,26 @@
     "toggle": "Switch language",
     "hebrew": "עברית",
     "english": "English"
+  },
+  "components": {
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "tryAgain": "Try Again"
+    },
+    "toast": {
+      "close": "Close notification"
+    },
+    "confidenceBadge": {
+      "checkMe": "Check Me"
+    },
+    "select": {
+      "search": "Search...",
+      "noResults": "No results found"
+    },
+    "searchInput": {
+      "label": "Search",
+      "clear": "Clear search"
+    }
   }
 }

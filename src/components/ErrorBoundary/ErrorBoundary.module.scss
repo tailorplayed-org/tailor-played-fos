@@ -1,0 +1,61 @@
+.fallback {
+  @include flex-column-center;
+
+  gap: $space-md;
+  padding: $space-lg;
+  text-align: center;
+}
+
+.title {
+  color: $error;
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  margin: 0;
+}
+
+.description {
+  color: $text-secondary;
+  font-size: $text-sm;
+  margin: 0;
+  max-width: 400px;
+}
+
+.details {
+  color: $text-muted;
+  font-size: $text-xs;
+  font-family: $font-mono;
+  background-color: $bg-tertiary;
+  padding: $space-sm $space-md;
+  border-radius: $radius-sm;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.retryButton {
+  @include interactive-reset;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding-inline: $space-lg;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  font-family: $font-family;
+  color: $text-secondary;
+  background-color: transparent;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background-color $transition-fast, transform $transition-fast;
+
+  &:hover {
+    background-color: rgba($gold, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

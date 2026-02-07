@@ -1,2 +1,2 @@
-// Skeleton component barrel export
-export {};
+export { Skeleton } from './Skeleton';
+export type { SkeletonProps, SkeletonVariant } from './Skeleton';

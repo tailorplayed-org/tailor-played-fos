@@ -1,2 +1,2 @@
-// ErrorBoundary component barrel export
-export {};
+export { ErrorBoundary } from './ErrorBoundary';
+export type { ErrorBoundaryProps } from './ErrorBoundary';

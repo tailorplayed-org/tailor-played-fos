@@ -1,0 +1,26 @@
+.card {
+  @include card-surface;
+
+  padding: $space-md;
+  transition: box-shadow $transition-fast,
+    border-color $transition-fast,
+    transform $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    border-color: rgba($gold, 0.3);
+  }
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: $shadow-glow, $shadow-lg;
+    border-color: $gold;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

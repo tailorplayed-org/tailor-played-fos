@@ -72,5 +72,26 @@
     "toggle": "החלף שפה",
     "hebrew": "עברית",
     "english": "English"
+  },
+  "components": {
+    "errorBoundary": {
+      "title": "משהו השתבש",
+      "description": "אירעה שגיאה לא צפויה. אנא נסו שוב.",
+      "tryAgain": "נסו שוב"
+    },
+    "toast": {
+      "close": "סגור התראה"
+    },
+    "confidenceBadge": {
+      "checkMe": "בדוק אותי"
+    },
+    "select": {
+      "search": "חיפוש...",
+      "noResults": "לא נמצאו תוצאות"
+    },
+    "searchInput": {
+      "label": "חיפוש",
+      "clear": "נקה חיפוש"
+    }
   }
 }

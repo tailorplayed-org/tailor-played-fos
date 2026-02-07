@@ -1,0 +1,108 @@
+// ── Container ──
+.container {
+  position: fixed;
+  inset-block-start: $space-lg;
+  inset-inline-end: $space-lg;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+  width: 360px;
+  max-width: calc(100vw - $space-lg * 2);
+}
+
+// ── Single Toast ──
+.toast {
+  @include elevated-surface;
+
+  display: flex;
+  align-items: flex-start;
+  gap: $space-sm;
+  padding: $space-md;
+  border-radius: $radius-md;
+  border-inline-start: 3px solid transparent;
+  animation: slideDown 300ms ease, fadeIn 300ms ease;
+}
+
+// ── Type Colors ──
+.success {
+  border-inline-start-color: $gold;
+
+  .icon {
+    color: $gold;
+  }
+}
+
+.error {
+  border-inline-start-color: $error;
+
+  .icon {
+    color: $error;
+  }
+}
+
+.warning {
+  border-inline-start-color: $warning;
+
+  .icon {
+    color: $warning;
+  }
+}
+
+.info {
+  border-inline-start-color: $text-muted;
+
+  .icon {
+    color: $text-secondary;
+  }
+}
+
+// ── Content ──
+.icon {
+  flex-shrink: 0;
+  margin-block-start: 1px;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.message {
+  color: $text-primary;
+  font-size: $text-sm;
+  line-height: $leading-normal;
+}
+
+.action {
+  @include interactive-reset;
+
+  color: $gold;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  text-decoration: none;
+  align-self: flex-start;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ── Close Button ──
+.close {
+  @include interactive-reset;
+
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-xs;
+  color: $text-muted;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: $text-primary;
+  }
+}

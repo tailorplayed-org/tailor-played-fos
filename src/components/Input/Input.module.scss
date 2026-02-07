@@ -1,0 +1,189 @@
+// ── Wrapper ──
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+// ── Label ──
+.label {
+  color: $text-secondary;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+}
+
+.srOnly {
+  @include visually-hidden;
+}
+
+// ── Base Input ──
+.input {
+  background-color: $bg-tertiary;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  min-height: 44px;
+  padding-inline: $space-md;
+  font-size: $text-base;
+  font-family: $font-family;
+  color: $text-primary;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  width: 100%;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $gold;
+    box-shadow: $shadow-glow;
+  }
+}
+
+.inputError {
+  border-color: $error;
+
+  &:focus {
+    border-color: $error;
+    box-shadow: 0 0 0 2px rgba($error, 0.25);
+  }
+}
+
+// ── Error / Helper Text ──
+.errorText {
+  color: $error;
+  font-size: $text-xs;
+}
+
+.helperText {
+  color: $text-muted;
+  font-size: $text-xs;
+}
+
+// ── Select Trigger ──
+.selectTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: start;
+}
+
+.selectValue {
+  color: $text-primary;
+  flex: 1;
+}
+
+.selectPlaceholder {
+  color: $text-muted;
+  flex: 1;
+}
+
+.selectCaret {
+  color: $text-muted;
+  margin-inline-start: $space-sm;
+  font-size: $text-xs;
+}
+
+// ── Select Dropdown ──
+.dropdown {
+  position: fixed;
+  z-index: 9999;
+  background-color: $bg-elevated;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  max-height: 240px;
+  overflow-y: auto;
+  min-width: 200px;
+}
+
+.option {
+  padding: $space-sm $space-md;
+  font-size: $text-base;
+  color: $text-primary;
+  cursor: pointer;
+  font-family: $font-family;
+
+  &:hover {
+    background-color: $bg-tertiary;
+  }
+}
+
+.optionSelected {
+  color: $gold;
+}
+
+.optionHighlighted {
+  background-color: $bg-tertiary;
+}
+
+.noResults {
+  padding: $space-sm $space-md;
+  color: $text-muted;
+  font-size: $text-sm;
+}
+
+.searchInput {
+  width: 100%;
+  padding: $space-sm $space-md;
+  background-color: $bg-tertiary;
+  border: none;
+  border-block-end: 1px solid $border-subtle;
+  color: $text-primary;
+  font-size: $text-sm;
+  font-family: $font-family;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// ── Search Input ──
+.searchWrapper {
+  position: relative;
+}
+
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  inset-inline-start: $space-md;
+  color: $text-muted;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.searchField {
+  padding-inline-start: calc($space-md + 20px + $space-sm);
+  padding-inline-end: calc($space-md + 18px + $space-sm);
+}
+
+.clearButton {
+  @include interactive-reset;
+
+  position: absolute;
+  inset-inline-end: $space-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-xs;
+  color: $text-muted;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
