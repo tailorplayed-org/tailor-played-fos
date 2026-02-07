@@ -1,17 +1,87 @@
 import { useTranslation } from 'react-i18next';
-import { ChartBar } from '@phosphor-icons/react';
+import { useNavigate } from 'react-router';
+import {
+  CurrencyCircleDollar,
+  Briefcase,
+  Receipt,
+  Tray,
+} from '@phosphor-icons/react';
+import { auth } from '@/services';
+import { formatCurrency } from '@/lib';
+import { HeroStat, KpiCard, getDelta } from './components';
+import { useDashboardData } from './hooks';
 import styles from './DashboardPage.module.scss';
 
 export function DashboardPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const {
+    netProfitAgora,
+    previousMonthNetProfitAgora,
+    taxJarAgora,
+    activeProjectCount,
+    monthlyOverheadAgora,
+    previousMonthOverheadAgora,
+    pendingReviewCount,
+    pendingGreenCount,
+    pendingCheckCount,
+    loading,
+  } = useDashboardData();
+
+  const userName = auth.currentUser?.displayName ?? '';
+
+  const overheadDelta = getDelta(monthlyOverheadAgora, previousMonthOverheadAgora);
+
+  const pendingSubtitle =
+    pendingReviewCount === 0
+      ? t('dashboard.kpi.allCaughtUp')
+      : t('dashboard.kpi.pendingBreakdown', {
+          green: String(pendingGreenCount),
+          check: String(pendingCheckCount),
+        });
 
   return (
-    <div className={styles.placeholder}>
-      <ChartBar size={48} className={styles.icon} />
-      <h1 className={styles.title}>{t('pages.dashboard.title')}</h1>
-      <p className={styles.description}>
-        {t('pages.dashboard.placeholder')}
-      </p>
+    <div className={styles.page}>
+      <HeroStat
+        netProfitAgora={netProfitAgora}
+        previousMonthNetProfitAgora={previousMonthNetProfitAgora}
+        userName={userName}
+        loading={loading}
+      />
+
+      <div className={styles.kpiRow}>
+        <KpiCard
+          label={t('dashboard.kpi.taxJar')}
+          value={formatCurrency(taxJarAgora, 'ILS')}
+          subtitle={t('dashboard.kpi.taxJarSubtitle')}
+          icon={<CurrencyCircleDollar size={20} />}
+          loading={loading}
+        />
+        <KpiCard
+          label={t('dashboard.kpi.activeProjects')}
+          value={String(activeProjectCount)}
+          subtitle={t('dashboard.kpi.activeProjectsSubtitle')}
+          icon={<Briefcase size={20} />}
+          loading={loading}
+        />
+        <KpiCard
+          label={t('dashboard.kpi.monthlyOverhead')}
+          value={formatCurrency(monthlyOverheadAgora, 'ILS')}
+          delta={overheadDelta}
+          icon={<Receipt size={20} />}
+          loading={loading}
+        />
+        <KpiCard
+          label={t('dashboard.kpi.pendingReview')}
+          value={String(pendingReviewCount)}
+          subtitle={pendingSubtitle}
+          icon={<Tray size={20} />}
+          onClick={pendingReviewCount > 0 ? () => navigate('/review') : undefined}
+          glowOnHover={pendingReviewCount > 0}
+          loading={loading}
+          ariaLabel={pendingReviewCount > 0 ? t('dashboard.kpi.pendingReviewAction') : undefined}
+        />
+      </div>
     </div>
   );
 }

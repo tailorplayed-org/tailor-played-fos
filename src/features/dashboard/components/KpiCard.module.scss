@@ -1,0 +1,88 @@
+.card {
+  @include card-surface;
+
+  padding: $space-md;
+  border-radius: $radius-md;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  min-inline-size: 200px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  color: $text-muted;
+}
+
+.label {
+  font-size: $text-sm;
+  color: $text-secondary;
+  font-weight: $font-medium;
+}
+
+.value {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex-wrap: wrap;
+}
+
+.subtitle {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.delta {
+  font-size: $text-xs;
+  font-weight: $font-medium;
+}
+
+.deltaPositive {
+  color: $success;
+}
+
+.deltaNegative {
+  color: $error;
+}
+
+.clickable {
+  @include interactive-reset;
+
+  cursor: pointer;
+  transition: box-shadow $transition-fast, transform $transition-fast;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.glow {
+  &:hover {
+    @include gold-glow;
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: $bp-md) {
+  .card {
+    min-inline-size: 160px;
+    min-block-size: 44px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}

@@ -1,19 +1,36 @@
-// ─────────────────────────────────────────────
-// Placeholder page styling — shared pattern
-// ─────────────────────────────────────────────
-
-.placeholder {
-  @include placeholder-page;
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xl;
+  max-inline-size: 1080px;
+  margin-inline: auto;
+  padding: $space-lg;
 }
 
-.icon {
-  @include placeholder-icon;
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-md;
 }
 
-.title {
-  @include placeholder-title;
-}
+@media (max-width: $bp-md) {
+  .page {
+    padding: $space-md;
+    gap: $space-lg;
+  }
 
-.description {
-  @include placeholder-description;
+  .kpiRow {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: $space-sm;
+    padding-block-end: $space-sm;
+
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }

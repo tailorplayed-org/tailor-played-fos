@@ -1,2 +1,2 @@
 // Dashboard hooks barrel export
-export {};
+export { useDashboardData } from './useDashboardData';

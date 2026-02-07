@@ -192,6 +192,30 @@
     "amount": "סכום",
     "date": "תאריך"
   },
+  "dashboard": {
+    "greeting": {
+      "morning": "בוקר טוב",
+      "afternoon": "צהריים טובים",
+      "evening": "ערב טוב"
+    },
+    "greetingName": "{{greeting}}, {{name}}",
+    "greetingAnonymous": "{{greeting}}",
+    "netProfitLabel": "רווח נקי — {{monthYear}}",
+    "deltaFromPrevious": "{{direction}} {{value}}% מ{{month}}",
+    "deltaUp": "▲",
+    "deltaDown": "▼",
+    "kpi": {
+      "taxJar": "צנצנת מס",
+      "taxJarSubtitle": "הופרש מרווח נקי",
+      "activeProjects": "פרויקטים פעילים",
+      "activeProjectsSubtitle": "בייצור",
+      "monthlyOverhead": "תקורה חודשית",
+      "pendingReview": "ממתינים לבדיקה",
+      "pendingReviewAction": "צפה בפריטים ממתינים",
+      "pendingBreakdown": "{{green}} ירוקים, {{check}} לבדיקה",
+      "allCaughtUp": "הכל מעודכן"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "משהו השתבש",

@@ -192,6 +192,30 @@
     "amount": "Amount",
     "date": "Date"
   },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "greetingName": "{{greeting}}, {{name}}",
+    "greetingAnonymous": "{{greeting}}",
+    "netProfitLabel": "Net Profit — {{monthYear}}",
+    "deltaFromPrevious": "{{direction}} {{value}}% from {{month}}",
+    "deltaUp": "▲",
+    "deltaDown": "▼",
+    "kpi": {
+      "taxJar": "Tax Jar",
+      "taxJarSubtitle": "set aside from net profit",
+      "activeProjects": "Active Projects",
+      "activeProjectsSubtitle": "in production",
+      "monthlyOverhead": "Monthly Overhead",
+      "pendingReview": "Pending Review",
+      "pendingReviewAction": "View pending reviews",
+      "pendingBreakdown": "{{green}} green, {{check}} to check",
+      "allCaughtUp": "All caught up"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "Something went wrong",
