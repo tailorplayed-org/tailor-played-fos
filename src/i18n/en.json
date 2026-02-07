@@ -129,6 +129,40 @@
       "title": "Failed to load Work Orders"
     }
   },
+  "transactions": {
+    "addTransaction": "Add Transaction",
+    "form": {
+      "title": "New Transaction",
+      "vendorName": "Vendor Name",
+      "vendorNameRequired": "Vendor name is required",
+      "amount": "Amount",
+      "amountRequired": "Amount is required",
+      "amountPositive": "Amount must be positive",
+      "currency": "Currency",
+      "date": "Date",
+      "dateRequired": "Date is required",
+      "category": "Category",
+      "categoryRequired": "Category is required",
+      "workOrder": "Work Order",
+      "workOrderPlaceholder": "Select a Work Order (optional)",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional notes",
+      "cancel": "Cancel",
+      "submit": "Add Transaction",
+      "estimatedConversion": "≈ {{amount}} (estimated)"
+    },
+    "category": {
+      "DirectCost": "Direct Cost",
+      "InventoryRestock": "Inventory Restock",
+      "Overhead": "Overhead",
+      "Revenue": "Revenue",
+      "Personal": "Personal"
+    },
+    "toast": {
+      "created": "Transaction saved",
+      "createError": "Failed to save transaction"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "Something went wrong",

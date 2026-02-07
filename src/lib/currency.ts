@@ -27,6 +27,33 @@ export function toDisplayAmount(minorUnits: number, currency: Currency = 'ILS'):
 }
 
 /**
+ * Default ILS conversion rates (approximate).
+ * Will be replaced by system_config values when available.
+ */
+export const DEFAULT_CONVERSION_RATES: Record<Currency, number> = {
+  ILS: 1,
+  USD: 3.5, // 1 USD ≈ 3.5 ILS
+  EUR: 3.8, // 1 EUR ≈ 3.8 ILS
+};
+
+/**
+ * Convert minor units in any currency to ILS agora.
+ * For ILS, returns as-is. For USD/EUR, multiplies by conversion rate.
+ */
+export function toIlsAgora(amountAgora: number, currency: Currency): number {
+  if (currency === 'ILS') return amountAgora;
+  const rate = DEFAULT_CONVERSION_RATES[currency];
+  return Math.round(amountAgora * rate);
+}
+
+/**
+ * Returns true if the currency requires estimated conversion.
+ */
+export function isEstimatedCurrency(currency: Currency): boolean {
+  return currency !== 'ILS';
+}
+
+/**
  * Format a minor-units amount as a currency string.
  * Input is in agora/cents — converts to display amount before formatting.
  * Returns e.g., "₪82.00", "$142.50", "€200.00"

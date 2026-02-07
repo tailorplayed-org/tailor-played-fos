@@ -1,0 +1,60 @@
+// ─────────────────────────────────────────────
+// Transaction Form — manual transaction entry
+// ─────────────────────────────────────────────
+
+.form {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.formTitle {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin-block-end: $space-md;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: $space-md;
+
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.currencyField {
+  display: flex;
+  flex-direction: column;
+}
+
+.estimateText {
+  font-size: $text-xs;
+  color: $text-muted;
+  margin-block-start: $space-xs;
+  padding-inline-start: $space-xs;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    > * {
+      inline-size: 100%;
+    }
+  }
+}

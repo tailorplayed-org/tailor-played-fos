@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardText, Plus, PencilSimple, WarningCircle, GameController } from '@phosphor-icons/react';
+import { ClipboardText, Plus, PencilSimple, WarningCircle, GameController, Receipt } from '@phosphor-icons/react';
 import { Button, Card, StatusBadge, Skeleton } from '@/components';
-import { useWorkOrders, useWorkOrderActions } from './hooks';
-import { WorkOrderForm, StatusStepper } from './components';
+import { useWorkOrders, useWorkOrderActions, useTransactions, useTransactionActions } from './hooks';
+import { WorkOrderForm, StatusStepper, TransactionForm } from './components';
 import { calculateMargin, getMarginStatus, formatCurrency } from '@/lib';
-import type { WorkOrder, WorkOrderStatus, CreateWorkOrderInput } from '@/types';
+import type { WorkOrder, WorkOrderStatus, CreateWorkOrderInput, CreateTransactionInput } from '@/types';
 import styles from './WorkOrdersPage.module.scss';
 
 const STATUS_PRIORITY: Record<WorkOrderStatus, number> = {
@@ -27,10 +27,23 @@ export function WorkOrdersPage() {
   const { t } = useTranslation();
   const { workOrders, loading, error } = useWorkOrders();
   const { createWorkOrder, updateWorkOrder } = useWorkOrderActions();
+  const { transactions } = useTransactions();
+  const { createTransaction } = useTransactionActions();
 
   const [showForm, setShowForm] = useState(false);
+  const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [editingOrder, setEditingOrder] = useState<WorkOrder | null>(null);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  const transactionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    transactions.forEach((t) => {
+      if (t.workOrderId) {
+        counts[t.workOrderId] = (counts[t.workOrderId] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [transactions]);
 
   const handleCreate = async (data: CreateWorkOrderInput) => {
     try {
@@ -51,14 +64,25 @@ export function WorkOrdersPage() {
     }
   };
 
+  const handleCreateTransaction = async (data: CreateTransactionInput) => {
+    try {
+      await createTransaction(data);
+      setShowTransactionForm(false);
+    } catch {
+      // Error toast already shown by useTransactionActions — keep form open
+    }
+  };
+
   const handleEdit = (order: WorkOrder) => {
     setEditingOrder(order);
     setShowForm(false);
+    setShowTransactionForm(false);
     setExpandedOrderId(null);
   };
 
   const handleCancel = () => {
     setShowForm(false);
+    setShowTransactionForm(false);
     setEditingOrder(null);
   };
 
@@ -79,7 +103,7 @@ export function WorkOrdersPage() {
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
   };
 
-  const isFormVisible = showForm || editingOrder !== null;
+  const isFormVisible = showForm || showTransactionForm || editingOrder !== null;
   const sortedOrders = useMemo(() => sortWorkOrders(workOrders), [workOrders]);
 
   if (error) {
@@ -99,14 +123,20 @@ export function WorkOrdersPage() {
       <header className={styles.header}>
         <h1 className={styles.title}>{t('workOrders.title')}</h1>
         {!isFormVisible && (
-          <Button onClick={() => setShowForm(true)}>
-            <Plus size={18} weight="bold" />
-            <span>{t('workOrders.newWorkOrder')}</span>
-          </Button>
+          <div className={styles.headerActions}>
+            <Button onClick={() => { setShowTransactionForm(true); setShowForm(false); setEditingOrder(null); }}>
+              <Receipt size={18} weight="bold" />
+              <span>{t('transactions.addTransaction')}</span>
+            </Button>
+            <Button onClick={() => { setShowForm(true); setShowTransactionForm(false); setEditingOrder(null); }}>
+              <Plus size={18} weight="bold" />
+              <span>{t('workOrders.newWorkOrder')}</span>
+            </Button>
+          </div>
         )}
       </header>
 
-      {isFormVisible && (
+      {(showForm || editingOrder !== null) && (
         <section className={styles.formSection} aria-label={editingOrder ? t('workOrders.editWorkOrder') : t('workOrders.newWorkOrder')}>
           <WorkOrderForm
             onSubmit={editingOrder ? handleUpdate : handleCreate}
@@ -126,6 +156,15 @@ export function WorkOrdersPage() {
         </section>
       )}
 
+      {showTransactionForm && (
+        <section className={styles.formSection} aria-label={t('transactions.form.title')}>
+          <TransactionForm
+            onSubmit={handleCreateTransaction}
+            onCancel={handleCancel}
+          />
+        </section>
+      )}
+
       {loading && <LoadingSkeleton />}
 
       {!loading && workOrders.length === 0 && <EmptyState onCreateClick={() => setShowForm(true)} />}
@@ -136,6 +175,7 @@ export function WorkOrdersPage() {
             <li key={order.id}>
               <WorkOrderCard
                 order={order}
+                transactionCount={transactionCounts[order.id] || 0}
                 onEdit={() => handleEdit(order)}
                 isExpanded={expandedOrderId === order.id}
                 onToggleStepper={() => toggleStepper(order.id)}
@@ -166,13 +206,14 @@ function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
 
 interface WorkOrderCardProps {
   order: WorkOrder;
+  transactionCount: number;
   onEdit: () => void;
   isExpanded: boolean;
   onToggleStepper: () => void;
   onStatusChange: (newStatus: WorkOrderStatus) => void;
 }
 
-function WorkOrderCard({ order, onEdit, isExpanded, onToggleStepper, onStatusChange }: WorkOrderCardProps) {
+function WorkOrderCard({ order, transactionCount, onEdit, isExpanded, onToggleStepper, onStatusChange }: WorkOrderCardProps) {
   const { t } = useTranslation();
 
   const totalCost = order.directCostAgora + order.inventoryCostAgora + order.overheadAllocationAgora;
@@ -229,7 +270,7 @@ function WorkOrderCard({ order, onEdit, isExpanded, onToggleStepper, onStatusCha
 
         <div className={styles.cardFinancials}>
           <span className={styles.revenue}>{formatCurrency(order.revenueTotalAgora)}</span>
-          <span className={styles.costCount}>0 {t('workOrders.card.transactions')}</span>
+          <span className={styles.costCount}>{transactionCount} {t('workOrders.card.transactions')}</span>
           <div className={styles.marginArea}>
             <span className={`${styles.marginValue} ${marginColorClass}`}>
               {hasRevenue ? `${Math.round(margin)}%` : t('workOrders.margin.noRevenue')}

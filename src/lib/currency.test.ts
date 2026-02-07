@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toMinorUnits, toDisplayAmount, formatCurrency } from './currency';
+import { toMinorUnits, toDisplayAmount, formatCurrency, toIlsAgora, isEstimatedCurrency, DEFAULT_CONVERSION_RATES } from './currency';
 
 describe('toMinorUnits', () => {
   it('converts 82.00 → 8200', () => {
@@ -98,7 +98,6 @@ describe('formatCurrency', () => {
     expect(result).toBe('₪82.00');
   });
 
-  // WAC calculation precision scenario
   it('handles WAC precision — multi-purchase average cost', () => {
     // Scenario: 10 items at ₪50 (5000 agora), then 5 items at ₪60 (6000 agora)
     // Total cost: 10*5000 + 5*6000 = 50000 + 30000 = 80000 agora
@@ -108,5 +107,58 @@ describe('formatCurrency', () => {
     expect(wacPerUnit).toBe(5333);
     const result = formatCurrency(wacPerUnit, 'ILS');
     expect(result).toBe('₪53.33');
+  });
+});
+
+describe('DEFAULT_CONVERSION_RATES', () => {
+  it('has ILS rate of 1', () => {
+    expect(DEFAULT_CONVERSION_RATES.ILS).toBe(1);
+  });
+
+  it('has USD rate of 3.5', () => {
+    expect(DEFAULT_CONVERSION_RATES.USD).toBe(3.5);
+  });
+
+  it('has EUR rate of 3.8', () => {
+    expect(DEFAULT_CONVERSION_RATES.EUR).toBe(3.8);
+  });
+});
+
+describe('toIlsAgora', () => {
+  it('returns ILS amount as-is', () => {
+    expect(toIlsAgora(8200, 'ILS')).toBe(8200);
+  });
+
+  it('converts USD agora to ILS agora', () => {
+    // 10000 USD cents * 3.5 = 35000 ILS agora
+    expect(toIlsAgora(10000, 'USD')).toBe(35000);
+  });
+
+  it('converts EUR agora to ILS agora', () => {
+    // 10000 EUR cents * 3.8 = 38000 ILS agora
+    expect(toIlsAgora(10000, 'EUR')).toBe(38000);
+  });
+
+  it('rounds to nearest integer', () => {
+    // 333 USD cents * 3.5 = 1165.5 → 1166
+    expect(toIlsAgora(333, 'USD')).toBe(1166);
+  });
+
+  it('handles zero amount', () => {
+    expect(toIlsAgora(0, 'USD')).toBe(0);
+  });
+});
+
+describe('isEstimatedCurrency', () => {
+  it('returns false for ILS', () => {
+    expect(isEstimatedCurrency('ILS')).toBe(false);
+  });
+
+  it('returns true for USD', () => {
+    expect(isEstimatedCurrency('USD')).toBe(true);
+  });
+
+  it('returns true for EUR', () => {
+    expect(isEstimatedCurrency('EUR')).toBe(true);
   });
 });

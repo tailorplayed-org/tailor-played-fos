@@ -1,18 +1,23 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useWorkOrderStore } from '@/stores';
-import type { WorkOrder } from '@/types';
+import { useWorkOrderStore, useTransactionStore } from '@/stores';
+import type { WorkOrder, Transaction } from '@/types';
 
 // Mock hooks
 const mockCreateWorkOrder = vi.fn();
 const mockUpdateWorkOrder = vi.fn();
+const mockCreateTransaction = vi.fn();
 
 vi.mock('./hooks', () => ({
   useWorkOrders: () => useWorkOrderStore(),
   useWorkOrderActions: () => ({
     createWorkOrder: mockCreateWorkOrder,
     updateWorkOrder: mockUpdateWorkOrder,
+  }),
+  useTransactions: () => useTransactionStore(),
+  useTransactionActions: () => ({
+    createTransaction: mockCreateTransaction,
   }),
 }));
 
@@ -81,6 +86,11 @@ describe('WorkOrdersPage', () => {
     vi.clearAllMocks();
     useWorkOrderStore.setState({
       workOrders: [],
+      loading: false,
+      error: null,
+    });
+    useTransactionStore.setState({
+      transactions: [],
       loading: false,
       error: null,
     });
@@ -339,11 +349,10 @@ describe('WorkOrdersPage', () => {
     expect(screen.queryByRole('group', { name: 'workOrders.statusStepper.label' })).not.toBeInTheDocument();
   });
 
-  it('displays transaction count placeholder (0)', () => {
+  it('displays transaction count as 0 when no transactions linked', () => {
     useWorkOrderStore.setState({ workOrders: [mockWorkOrders[0]] });
     renderPage();
 
-    // AC 1: "cost count (number of linked transactions — show 0 for now)"
     expect(screen.getByText('0 workOrders.card.transactions')).toBeInTheDocument();
   });
 
@@ -353,5 +362,98 @@ describe('WorkOrdersPage', () => {
 
     // formatCurrency(50000 agora) = ₪500.00
     expect(screen.getByText('₪500.00')).toBeInTheDocument();
+  });
+
+  // ── Story 2.3 tests ──
+
+  it('shows "Add Transaction" button', () => {
+    useWorkOrderStore.setState({ workOrders: mockWorkOrders });
+    renderPage();
+
+    expect(screen.getByText('transactions.addTransaction')).toBeInTheDocument();
+  });
+
+  it('shows transaction form when "Add Transaction" button is clicked', async () => {
+    useWorkOrderStore.setState({ workOrders: mockWorkOrders });
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByText('transactions.addTransaction'));
+
+    expect(screen.getByText('transactions.form.title')).toBeInTheDocument();
+  });
+
+  it('closes transaction form when opening work order form (mutual exclusion)', async () => {
+    useWorkOrderStore.setState({ workOrders: mockWorkOrders });
+    renderPage();
+    const user = userEvent.setup();
+
+    // Open transaction form
+    await user.click(screen.getByText('transactions.addTransaction'));
+    expect(screen.getByText('transactions.form.title')).toBeInTheDocument();
+
+    // Both buttons should be hidden while form is open
+    expect(screen.queryByText('workOrders.newWorkOrder')).not.toBeInTheDocument();
+
+    // Cancel the transaction form
+    const cancelBtn = screen.getByRole('button', { name: 'transactions.form.cancel' });
+    await user.click(cancelBtn);
+
+    // Buttons reappear
+    expect(screen.getByText('workOrders.newWorkOrder')).toBeInTheDocument();
+
+    // Open work order form
+    await user.click(screen.getByText('workOrders.newWorkOrder'));
+    expect(screen.getByLabelText('workOrders.form.clientName')).toBeInTheDocument();
+
+    // Transaction form should not be visible
+    expect(screen.queryByText('transactions.form.title')).not.toBeInTheDocument();
+  });
+
+  it('displays real transaction count per work order', () => {
+    const mockTransactions: Transaction[] = [
+      {
+        id: 'txn-1',
+        vendorName: 'Supplier A',
+        amountAgora: 5000,
+        currency: 'ILS',
+        date: new Date('2026-02-01'),
+        category: 'DirectCost',
+        workOrderId: 'wo-1',
+        inventoryItemId: null,
+        status: 'approved',
+        aiConfidence: null,
+        originalFileUrl: null,
+        source: 'manual',
+        notes: null,
+        createdAt: new Date('2026-02-01'),
+        updatedAt: new Date('2026-02-01'),
+      },
+      {
+        id: 'txn-2',
+        vendorName: 'Supplier B',
+        amountAgora: 3000,
+        currency: 'ILS',
+        date: new Date('2026-02-02'),
+        category: 'DirectCost',
+        workOrderId: 'wo-1',
+        inventoryItemId: null,
+        status: 'approved',
+        aiConfidence: null,
+        originalFileUrl: null,
+        source: 'manual',
+        notes: null,
+        createdAt: new Date('2026-02-02'),
+        updatedAt: new Date('2026-02-02'),
+      },
+    ];
+
+    useWorkOrderStore.setState({ workOrders: mockWorkOrders });
+    useTransactionStore.setState({ transactions: mockTransactions });
+    renderPage();
+
+    // wo-1 has 2 transactions, wo-2 has 0
+    expect(screen.getByText('2 workOrders.card.transactions')).toBeInTheDocument();
+    expect(screen.getByText('0 workOrders.card.transactions')).toBeInTheDocument();
   });
 });

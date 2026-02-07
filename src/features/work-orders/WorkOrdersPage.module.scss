@@ -28,6 +28,15 @@
   margin: 0;
 }
 
+.headerActions {
+  display: flex;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column;
+  }
+}
+
 // Form section
 .formSection {
   margin-block-end: $space-lg;

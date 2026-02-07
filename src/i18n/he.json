@@ -129,6 +129,40 @@
       "title": "טעינת הזמנות העבודה נכשלה"
     }
   },
+  "transactions": {
+    "addTransaction": "הוסף עסקה",
+    "form": {
+      "title": "עסקה חדשה",
+      "vendorName": "שם ספק",
+      "vendorNameRequired": "שם ספק הוא שדה חובה",
+      "amount": "סכום",
+      "amountRequired": "סכום הוא שדה חובה",
+      "amountPositive": "הסכום חייב להיות חיובי",
+      "currency": "מטבע",
+      "date": "תאריך",
+      "dateRequired": "תאריך הוא שדה חובה",
+      "category": "קטגוריה",
+      "categoryRequired": "קטגוריה היא שדה חובה",
+      "workOrder": "הזמנת עבודה",
+      "workOrderPlaceholder": "בחר הזמנת עבודה (אופציונלי)",
+      "notes": "הערות",
+      "notesPlaceholder": "הערות אופציונליות",
+      "cancel": "ביטול",
+      "submit": "הוסף עסקה",
+      "estimatedConversion": "≈ {{amount}} (אומדן)"
+    },
+    "category": {
+      "DirectCost": "עלות ישירה",
+      "InventoryRestock": "חידוש מלאי",
+      "Overhead": "תקורה",
+      "Revenue": "הכנסה",
+      "Personal": "אישי"
+    },
+    "toast": {
+      "created": "העסקה נשמרה",
+      "createError": "שמירת העסקה נכשלה"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "משהו השתבש",
