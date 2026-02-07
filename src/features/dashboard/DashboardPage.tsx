@@ -8,7 +8,7 @@ import {
 } from '@phosphor-icons/react';
 import { auth } from '@/services';
 import { formatCurrency } from '@/lib';
-import { HeroStat, KpiCard, getDelta } from './components';
+import { HeroStat, KpiCard, getDelta, ProjectList } from './components';
 import { useDashboardData } from './hooks';
 import styles from './DashboardPage.module.scss';
 
@@ -25,6 +25,7 @@ export function DashboardPage() {
     pendingReviewCount,
     pendingGreenCount,
     pendingCheckCount,
+    workOrders,
     loading,
   } = useDashboardData();
 
@@ -82,6 +83,8 @@ export function DashboardPage() {
           ariaLabel={pendingReviewCount > 0 ? t('dashboard.kpi.pendingReviewAction') : undefined}
         />
       </div>
+
+      <ProjectList workOrders={workOrders} loading={loading} />
     </div>
   );
 }

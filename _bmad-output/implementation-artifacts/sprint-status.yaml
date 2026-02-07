@@ -62,7 +62,7 @@ development_status:
   # Epic 3: Dashboard & Project Health
   epic-3: in-progress
   3-1-hero-stat-kpi-cards: done
-  3-2-project-health-table: backlog
+  3-2-project-health-table: done
   3-3-real-time-dashboard-data-layer: backlog
   epic-3-retrospective: optional
 

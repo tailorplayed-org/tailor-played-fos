@@ -214,6 +214,19 @@
       "pendingReviewAction": "View pending reviews",
       "pendingBreakdown": "{{green}} green, {{check}} to check",
       "allCaughtUp": "All caught up"
+    },
+    "projectHealth": {
+      "title": "Project Health",
+      "count": "{{count}} projects",
+      "count_one": "{{count}} project",
+      "emptyTitle": "No projects yet — create your first Work Order",
+      "emptyCta": "Create Work Order",
+      "noRevenue": "—",
+      "status": {
+        "Lead": "Lead",
+        "Design": "Design",
+        "Production": "Production"
+      }
     }
   },
   "components": {

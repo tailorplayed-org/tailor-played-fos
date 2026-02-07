@@ -18,6 +18,7 @@ vi.mock('@phosphor-icons/react', () => {
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
     Warning: iconStub('Warning'),
+    WarningCircle: iconStub('WarningCircle'),
     Info: iconStub('Info'),
     X: iconStub('X'),
     // Layout components
@@ -48,6 +49,15 @@ vi.mock('@/lib', () => ({
   calculateTaxReserve: (net: number, _method: string, rate: number) =>
     Math.round(net * rate),
   toIlsAgora: (amount: number) => amount,
+  calculateMargin: (revenue: number, cost: number) => {
+    if (revenue === 0) return 0;
+    return ((revenue - cost) / revenue) * 100;
+  },
+  getMarginStatus: (margin: number) => {
+    if (margin >= 30) return 'healthy';
+    if (margin >= 20) return 'watch';
+    return 'danger';
+  },
 }));
 
 // Mock navigate
@@ -67,6 +77,34 @@ const mockDashboardData = {
   pendingReviewCount: 5,
   pendingGreenCount: 3,
   pendingCheckCount: 2,
+  workOrders: [
+    {
+      id: 'wo-1',
+      clientName: 'Alpha Corp',
+      projectDescription: 'Branding',
+      deadline: null,
+      status: 'Production',
+      revenueTotalAgora: 1_000_000,
+      directCostAgora: 400_000,
+      inventoryCostAgora: 100_000,
+      overheadAllocationAgora: 50_000,
+      createdAt: new Date(2026, 0, 1),
+      updatedAt: new Date(2026, 0, 15),
+    },
+    {
+      id: 'wo-2',
+      clientName: 'Beta Inc',
+      projectDescription: 'Website',
+      deadline: null,
+      status: 'Design',
+      revenueTotalAgora: 500_000,
+      directCostAgora: 350_000,
+      inventoryCostAgora: 50_000,
+      overheadAllocationAgora: 0,
+      createdAt: new Date(2026, 0, 5),
+      updatedAt: new Date(2026, 0, 20),
+    },
+  ],
   loading: false,
 };
 
@@ -91,6 +129,34 @@ describe('DashboardPage', () => {
       pendingReviewCount: 5,
       pendingGreenCount: 3,
       pendingCheckCount: 2,
+      workOrders: [
+        {
+          id: 'wo-1',
+          clientName: 'Alpha Corp',
+          projectDescription: 'Branding',
+          deadline: null,
+          status: 'Production',
+          revenueTotalAgora: 1_000_000,
+          directCostAgora: 400_000,
+          inventoryCostAgora: 100_000,
+          overheadAllocationAgora: 50_000,
+          createdAt: new Date(2026, 0, 1),
+          updatedAt: new Date(2026, 0, 15),
+        },
+        {
+          id: 'wo-2',
+          clientName: 'Beta Inc',
+          projectDescription: 'Website',
+          deadline: null,
+          status: 'Design',
+          revenueTotalAgora: 500_000,
+          directCostAgora: 350_000,
+          inventoryCostAgora: 50_000,
+          overheadAllocationAgora: 0,
+          createdAt: new Date(2026, 0, 5),
+          updatedAt: new Date(2026, 0, 20),
+        },
+      ],
       loading: false,
     });
   });
@@ -168,7 +234,8 @@ describe('DashboardPage', () => {
   it('renders all 4 KPI Phosphor icons', () => {
     render(<DashboardPage />);
     expect(screen.getByTestId('icon-CurrencyCircleDollar')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-Briefcase')).toBeInTheDocument();
+    // Briefcase appears in KPI card + ProjectRow rows — just verify at least one exists
+    expect(screen.getAllByTestId('icon-Briefcase').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByTestId('icon-Receipt')).toBeInTheDocument();
     expect(screen.getByTestId('icon-Tray')).toBeInTheDocument();
   });
@@ -179,5 +246,43 @@ describe('DashboardPage', () => {
     expect(screen.getByTestId('hero-stat-skeleton')).toBeInTheDocument();
     const kpiSkeletons = screen.getAllByTestId('kpi-card-skeleton');
     expect(kpiSkeletons).toHaveLength(4);
+  });
+
+  it('renders Project Health section with work orders', () => {
+    render(<DashboardPage />);
+    expect(screen.getByText('dashboard.projectHealth.title')).toBeInTheDocument();
+    expect(screen.getByText('Alpha Corp')).toBeInTheDocument();
+    expect(screen.getByText('Beta Inc')).toBeInTheDocument();
+  });
+
+  it('renders Project Health count subtitle', () => {
+    render(<DashboardPage />);
+    // 2 work orders, both non-shipped
+    expect(screen.getByText('dashboard.projectHealth.count|count=2')).toBeInTheDocument();
+  });
+
+  it('renders empty state when no work orders', () => {
+    Object.assign(mockDashboardData, { workOrders: [] });
+    render(<DashboardPage />);
+    expect(screen.getByText('dashboard.projectHealth.emptyTitle')).toBeInTheDocument();
+  });
+
+  it('navigates to work order detail when row is clicked', () => {
+    render(<DashboardPage />);
+    // Click the first row (Production comes before Design in sort order)
+    const projectButtons = screen.getAllByRole('button').filter((btn) => {
+      const label = btn.getAttribute('aria-label') ?? '';
+      return label.includes('Alpha Corp');
+    });
+    expect(projectButtons).toHaveLength(1);
+    fireEvent.click(projectButtons[0]);
+    expect(mockNavigate).toHaveBeenCalledWith('/work-orders/wo-1');
+  });
+
+  it('renders skeleton rows for Project Health when loading', () => {
+    mockDashboardData.loading = true;
+    render(<DashboardPage />);
+    const skeletonRows = screen.getAllByTestId('project-row-skeleton');
+    expect(skeletonRows).toHaveLength(3);
   });
 });

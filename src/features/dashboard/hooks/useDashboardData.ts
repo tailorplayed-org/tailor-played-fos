@@ -110,6 +110,7 @@ export function useDashboardData() {
 
   return {
     ...metrics,
+    workOrders: woStore.workOrders,
     loading: woStore.loading || txnStore.loading,
   };
 }

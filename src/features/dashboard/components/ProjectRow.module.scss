@@ -1,0 +1,148 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  inline-size: 100%;
+  min-block-size: 44px;
+  text-align: start;
+}
+
+.interactive {
+  @include interactive-reset;
+  cursor: pointer;
+  transition: background-color $transition-fast, border-color $transition-fast;
+
+  &:hover {
+    background-color: $bg-elevated;
+    border-color: $gold-light;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.iconContainer {
+  @include flex-center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: $radius-sm;
+  background-color: $bg-elevated;
+  color: $text-secondary;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.name {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.amount {
+  font-size: $text-sm;
+  font-variant-numeric: tabular-nums;
+  color: $text-secondary;
+  white-space: nowrap;
+  min-inline-size: 80px;
+  text-align: end;
+}
+
+.marginCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-xs;
+  min-inline-size: 70px;
+}
+
+.marginValue {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.marginBar {
+  inline-size: 60px;
+  block-size: 4px;
+  border-radius: $radius-full;
+  background-color: rgba($text-muted, 0.2);
+  overflow: hidden;
+}
+
+.marginBarFill {
+  block-size: 100%;
+  border-radius: $radius-full;
+  transition: inline-size $transition-fast;
+}
+
+// Margin status colors
+.healthy {
+  .marginValue {
+    color: $success;
+  }
+
+  .marginBarFill {
+    background-color: $success;
+  }
+}
+
+.watch {
+  .marginValue {
+    color: $warning;
+  }
+
+  .marginBarFill {
+    background-color: $warning;
+  }
+}
+
+.danger {
+  border-color: rgba($error, 0.3);
+
+  .marginValue {
+    color: $error;
+  }
+
+  .marginBarFill {
+    background-color: $error;
+  }
+}
+
+.desktopOnly {
+  display: block;
+}
+
+// Mobile responsive
+@media (max-width: $bp-md) {
+  .desktopOnly {
+    display: none;
+  }
+
+  .row {
+    gap: $space-sm;
+    padding: $space-sm $space-md;
+  }
+}

@@ -1,0 +1,49 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: $space-sm;
+}
+
+.title {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.count {
+  font-size: $text-sm;
+  color: $text-muted;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.emptyState {
+  @include card-surface;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-2xl;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $text-muted;
+}
+
+.emptyTitle {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin: 0;
+}

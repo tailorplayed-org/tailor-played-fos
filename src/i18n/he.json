@@ -214,6 +214,19 @@
       "pendingReviewAction": "צפה בפריטים ממתינים",
       "pendingBreakdown": "{{green}} ירוקים, {{check}} לבדיקה",
       "allCaughtUp": "הכל מעודכן"
+    },
+    "projectHealth": {
+      "title": "בריאות פרויקטים",
+      "count": "{{count}} פרויקטים",
+      "count_one": "פרויקט {{count}}",
+      "emptyTitle": "אין פרויקטים עדיין — צרו את הזמנת העבודה הראשונה",
+      "emptyCta": "צור הזמנת עבודה",
+      "noRevenue": "—",
+      "status": {
+        "Lead": "ליד",
+        "Design": "עיצוב",
+        "Production": "ייצור"
+      }
     }
   },
   "components": {
