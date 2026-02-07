@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@lottiefiles/dotlottie-react": "^0.17.14",
     "@phosphor-icons/react": "^2.1.10",
     "firebase": "^12.9.0",

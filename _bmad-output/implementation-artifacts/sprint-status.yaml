@@ -51,8 +51,8 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Work Orders & Manual Financial Tracking
-  epic-2: backlog
-  2-1-work-order-data-model-crud: backlog
+  epic-2: in-progress
+  2-1-work-order-data-model-crud: done
   2-2-work-order-status-lifecycle-list-view: backlog
   2-3-manual-transaction-entry-cost-revenue-linkage: backlog
   2-4-nutrition-label-margin-calculations: backlog

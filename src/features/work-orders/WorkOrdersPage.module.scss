@@ -1,19 +1,149 @@
 // ─────────────────────────────────────────────
-// Placeholder page styling
+// Work Orders Page
 // ─────────────────────────────────────────────
 
-.placeholder {
-  @include placeholder-page;
+.page {
+  padding: $space-lg;
+  max-inline-size: 960px;
+  margin-inline: auto;
 }
 
-.icon {
-  @include placeholder-icon;
+// Header
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: $space-lg;
+  gap: $space-md;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .title {
-  @include placeholder-title;
+  font-size: $text-2xl;
+  color: $text-primary;
+  margin: 0;
+}
+
+// Form section
+.formSection {
+  margin-block-end: $space-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+// List
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+// Card
+.card {
+  padding: $space-md;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+  margin-block-end: $space-xs;
+}
+
+.clientName {
+  font-size: $text-lg;
+  color: $gold;
+  margin: 0;
+  font-weight: 600;
 }
 
 .description {
-  @include placeholder-description;
+  font-size: $text-sm;
+  color: $text-primary;
+  margin: 0;
+  margin-block-end: $space-xs;
+}
+
+.deadline {
+  display: block;
+  font-size: $text-xs;
+  color: $text-muted;
+  margin-block-end: $space-sm;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Error
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-2xl $space-lg;
+  text-align: center;
+}
+
+.errorIcon {
+  color: $error;
+  margin-block-end: $space-md;
+}
+
+.errorText {
+  font-size: $text-lg;
+  color: $text-primary;
+  margin: 0;
+  margin-block-end: $space-xs;
+}
+
+.errorDetail {
+  font-size: $text-sm;
+  color: $text-muted;
+  margin: 0;
+}
+
+// Empty state
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-2xl $space-lg;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $text-muted;
+  margin-block-end: $space-md;
+}
+
+.emptyTitle {
+  font-size: $text-xl;
+  color: $text-primary;
+  margin: 0;
+  margin-block-end: $space-xs;
+}
+
+.emptyDescription {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin: 0;
+  margin-block-end: $space-lg;
+  max-inline-size: 400px;
+}
+
+// Loading skeleton
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
 }

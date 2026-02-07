@@ -73,6 +73,46 @@
     "hebrew": "עברית",
     "english": "English"
   },
+  "workOrders": {
+    "title": "Work Orders",
+    "newWorkOrder": "New Work Order",
+    "editWorkOrder": "Edit Work Order",
+    "emptyState": {
+      "title": "No projects yet",
+      "description": "Create your first Work Order to start tracking project finances.",
+      "cta": "Create First Work Order"
+    },
+    "form": {
+      "clientName": "Client Name",
+      "clientNameRequired": "Client name is required",
+      "projectDescription": "Project Description",
+      "deadline": "Deadline",
+      "status": "Status",
+      "save": "Save",
+      "cancel": "Cancel",
+      "create": "Create Work Order",
+      "update": "Update Work Order"
+    },
+    "status": {
+      "Lead": "Lead",
+      "Design": "Design",
+      "Production": "Production",
+      "Shipped": "Shipped"
+    },
+    "toast": {
+      "created": "Work Order created successfully",
+      "updated": "Work Order updated successfully",
+      "createError": "Failed to create Work Order",
+      "updateError": "Failed to update Work Order"
+    },
+    "card": {
+      "edit": "Edit",
+      "noDescription": "No description"
+    },
+    "error": {
+      "title": "Failed to load Work Orders"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "Something went wrong",

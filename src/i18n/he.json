@@ -73,6 +73,46 @@
     "hebrew": "עברית",
     "english": "English"
   },
+  "workOrders": {
+    "title": "הזמנות עבודה",
+    "newWorkOrder": "הזמנת עבודה חדשה",
+    "editWorkOrder": "עריכת הזמנת עבודה",
+    "emptyState": {
+      "title": "אין פרויקטים עדיין",
+      "description": "צרו את הזמנת העבודה הראשונה כדי להתחיל לעקוב אחר כספי הפרויקט.",
+      "cta": "צור הזמנת עבודה ראשונה"
+    },
+    "form": {
+      "clientName": "שם הלקוח",
+      "clientNameRequired": "שם הלקוח נדרש",
+      "projectDescription": "תיאור הפרויקט",
+      "deadline": "תאריך יעד",
+      "status": "סטטוס",
+      "save": "שמור",
+      "cancel": "ביטול",
+      "create": "צור הזמנת עבודה",
+      "update": "עדכן הזמנת עבודה"
+    },
+    "status": {
+      "Lead": "ליד",
+      "Design": "עיצוב",
+      "Production": "ייצור",
+      "Shipped": "נשלח"
+    },
+    "toast": {
+      "created": "הזמנת העבודה נוצרה בהצלחה",
+      "updated": "הזמנת העבודה עודכנה בהצלחה",
+      "createError": "יצירת הזמנת העבודה נכשלה",
+      "updateError": "עדכון הזמנת העבודה נכשל"
+    },
+    "card": {
+      "edit": "עריכה",
+      "noDescription": "אין תיאור"
+    },
+    "error": {
+      "title": "טעינת הזמנות העבודה נכשלה"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "משהו השתבש",
