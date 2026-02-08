@@ -6,3 +6,4 @@ initializeApp();
 // Export Cloud Functions
 export { onEmailReceived } from './email/onEmailReceived.js';
 export { processDocument } from './ai/processDocument.js';
+export { retryFailedProcessing } from './scheduled/retryFailedProcessing.js';

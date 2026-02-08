@@ -40,6 +40,7 @@ export const transactionSchema = z.object({
   isEstimatedConversion: z.boolean(), // true for non-ILS currencies
   conversionRate: z.number().nullable(), // Rate used (e.g., 3.5 for USD→ILS)
   conversionRateDate: z.string().nullable(), // ISO date when rate was recorded
+  conversionRateStale: z.boolean(), // true when using fallback/stale conversion rates (Story 4.5)
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;

@@ -14,6 +14,7 @@ export const EMAIL_STATUSES = [
   'processed',
   'unprocessed',
   'failed',
+  'failed_permanent', // After 3 retries, permanently failed (Story 4.5)
 ] as const;
 export type EmailStatus = (typeof EMAIL_STATUSES)[number];
 
@@ -29,6 +30,8 @@ export const emailLogSchema = z.object({
   transactionId: z.string().nullable(),
   errorMessage: z.string().nullable(),
   paperlessForwarded: z.boolean(), // Tracks Paperless forwarding status (FR42/FR43/FR44)
+  retryCount: z.number().int(), // Number of retry attempts (0 = first processing) (Story 4.5)
+  updatedAt: z.date(), // Last status change (Story 4.5)
 });
 
 export type EmailLog = z.infer<typeof emailLogSchema>;

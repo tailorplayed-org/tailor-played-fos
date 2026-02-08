@@ -21,6 +21,8 @@ describe('EmailLog Schema', () => {
     transactionId: null,
     errorMessage: null,
     paperlessForwarded: true,
+    retryCount: 0,
+    updatedAt: new Date('2026-02-07T10:00:00Z'),
   };
 
   it('validates a correct EmailLog object', () => {
@@ -162,15 +164,16 @@ describe('EmailLog Constants', () => {
     expect(DESIGNATED_MAILBOXES).toHaveLength(4);
   });
 
-  it('EMAIL_STATUSES contains all 5 statuses', () => {
+  it('EMAIL_STATUSES contains all 6 statuses', () => {
     expect(EMAIL_STATUSES).toEqual([
       'received',
       'processing',
       'processed',
       'unprocessed',
       'failed',
+      'failed_permanent',
     ]);
-    expect(EMAIL_STATUSES).toHaveLength(5);
+    expect(EMAIL_STATUSES).toHaveLength(6);
   });
 });
 
@@ -189,6 +192,8 @@ describe('EmailLog Type', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: new Date(),
     };
     expect(log.mailbox).toBe('supplies');
   });

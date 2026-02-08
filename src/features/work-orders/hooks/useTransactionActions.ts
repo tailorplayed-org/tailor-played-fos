@@ -40,6 +40,7 @@ export function useTransactionActions() {
         isEstimatedConversion: data.currency !== 'ILS',
         conversionRate: data.currency !== 'ILS' ? DEFAULT_CONVERSION_RATES[data.currency] : null,
         conversionRateDate: data.currency !== 'ILS' ? new Date().toISOString().split('T')[0] : null,
+        conversionRateStale: false, // Manual transactions don't use stale rates (Story 4.5)
       });
 
       // 2. Update Work Order cost/revenue if linked

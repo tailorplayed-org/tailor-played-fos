@@ -89,10 +89,11 @@ export async function getActiveWorkOrders(
 
 /**
  * Get currency conversion rates from system_config, with fallback to defaults.
+ * Returns usedDefaults flag to track rate staleness (Story 4.5).
  */
 export async function getConversionRates(
   db: FirebaseFirestore.Firestore,
-): Promise<{ rates: Record<string, number>; date: string | null }> {
+): Promise<{ rates: Record<string, number>; date: string | null; usedDefaults: boolean }> {
   try {
     const configDoc = await db.collection('system_config').doc('currency').get();
     if (configDoc.exists) {
@@ -100,6 +101,7 @@ export async function getConversionRates(
       return {
         rates: (data?.currencyRates as Record<string, number>) ?? {},
         date: (data?.updatedAt as string) ?? null,
+        usedDefaults: false,
       };
     }
   } catch (error) {
@@ -112,13 +114,109 @@ export async function getConversionRates(
   return {
     rates: { ...DEFAULT_CONVERSION_RATES },
     date: null,
+    usedDefaults: true,
   };
+}
+
+/**
+ * Core AI processing logic: download from Storage → Gemini → create transaction.
+ * Used by both the onCreate trigger and the retry scheduled function (Story 4.5).
+ */
+export async function runAIProcessing(
+  db: FirebaseFirestore.Firestore,
+  documentUrl: string,
+  sourceEmailRefId: string,
+): Promise<{ transactionId: string }> {
+  const mimeType = guessMimeType(documentUrl);
+
+  // Query classification context (graceful degradation)
+  let classificationContext: ClassificationContext = { vendorHistory: [], workOrders: [] };
+  try {
+    const [vendorHistory, workOrders] = await Promise.all([
+      getVendorHistory(db),
+      getActiveWorkOrders(db),
+    ]);
+
+    // Enrich vendor history with work order names for better Gemini classification
+    for (const entry of vendorHistory) {
+      if (entry.workOrderId) {
+        const matchedWo = workOrders.find(wo => wo.id === entry.workOrderId);
+        if (matchedWo) {
+          entry.workOrderName = matchedWo.clientName;
+        }
+      }
+    }
+
+    classificationContext = { vendorHistory, workOrders };
+  } catch (contextError) {
+    logger.warn('Classification context failed, proceeding without', {
+      error: contextError instanceof Error ? contextError.message : String(contextError),
+    });
+  }
+
+  // Call Gemini for AI extraction + classification
+  const parsed = await parseFinancialDocument(documentUrl, mimeType, classificationContext);
+
+  // Convert amount to agora (integer)
+  const amountAgora = Math.round(parsed.totalAmount * 100);
+
+  // Parse and validate date
+  const parsedDate = new Date(parsed.date);
+  if (isNaN(parsedDate.getTime())) {
+    throw new Error(`Invalid date from Gemini: ${parsed.date}`);
+  }
+
+  // Handle currency conversion (Story 4.4 + 4.5 conversionRateStale)
+  const isEstimatedConversion = parsed.currency !== 'ILS';
+  let conversionRate: number | null = null;
+  let conversionRateDate: string | null = null;
+  let conversionRateStale = false;
+
+  if (isEstimatedConversion) {
+    const { rates, date, usedDefaults } = await getConversionRates(db);
+    conversionRate = rates[parsed.currency] ?? DEFAULT_CONVERSION_RATES[parsed.currency as keyof typeof DEFAULT_CONVERSION_RATES];
+    conversionRateDate = date ?? new Date().toISOString().split('T')[0];
+    conversionRateStale = usedDefaults;
+  }
+
+  // Create transaction document
+  const transactionRef = await db.collection('transactions').add({
+    vendorName: parsed.vendorName,
+    amountAgora,
+    currency: parsed.currency,
+    date: parsedDate,
+    category: parsed.category,
+    workOrderId: null,
+    inventoryItemId: null,
+    status: 'pending_review',
+    aiConfidence: parsed.confidence,
+    originalFileUrl: documentUrl,
+    source: 'ai',
+    sourceEmailRef: sourceEmailRefId,
+    notes: null,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+
+    // Classification fields (Story 4.4)
+    suggestedWorkOrderId: parsed.suggestedWorkOrderId,
+    suggestedInventoryItemId: parsed.suggestedInventoryItemId,
+    classificationReasoning: parsed.classificationReasoning,
+
+    // Currency conversion fields (Story 4.4 + 4.5)
+    isEstimatedConversion,
+    conversionRate,
+    conversionRateDate,
+    conversionRateStale,
+  });
+
+  return { transactionId: transactionRef.id };
 }
 
 export const processDocument = onDocumentCreated(
   {
     document: 'email_log/{docId}',
     secrets: [geminiApiKey],
+    maxInstances: 3, // Limit concurrency for backlog recovery (Story 4.5)
   },
   async (event) => {
     const db = getFirestore();
@@ -142,111 +240,27 @@ export const processDocument = onDocumentCreated(
 
     try {
       // 1. Update status to 'processing'
-      await emailLogRef.update({ status: 'processing' });
+      await emailLogRef.update({ status: 'processing', updatedAt: FieldValue.serverTimestamp() });
 
       // 2. Get first attachment URL
       const attachmentUrls: string[] = emailLogData.attachmentUrls ?? [];
       if (attachmentUrls.length === 0) {
         throw new Error('No attachments found in email_log');
       }
-      const documentUrl = attachmentUrls[0]; // Process first attachment
-      const mimeType = guessMimeType(documentUrl);
 
-      // 3. Query classification context from Firestore (Story 4.4)
-      // Gracefully degrade if context queries fail — classification context is enhancing, not essential
-      let classificationContext: ClassificationContext = { vendorHistory: [], workOrders: [] };
-      try {
-        const [vendorHistory, workOrders] = await Promise.all([
-          getVendorHistory(db),
-          getActiveWorkOrders(db),
-        ]);
+      // 3. Run core AI processing (extracted for retry reuse — Story 4.5)
+      const result = await runAIProcessing(db, attachmentUrls[0], event.params.docId);
 
-        // Enrich vendor history with work order names for better Gemini classification
-        for (const entry of vendorHistory) {
-          if (entry.workOrderId) {
-            const matchedWo = workOrders.find(wo => wo.id === entry.workOrderId);
-            if (matchedWo) {
-              entry.workOrderName = matchedWo.clientName;
-            }
-          }
-        }
-
-        classificationContext = { vendorHistory, workOrders };
-      } catch (contextError) {
-        logger.warn('Failed to load classification context, proceeding without', {
-          error: contextError instanceof Error ? contextError.message : String(contextError),
-          docId: event.params.docId,
-        });
-      }
-
-      // 4. Call Gemini for AI extraction + classification (Story 4.4)
-      const parsed = await parseFinancialDocument(documentUrl, mimeType, classificationContext);
-
-      // 5. Convert amount to agora (integer)
-      const amountAgora = Math.round(parsed.totalAmount * 100);
-
-      // 6. Parse and validate date
-      const parsedDate = new Date(parsed.date);
-      if (isNaN(parsedDate.getTime())) {
-        throw new Error(`Invalid date from Gemini: ${parsed.date}`);
-      }
-
-      // 7. Handle currency conversion (Story 4.4)
-      const isEstimatedConversion = parsed.currency !== 'ILS';
-      let conversionRate: number | null = null;
-      let conversionRateDate: string | null = null;
-
-      if (isEstimatedConversion) {
-        const { rates, date } = await getConversionRates(db);
-        conversionRate = rates[parsed.currency] ?? DEFAULT_CONVERSION_RATES[parsed.currency as keyof typeof DEFAULT_CONVERSION_RATES];
-        conversionRateDate = date ?? new Date().toISOString().split('T')[0];
-      }
-
-      // 8. Create transaction document with classification + conversion fields (Story 4.4)
-      const transactionRef = await db.collection('transactions').add({
-        vendorName: parsed.vendorName,
-        amountAgora,
-        currency: parsed.currency,
-        date: parsedDate,
-        category: parsed.category, // Now Gemini-classified (replaces mailbox heuristic)
-        workOrderId: null, // Confirmed link — set by Ghost Text approval (Epic 5)
-        inventoryItemId: null, // Confirmed link — set by Ghost Text approval (Epic 5)
-        status: 'pending_review',
-        aiConfidence: parsed.confidence, // Now includes classification confidence
-        originalFileUrl: documentUrl,
-        source: 'ai',
-        sourceEmailRef: event.params.docId,
-        notes: null,
-        createdAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-
-        // NEW classification fields (Story 4.4)
-        suggestedWorkOrderId: parsed.suggestedWorkOrderId,
-        suggestedInventoryItemId: parsed.suggestedInventoryItemId,
-        classificationReasoning: parsed.classificationReasoning,
-
-        // NEW currency conversion fields (Story 4.4)
-        isEstimatedConversion,
-        conversionRate,
-        conversionRateDate,
-      });
-
-      // 9. Update email_log: processed + transaction link
+      // 4. Update email_log: processed + transaction link
       await emailLogRef.update({
         status: 'processed',
-        transactionId: transactionRef.id,
+        transactionId: result.transactionId,
+        updatedAt: FieldValue.serverTimestamp(),
       });
 
       logger.info('Document processed and classified successfully', {
         emailLogId: event.params.docId,
-        transactionId: transactionRef.id,
-        vendorName: parsed.vendorName,
-        amountAgora,
-        currency: parsed.currency,
-        category: parsed.category,
-        confidence: parsed.confidence,
-        suggestedWorkOrderId: parsed.suggestedWorkOrderId,
-        isEstimatedConversion,
+        transactionId: result.transactionId,
       });
     } catch (error) {
       // Error path: mark as 'unprocessed', preserve error details
@@ -260,6 +274,7 @@ export const processDocument = onDocumentCreated(
         await emailLogRef.update({
           status: 'unprocessed',
           errorMessage: errorMsg,
+          updatedAt: FieldValue.serverTimestamp(),
         });
       } catch (updateError) {
         // If even the error status update fails, log it — document stays in 'processing'

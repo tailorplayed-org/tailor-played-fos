@@ -31,6 +31,7 @@ describe('transactionSchema', () => {
     isEstimatedConversion: false,
     conversionRate: null,
     conversionRateDate: null,
+    conversionRateStale: false,
   };
 
   it('parses a valid transaction', () => {

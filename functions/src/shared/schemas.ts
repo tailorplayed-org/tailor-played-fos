@@ -13,6 +13,7 @@ export const EMAIL_STATUSES = [
   'processed',
   'unprocessed',
   'failed',
+  'failed_permanent', // After 3 retries, permanently failed (Story 4.5)
 ] as const;
 
 // Server-side schema: uses z.any() for Firestore Timestamps
@@ -28,6 +29,8 @@ export const emailLogSchema = z.object({
   transactionId: z.string().nullable(),
   errorMessage: z.string().nullable(),
   paperlessForwarded: z.boolean(), // Tracks Paperless forwarding status (FR42/FR43/FR44)
+  retryCount: z.number().int(), // Number of retry attempts (0 = first processing) (Story 4.5)
+  updatedAt: z.any(), // Firestore Timestamp — last status change (Story 4.5)
 });
 
 export type EmailLog = z.infer<typeof emailLogSchema>;
@@ -70,6 +73,7 @@ export const transactionSchema = z.object({
   isEstimatedConversion: z.boolean(), // true for non-ILS currencies
   conversionRate: z.number().nullable(), // Rate used (e.g., 3.5 for USD→ILS)
   conversionRateDate: z.string().nullable(), // ISO date when rate was recorded
+  conversionRateStale: z.boolean(), // true when using fallback/stale conversion rates (Story 4.5)
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;

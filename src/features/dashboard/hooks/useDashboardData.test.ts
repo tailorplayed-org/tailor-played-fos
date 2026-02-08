@@ -54,6 +54,7 @@ const mockTxnStore = {
     isEstimatedConversion: boolean;
     conversionRate: number | null;
     conversionRateDate: string | null;
+    conversionRateStale: boolean;
   }>,
   loading: false,
   error: null as string | null,
@@ -119,6 +120,7 @@ function createTransaction(overrides: Partial<typeof mockTxnStore.transactions[0
     isEstimatedConversion: false,
     conversionRate: null,
     conversionRateDate: null,
+    conversionRateStale: false,
     ...overrides,
   };
 }

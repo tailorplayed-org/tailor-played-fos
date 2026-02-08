@@ -84,6 +84,7 @@ describe('useTransactionActions', () => {
           isEstimatedConversion: false,
           conversionRate: null,
           conversionRateDate: null,
+          conversionRateStale: false,
         }),
       );
       expect(mockBatchCommit).toHaveBeenCalledTimes(1);
@@ -168,6 +169,7 @@ describe('useTransactionActions', () => {
           isEstimatedConversion: true,
           conversionRate: 3.5, // DEFAULT_CONVERSION_RATES.USD
           conversionRateDate: expect.any(String),
+          conversionRateStale: false, // Manual transactions never stale (Story 4.5)
         }),
       );
       expect(mockBatchUpdate).toHaveBeenCalledWith(

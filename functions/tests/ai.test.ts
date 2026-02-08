@@ -322,8 +322,8 @@ describe('processDocument — Firestore onCreate trigger', () => {
     const event = createFirestoreEvent('received', 'orders');
     await handler(event);
 
-    // Verify status transition: received → processing
-    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing' });
+    // Verify status transition: received → processing (with updatedAt)
+    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing', updatedAt: 'SERVER_TIMESTAMP' });
 
     // Verify transaction created with correct fields (category from Gemini, not mailbox)
     expect(mockTransactionAdd).toHaveBeenCalledWith(
@@ -344,17 +344,19 @@ describe('processDocument — Firestore onCreate trigger', () => {
         suggestedWorkOrderId: null,
         suggestedInventoryItemId: null,
         classificationReasoning: 'Game box printing is a direct production cost for a board game company.',
-        // Currency conversion fields (Story 4.4) — ILS transaction
+        // Currency conversion fields (Story 4.4 + 4.5) — ILS transaction
         isEstimatedConversion: false,
         conversionRate: null,
         conversionRateDate: null,
+        conversionRateStale: false, // ILS = no stale rates (Story 4.5)
       }),
     );
 
-    // Verify email_log updated: processed + transactionId
+    // Verify email_log updated: processed + transactionId + updatedAt
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'processed',
       transactionId: 'txn-ai-001',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
   });
 
@@ -385,10 +387,11 @@ describe('processDocument — Firestore onCreate trigger', () => {
         suggestedWorkOrderId: 'wo-david-game',
         suggestedInventoryItemId: null,
         classificationReasoning: 'Custom card deck order is a direct cost for game production.',
-        // Currency conversion fields (Story 4.4) — USD transaction
+        // Currency conversion fields (Story 4.4 + 4.5) — USD transaction
         isEstimatedConversion: true,
         conversionRate: 3.5, // DEFAULT_CONVERSION_RATES.USD
         conversionRateDate: expect.any(String),
+        conversionRateStale: true, // Uses defaults → stale (Story 4.5)
       }),
     );
   });
@@ -438,11 +441,12 @@ describe('processDocument — Firestore onCreate trigger', () => {
     const event = createFirestoreEvent('received', 'orders');
     await handler(event);
 
-    // Should set status to 'processing' first, then 'unprocessed' on error
-    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing' });
+    // Should set status to 'processing' first, then 'unprocessed' on error (with updatedAt)
+    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing', updatedAt: 'SERVER_TIMESTAMP' });
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'unprocessed',
       errorMessage: 'Gemini API rate limit exceeded',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
 
     // Should NOT create transaction
@@ -463,6 +467,7 @@ describe('processDocument — Firestore onCreate trigger', () => {
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'unprocessed',
       errorMessage: 'No attachments found in email_log',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
     expect(mockTransactionAdd).not.toHaveBeenCalled();
   });
@@ -483,6 +488,7 @@ describe('processDocument — Firestore onCreate trigger', () => {
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'unprocessed',
       errorMessage: expect.any(String),
+      updatedAt: 'SERVER_TIMESTAMP',
     });
     expect(mockTransactionAdd).not.toHaveBeenCalled();
   });
@@ -556,11 +562,12 @@ describe('processDocument — Firestore onCreate trigger', () => {
     const event = createFirestoreEvent('received', 'orders');
     await handler(event);
 
-    // Verify status updates include processing → processed
-    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing' });
+    // Verify status updates include processing → processed (with updatedAt)
+    expect(mockUpdate).toHaveBeenCalledWith({ status: 'processing', updatedAt: 'SERVER_TIMESTAMP' });
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'processed',
       transactionId: 'txn-ai-001',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
   });
 
@@ -598,6 +605,7 @@ describe('processDocument — Firestore onCreate trigger', () => {
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'unprocessed',
       errorMessage: 'File not found in Storage',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
     expect(mockTransactionAdd).not.toHaveBeenCalled();
   });
@@ -649,6 +657,7 @@ describe('processDocument — Firestore onCreate trigger', () => {
     expect(mockUpdate).toHaveBeenCalledWith({
       status: 'unprocessed',
       errorMessage: 'Invalid date from Gemini: not-a-date',
+      updatedAt: 'SERVER_TIMESTAMP',
     });
     expect(mockTransactionAdd).not.toHaveBeenCalled();
   });
@@ -1185,6 +1194,7 @@ describe('getConversionRates — unit tests (Story 4.4)', () => {
 
     expect(result.rates).toEqual({ ILS: 1, USD: 3.5, EUR: 3.8 });
     expect(result.date).toBeNull();
+    expect(result.usedDefaults).toBe(true); // Story 4.5
   });
 
   it('returns system_config rates when available', async () => {
@@ -1200,6 +1210,7 @@ describe('getConversionRates — unit tests (Story 4.4)', () => {
 
     expect(result.rates).toEqual({ USD: 4.0, EUR: 4.2, ILS: 1 });
     expect(result.date).toBe('2026-02-01');
+    expect(result.usedDefaults).toBe(false); // Story 4.5
   });
 
   it('falls back to defaults when Firestore query throws', async () => {
@@ -1212,6 +1223,7 @@ describe('getConversionRates — unit tests (Story 4.4)', () => {
     // Should fall back to default rates, not throw
     expect(result.rates).toEqual({ ILS: 1, USD: 3.5, EUR: 3.8 });
     expect(result.date).toBeNull();
+    expect(result.usedDefaults).toBe(true); // Story 4.5
   });
 });
 
@@ -1291,6 +1303,7 @@ describe('server-side transactionSchema — classification + conversion fields (
       isEstimatedConversion: true,
       conversionRate: 3.5,
       conversionRateDate: '2026-02-01',
+      conversionRateStale: false,
     };
 
     const result = transactionSchema.safeParse(validTxn);
@@ -1322,6 +1335,7 @@ describe('server-side transactionSchema — classification + conversion fields (
       isEstimatedConversion: 'yes', // Should be boolean
       conversionRate: null,
       conversionRateDate: null,
+      conversionRateStale: false,
     };
 
     const result = transactionSchema.safeParse(invalid);
@@ -1353,6 +1367,7 @@ describe('server-side transactionSchema — classification + conversion fields (
       isEstimatedConversion: false,
       conversionRate: null,
       conversionRateDate: null,
+      conversionRateStale: false,
     };
 
     const result = transactionSchema.safeParse(manualTxn);
@@ -1386,6 +1401,7 @@ describe('server-side transactionSchema with sourceEmailRef', () => {
       isEstimatedConversion: false,
       conversionRate: null,
       conversionRateDate: null,
+      conversionRateStale: false,
     };
 
     const result = transactionSchema.safeParse(validTxn);
@@ -1417,9 +1433,150 @@ describe('server-side transactionSchema with sourceEmailRef', () => {
       isEstimatedConversion: true,
       conversionRate: 3.5,
       conversionRateDate: '2026-02-01',
+      conversionRateStale: false,
     };
 
     const result = transactionSchema.safeParse(validTxn);
     expect(result.success).toBe(true);
+  });
+});
+
+// ── Story 4.5: conversionRateStale + updatedAt Tests ──
+
+describe('processDocument — conversionRateStale (Story 4.5)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDownload.mockResolvedValue([Buffer.from('PDF-content')]);
+    mockVendorHistoryDocs.length = 0;
+    mockWorkOrderDocs.length = 0;
+    mockCurrencyConfigDoc.exists = false;
+  });
+
+  it('conversionRateStale = true when using default conversion rates', async () => {
+    // No system_config → defaults used → stale
+    mockCurrencyConfigDoc.exists = false;
+
+    mockGenerateContent.mockResolvedValueOnce({
+      text: JSON.stringify(englishInvoiceResponse), // USD
+    });
+
+    const { processDocument } = await import('../src/ai/processDocument.js');
+    const handler = processDocument as unknown as (event: unknown) => Promise<void>;
+
+    const event = createFirestoreEvent('received', 'orders');
+    await handler(event);
+
+    expect(mockTransactionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversionRateStale: true,
+      }),
+    );
+  });
+
+  it('conversionRateStale = false when using system_config rates', async () => {
+    mockCurrencyConfigDoc.exists = true;
+    mockCurrencyConfigDoc.data = () => ({
+      currencyRates: { USD: 4.0, EUR: 4.2, ILS: 1 },
+      updatedAt: '2026-02-01',
+    });
+
+    mockGenerateContent.mockResolvedValueOnce({
+      text: JSON.stringify(englishInvoiceResponse), // USD
+    });
+
+    const { processDocument } = await import('../src/ai/processDocument.js');
+    const handler = processDocument as unknown as (event: unknown) => Promise<void>;
+
+    const event = createFirestoreEvent('received', 'orders');
+    await handler(event);
+
+    expect(mockTransactionAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        conversionRateStale: false,
+      }),
+    );
+  });
+
+  it('updatedAt is set in all email_log updates', async () => {
+    mockGenerateContent.mockResolvedValueOnce({
+      text: JSON.stringify(hebrewInvoiceResponse),
+    });
+
+    const { processDocument } = await import('../src/ai/processDocument.js');
+    const handler = processDocument as unknown as (event: unknown) => Promise<void>;
+
+    const event = createFirestoreEvent('received', 'orders');
+    await handler(event);
+
+    // All update calls should include updatedAt
+    for (const call of mockUpdate.mock.calls) {
+      expect(call[0]).toHaveProperty('updatedAt', 'SERVER_TIMESTAMP');
+    }
+  });
+});
+
+describe('server-side transactionSchema — conversionRateStale field (Story 4.5)', () => {
+  it('validates transaction with conversionRateStale: true', async () => {
+    const { transactionSchema } = await import('../src/shared/schemas.js');
+
+    const validTxn = {
+      vendorName: 'Test Vendor',
+      amountAgora: 5000,
+      currency: 'USD',
+      date: new Date(),
+      category: 'DirectCost',
+      workOrderId: null,
+      inventoryItemId: null,
+      status: 'pending_review',
+      aiConfidence: 90,
+      originalFileUrl: 'doc.pdf',
+      source: 'ai',
+      sourceEmailRef: 'email-123',
+      notes: null,
+      createdAt: 'SERVER_TIMESTAMP',
+      updatedAt: 'SERVER_TIMESTAMP',
+      suggestedWorkOrderId: null,
+      suggestedInventoryItemId: null,
+      classificationReasoning: 'Test',
+      isEstimatedConversion: true,
+      conversionRate: 3.5,
+      conversionRateDate: '2026-02-01',
+      conversionRateStale: true,
+    };
+
+    const result = transactionSchema.safeParse(validTxn);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects non-boolean conversionRateStale', async () => {
+    const { transactionSchema } = await import('../src/shared/schemas.js');
+
+    const invalid = {
+      vendorName: 'Test',
+      amountAgora: 1000,
+      currency: 'ILS',
+      date: new Date(),
+      category: 'DirectCost',
+      workOrderId: null,
+      inventoryItemId: null,
+      status: 'approved',
+      aiConfidence: null,
+      originalFileUrl: null,
+      source: 'manual',
+      sourceEmailRef: null,
+      notes: null,
+      createdAt: 'SERVER_TIMESTAMP',
+      updatedAt: 'SERVER_TIMESTAMP',
+      suggestedWorkOrderId: null,
+      suggestedInventoryItemId: null,
+      classificationReasoning: null,
+      isEstimatedConversion: false,
+      conversionRate: null,
+      conversionRateDate: null,
+      conversionRateStale: 'yes', // Should be boolean
+    };
+
+    const result = transactionSchema.safeParse(invalid);
+    expect(result.success).toBe(false);
   });
 });

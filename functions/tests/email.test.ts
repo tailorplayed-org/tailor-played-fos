@@ -335,7 +335,7 @@ describe('onEmailReceived', () => {
       createPubSubEvent('orders@tailorplayed.com', 12345),
     );
 
-    // Verify email_log document was created with paperlessForwarded
+    // Verify email_log document was created with paperlessForwarded + retryCount + updatedAt
     expect(mockAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         messageId: 'msg-new-1',
@@ -346,6 +346,8 @@ describe('onEmailReceived', () => {
         transactionId: null,
         errorMessage: null,
         paperlessForwarded: true,
+        retryCount: 0,
+        updatedAt: 'SERVER_TIMESTAMP',
       }),
     );
   });
@@ -439,13 +441,15 @@ describe('onEmailReceived', () => {
       handler(createPubSubEvent('orders@tailorplayed.com', 12348)),
     ).rejects.toThrow();
 
-    // Verify error email_log was created with 'failed' status, error message, and paperlessForwarded
+    // Verify error email_log was created with 'failed' status, error message, paperlessForwarded, retryCount, updatedAt
     expect(mockAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         messageId: 'msg-error',
         status: 'failed',
         errorMessage: expect.stringContaining('Gmail API down'),
         paperlessForwarded: true,
+        retryCount: 0,
+        updatedAt: 'SERVER_TIMESTAMP',
       }),
     );
   });
@@ -496,6 +500,8 @@ describe('onEmailReceived', () => {
         messageId: 'msg-pf-success',
         status: 'received',
         paperlessForwarded: true,
+        retryCount: 0,
+        updatedAt: 'SERVER_TIMESTAMP',
       }),
     );
   });
@@ -524,6 +530,8 @@ describe('onEmailReceived', () => {
         messageId: 'msg-pf-error',
         status: 'failed',
         paperlessForwarded: true,
+        retryCount: 0,
+        updatedAt: 'SERVER_TIMESTAMP',
       }),
     );
   });
@@ -627,6 +635,8 @@ describe('emailLogSchema (server-side)', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: { seconds: 1707350400, nanoseconds: 0 },
     };
 
     const result = emailLogSchema.safeParse(validDoc);
@@ -647,6 +657,8 @@ describe('emailLogSchema (server-side)', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: new Date(),
     };
 
     const result = emailLogSchema.safeParse(invalidDoc);
@@ -667,6 +679,8 @@ describe('emailLogSchema (server-side)', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: new Date(),
     };
 
     const result = emailLogSchema.safeParse(invalidDoc);
@@ -687,6 +701,8 @@ describe('emailLogSchema (server-side)', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: new Date(),
     };
 
     const result = emailLogSchema.safeParse(validDoc);
@@ -725,6 +741,8 @@ describe('emailLogSchema (server-side)', () => {
       transactionId: null,
       errorMessage: null,
       paperlessForwarded: true,
+      retryCount: 0,
+      updatedAt: firestoreTimestamp,
     };
 
     const result = emailLogSchema.safeParse(validDoc);
@@ -753,6 +771,7 @@ describe('DESIGNATED_MAILBOXES and EMAIL_STATUSES (server-side)', () => {
       'processed',
       'unprocessed',
       'failed',
+      'failed_permanent',
     ]);
   });
 });
