@@ -2,7 +2,7 @@ import { writeBatch, doc, collection, increment, serverTimestamp } from 'firebas
 import { useTranslation } from 'react-i18next';
 import { db } from '@/services';
 import { toast } from '@/components/Toast';
-import { toMinorUnits, toIlsAgora } from '@/lib';
+import { toMinorUnits, toIlsAgora, DEFAULT_CONVERSION_RATES } from '@/lib';
 import type { CreateTransactionInput } from '@/types';
 
 export function useTransactionActions() {
@@ -32,6 +32,14 @@ export function useTransactionActions() {
         notes: data.notes || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+
+        // AI-only fields — defaults for manual transactions (Story 4.4)
+        suggestedWorkOrderId: null,
+        suggestedInventoryItemId: null,
+        classificationReasoning: null,
+        isEstimatedConversion: data.currency !== 'ILS',
+        conversionRate: data.currency !== 'ILS' ? DEFAULT_CONVERSION_RATES[data.currency] : null,
+        conversionRateDate: data.currency !== 'ILS' ? new Date().toISOString().split('T')[0] : null,
       });
 
       // 2. Update Work Order cost/revenue if linked

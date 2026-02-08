@@ -24,3 +24,27 @@ export interface ParsedEmailData {
     mimeType: string;
   }>;
 }
+
+// --- Classification context types (Story 4.4) ---
+
+/** Vendor history entry for AI classification context */
+export interface VendorHistoryEntry {
+  vendorName: string;
+  category: string;
+  workOrderId: string | null;
+  workOrderName: string | null;
+  count: number; // Number of times this vendor → workOrder pairing occurred
+}
+
+/** Work order summary for AI classification context */
+export interface WorkOrderSummary {
+  id: string;
+  clientName: string;
+  status: string;
+}
+
+/** Full classification context passed to Gemini */
+export interface ClassificationContext {
+  vendorHistory: VendorHistoryEntry[];
+  workOrders: WorkOrderSummary[];
+}

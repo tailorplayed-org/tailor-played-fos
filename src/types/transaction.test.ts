@@ -25,6 +25,12 @@ describe('transactionSchema', () => {
     notes: 'Test transaction',
     createdAt: new Date('2026-02-01'),
     updatedAt: new Date('2026-02-01'),
+    suggestedWorkOrderId: null,
+    suggestedInventoryItemId: null,
+    classificationReasoning: null,
+    isEstimatedConversion: false,
+    conversionRate: null,
+    conversionRateDate: null,
   };
 
   it('parses a valid transaction', () => {
@@ -128,6 +134,56 @@ describe('transactionSchema', () => {
   it('accepts string sourceEmailRef (links to email_log)', () => {
     const result = transactionSchema.parse({ ...validTransaction, sourceEmailRef: 'email-log-123' });
     expect(result.sourceEmailRef).toBe('email-log-123');
+  });
+
+  // Story 4.4: Classification + conversion field tests
+  it('accepts AI classification fields', () => {
+    const result = transactionSchema.parse({
+      ...validTransaction,
+      suggestedWorkOrderId: 'wo-ai-suggestion',
+      suggestedInventoryItemId: null,
+      classificationReasoning: 'Known vendor matched to project.',
+      isEstimatedConversion: false,
+      conversionRate: null,
+      conversionRateDate: null,
+    });
+    expect(result.suggestedWorkOrderId).toBe('wo-ai-suggestion');
+    expect(result.classificationReasoning).toBe('Known vendor matched to project.');
+    expect(result.isEstimatedConversion).toBe(false);
+  });
+
+  it('accepts currency conversion fields for non-ILS transaction', () => {
+    const result = transactionSchema.parse({
+      ...validTransaction,
+      currency: 'USD',
+      isEstimatedConversion: true,
+      conversionRate: 3.5,
+      conversionRateDate: '2026-02-01',
+    });
+    expect(result.isEstimatedConversion).toBe(true);
+    expect(result.conversionRate).toBe(3.5);
+    expect(result.conversionRateDate).toBe('2026-02-01');
+  });
+
+  it('rejects non-boolean isEstimatedConversion', () => {
+    const invalid = { ...validTransaction, isEstimatedConversion: 'yes' };
+    expect(() => transactionSchema.parse(invalid)).toThrow();
+  });
+
+  it('accepts null values for all nullable classification fields', () => {
+    const result = transactionSchema.parse({
+      ...validTransaction,
+      suggestedWorkOrderId: null,
+      suggestedInventoryItemId: null,
+      classificationReasoning: null,
+      conversionRate: null,
+      conversionRateDate: null,
+    });
+    expect(result.suggestedWorkOrderId).toBeNull();
+    expect(result.suggestedInventoryItemId).toBeNull();
+    expect(result.classificationReasoning).toBeNull();
+    expect(result.conversionRate).toBeNull();
+    expect(result.conversionRateDate).toBeNull();
   });
 });
 

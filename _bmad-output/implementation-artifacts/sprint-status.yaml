@@ -71,7 +71,7 @@ development_status:
   4-1-gmail-api-integration-email-detection: review
   4-2-paperless-auto-forward: done
   4-3-ai-document-processing-gemini: done
-  4-4-transaction-classification-confidence-scoring: backlog
+  4-4-transaction-classification-confidence-scoring: done
   4-5-error-handling-retry-pipeline-resilience: backlog
   epic-4-retrospective: optional
 

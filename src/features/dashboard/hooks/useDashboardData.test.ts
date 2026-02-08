@@ -48,6 +48,12 @@ const mockTxnStore = {
     notes: string | null;
     createdAt: Date;
     updatedAt: Date;
+    suggestedWorkOrderId: string | null;
+    suggestedInventoryItemId: string | null;
+    classificationReasoning: string | null;
+    isEstimatedConversion: boolean;
+    conversionRate: number | null;
+    conversionRateDate: string | null;
   }>,
   loading: false,
   error: null as string | null,
@@ -107,6 +113,12 @@ function createTransaction(overrides: Partial<typeof mockTxnStore.transactions[0
     notes: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    suggestedWorkOrderId: null,
+    suggestedInventoryItemId: null,
+    classificationReasoning: null,
+    isEstimatedConversion: false,
+    conversionRate: null,
+    conversionRateDate: null,
     ...overrides,
   };
 }

@@ -62,6 +62,14 @@ export const transactionSchema = z.object({
   notes: z.string().nullable(),
   createdAt: z.any(), // Firestore Timestamp / FieldValue.serverTimestamp()
   updatedAt: z.any(), // Firestore Timestamp / FieldValue.serverTimestamp()
+
+  // --- NEW classification + conversion fields (Story 4.4) ---
+  suggestedWorkOrderId: z.string().nullable(), // AI suggestion — user confirms in Ghost Text (Epic 5)
+  suggestedInventoryItemId: z.string().nullable(), // AI suggestion for restock items
+  classificationReasoning: z.string().nullable(), // AI reasoning for category/project match
+  isEstimatedConversion: z.boolean(), // true for non-ILS currencies
+  conversionRate: z.number().nullable(), // Rate used (e.g., 3.5 for USD→ILS)
+  conversionRateDate: z.string().nullable(), // ISO date when rate was recorded
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
@@ -73,6 +81,7 @@ export const parsedLineItemSchema = z.object({
 });
 
 export const parsedDocumentSchema = z.object({
+  // --- Existing extraction fields (Story 4.3) ---
   vendorName: z.string().min(1),
   date: z.string(), // ISO 8601 format: YYYY-MM-DD
   totalAmount: z.number(), // Raw decimal (e.g., 82.50) — converted to agora later
@@ -80,7 +89,13 @@ export const parsedDocumentSchema = z.object({
   lineItems: z.array(parsedLineItemSchema),
   documentType: z.enum(['invoice', 'receipt', 'quote']),
   languageDetected: z.enum(['hebrew', 'english', 'mixed']),
-  confidence: z.number().min(0).max(100),
+  confidence: z.number().min(0).max(100), // Overall confidence (extraction + classification)
+
+  // --- NEW classification fields (Story 4.4) ---
+  category: z.enum(TRANSACTION_CATEGORIES), // AI-classified category
+  classificationReasoning: z.string(), // 1-2 sentence explanation
+  suggestedWorkOrderId: z.string().nullable(), // Matched from provided context (Firestore ID)
+  suggestedInventoryItemId: z.string().nullable(), // Matched from provided context (Firestore ID)
 });
 
 export type ParsedDocument = z.infer<typeof parsedDocumentSchema>;

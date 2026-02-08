@@ -78,6 +78,12 @@ describe('useTransactionActions', () => {
           notes: null,
           createdAt: 'server-timestamp',
           updatedAt: 'server-timestamp',
+          suggestedWorkOrderId: null,
+          suggestedInventoryItemId: null,
+          classificationReasoning: null,
+          isEstimatedConversion: false,
+          conversionRate: null,
+          conversionRateDate: null,
         }),
       );
       expect(mockBatchCommit).toHaveBeenCalledTimes(1);
@@ -159,6 +165,9 @@ describe('useTransactionActions', () => {
         expect.objectContaining({
           amountAgora: 10000, // Original USD cents
           currency: 'USD',
+          isEstimatedConversion: true,
+          conversionRate: 3.5, // DEFAULT_CONVERSION_RATES.USD
+          conversionRateDate: expect.any(String),
         }),
       );
       expect(mockBatchUpdate).toHaveBeenCalledWith(
