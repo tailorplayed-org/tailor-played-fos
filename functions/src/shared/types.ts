@@ -1,7 +1,7 @@
-import type { EmailLog, ParsedDocument, ParsedLineItem, Transaction } from './schemas.js';
+import type { AuditLog, EmailLog, ParsedDocument, ParsedLineItem, Transaction } from './schemas.js';
 import type { DESIGNATED_MAILBOXES, EMAIL_STATUSES } from './schemas.js';
 
-export type { EmailLog, ParsedDocument, ParsedLineItem, Transaction };
+export type { AuditLog, EmailLog, ParsedDocument, ParsedLineItem, Transaction };
 
 export type DesignatedMailbox = (typeof DESIGNATED_MAILBOXES)[number];
 export type EmailStatus = (typeof EMAIL_STATUSES)[number];

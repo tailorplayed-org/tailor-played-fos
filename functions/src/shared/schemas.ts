@@ -104,3 +104,17 @@ export const parsedDocumentSchema = z.object({
 
 export type ParsedDocument = z.infer<typeof parsedDocumentSchema>;
 export type ParsedLineItem = z.infer<typeof parsedLineItemSchema>;
+
+// Audit log schema (Story 5.4 — transaction approval/rejection audit trail)
+export const AUDIT_LOG_ACTIONS = ['approved', 'rejected'] as const;
+
+export const auditLogSchema = z.object({
+  transactionId: z.string(),
+  action: z.enum(AUDIT_LOG_ACTIONS),
+  actorUid: z.string(),
+  timestamp: z.any(), // Firestore Timestamp / FieldValue.serverTimestamp()
+  beforeSnapshot: z.record(z.string(), z.any()),
+  afterSnapshot: z.record(z.string(), z.any()),
+});
+
+export type AuditLog = z.infer<typeof auditLogSchema>;
