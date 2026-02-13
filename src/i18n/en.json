@@ -162,6 +162,30 @@
       "createError": "Failed to save transaction"
     }
   },
+  "review": {
+    "queue": {
+      "pendingCount": "{{count}} pending",
+      "pendingCount_one": "1 pending",
+      "sortedByAttention": "Sorted by attention needed",
+      "lastReviewAt": "Last reviewed {{time}}",
+      "mailboxSource": "via {{mailbox}}"
+    },
+    "error": {
+      "title": "Failed to load review queue"
+    }
+  },
+  "dates": {
+    "relative": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{count}} days ago",
+      "daysAgo_one": "1 day ago",
+      "monthsAgo": "{{count}} months ago",
+      "monthsAgo_one": "1 month ago",
+      "yearsAgo": "{{count}} years ago",
+      "yearsAgo_one": "1 year ago"
+    }
+  },
   "workOrderDetail": {
     "backToList": "Work Orders",
     "editWorkOrder": "Edit Work Order",

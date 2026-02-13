@@ -162,6 +162,30 @@
       "createError": "שמירת העסקה נכשלה"
     }
   },
+  "review": {
+    "queue": {
+      "pendingCount": "{{count}} ממתינים",
+      "pendingCount_one": "1 ממתין",
+      "sortedByAttention": "ממוין לפי דחיפות",
+      "lastReviewAt": "נבדק לאחרונה {{time}}",
+      "mailboxSource": "דרך {{mailbox}}"
+    },
+    "error": {
+      "title": "טעינת תור הביקורת נכשלה"
+    }
+  },
+  "dates": {
+    "relative": {
+      "today": "היום",
+      "yesterday": "אתמול",
+      "daysAgo": "לפני {{count}} ימים",
+      "daysAgo_one": "לפני יום",
+      "monthsAgo": "לפני {{count}} חודשים",
+      "monthsAgo_one": "לפני חודש",
+      "yearsAgo": "לפני {{count}} שנים",
+      "yearsAgo_one": "לפני שנה"
+    }
+  },
   "workOrderDetail": {
     "backToList": "הזמנות עבודה",
     "editWorkOrder": "ערוך הזמנת עבודה",

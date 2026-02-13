@@ -76,8 +76,8 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Ghost Text Review & Transaction Approval
-  epic-5: backlog
-  5-1-review-queue-pending-items-list: backlog
+  epic-5: in-progress
+  5-1-review-queue-pending-items-list: done
   5-2-ghost-text-card-core-confirmation-flow: backlog
   5-3-ghost-text-field-editing-rejection: backlog
   5-4-post-approval-side-effects-real-time-updates: backlog

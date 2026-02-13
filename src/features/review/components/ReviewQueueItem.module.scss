@@ -1,0 +1,76 @@
+// ─────────────────────────────────────────────
+// ReviewQueueItem — Individual pending item row
+// ─────────────────────────────────────────────
+
+.item {
+  @include interactive-reset;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  width: 100%;
+  min-height: 44px;
+  padding: $space-md;
+  border-radius: $radius-md;
+  border-inline-start: 3px solid transparent;
+  background-color: transparent;
+  text-align: start;
+  transition: background-color $transition-fast, transform $transition-fast,
+    border-color $transition-fast;
+
+  &:hover {
+    background-color: $bg-elevated;
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.selected {
+  background-color: $bg-elevated;
+  border-inline-start-color: $gold;
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+}
+
+.vendorName {
+  @include truncate;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-primary;
+  flex: 1;
+  min-width: 0;
+}
+
+.amount {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $gold;
+  white-space: nowrap;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex-wrap: wrap;
+}
+
+.confidence {
+  flex-shrink: 0;
+}
+
+.date {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.mailbox {
+  font-size: $text-xs;
+}

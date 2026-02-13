@@ -1,19 +1,55 @@
 // ─────────────────────────────────────────────
-// Placeholder page styling
+// Review Page layout
 // ─────────────────────────────────────────────
 
-.placeholder {
-  @include placeholder-page;
-}
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  padding: $space-md;
+  max-width: 720px;
+  width: 100%;
+  margin-inline: auto;
 
-.icon {
-  @include placeholder-icon;
+  @include lg {
+    padding: $space-lg;
+  }
 }
 
 .title {
-  @include placeholder-title;
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
 }
 
-.description {
-  @include placeholder-description;
+.content {
+  @include card-surface;
+  padding: $space-md;
+  overflow: hidden;
+}
+
+// ─────────────────────────────────────────────
+// Error state
+// ─────────────────────────────────────────────
+.errorState {
+  @include card-surface;
+  @include flex-column-center;
+  gap: $space-md;
+  padding: $space-2xl $space-md;
+  text-align: center;
+}
+
+.errorIcon {
+  color: $danger;
+}
+
+.errorText {
+  font-size: $text-lg;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+.errorDetail {
+  font-size: $text-xs;
+  color: $text-muted;
 }

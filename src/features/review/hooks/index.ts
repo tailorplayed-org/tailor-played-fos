@@ -1,2 +1,2 @@
 // Review hooks barrel export
-export {};
+export { usePendingReview } from './usePendingReview';

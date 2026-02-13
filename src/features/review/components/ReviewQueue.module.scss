@@ -1,0 +1,89 @@
+// ─────────────────────────────────────────────
+// ReviewQueue — Pending items list
+// ─────────────────────────────────────────────
+
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: $space-sm $space-md;
+  gap: $space-sm;
+}
+
+.pendingCount {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $gold;
+}
+
+.sortHint {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+// ─────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────
+.emptyState {
+  @include flex-column-center;
+  gap: $space-md;
+  padding-block: $space-2xl;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $success;
+}
+
+.emptyText {
+  font-size: $text-lg;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+.lastReviewTime {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+// ─────────────────────────────────────────────
+// Loading skeleton
+// ─────────────────────────────────────────────
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+  padding: $space-md;
+}
+
+.skeletonItem {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-md;
+}
+
+.skeletonMainRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-sm;
+}
+
+.skeletonMetaRow {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
