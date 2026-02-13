@@ -85,8 +85,8 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Inventory Management & WAC Engine
-  epic-6: backlog
-  6-1-inventory-data-model-item-management: backlog
+  epic-6: in-progress
+  6-1-inventory-data-model-item-management: done
   6-2-restock-wac-recalculation: backlog
   6-3-scoop-action-consume-inventory-work-orders: backlog
   6-4-audit-log-waste-tracking: backlog

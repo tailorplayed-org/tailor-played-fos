@@ -1,2 +1,2 @@
 // Inventory hooks barrel export
-export {};
+export { useInventory } from './useInventory';

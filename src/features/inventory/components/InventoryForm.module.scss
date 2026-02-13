@@ -1,0 +1,31 @@
+// ─────────────────────────────────────────────
+// Inventory Form — create/edit layout
+// ─────────────────────────────────────────────
+
+.form {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    > * {
+      inline-size: 100%;
+    }
+  }
+}

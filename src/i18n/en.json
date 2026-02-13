@@ -49,10 +49,6 @@
     "workOrderDetail": {
       "title": "Work Order Detail"
     },
-    "inventory": {
-      "title": "Inventory",
-      "placeholder": "Manage your ingredients and stock levels here."
-    },
     "overhead": {
       "title": "Overhead",
       "placeholder": "Track monthly expenses and overhead costs here."
@@ -293,6 +289,53 @@
         "Design": "Design",
         "Production": "Production"
       }
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "addMaterial": "Add Material",
+    "editMaterial": "Edit Material",
+    "emptyState": "Add your first material",
+    "emptyStateHint": "Track your shared materials, stock levels, and costs",
+    "lowStock": "Low Stock",
+    "searchPlaceholder": "Filter materials...",
+    "columns": {
+      "name": "Name",
+      "sku": "SKU",
+      "supplier": "Supplier",
+      "currentQty": "Qty",
+      "wacPerUnit": "WAC/Unit",
+      "totalValue": "Total Value",
+      "reorderThreshold": "Reorder At",
+      "unit": "Unit"
+    },
+    "form": {
+      "name": "Material Name",
+      "nameRequired": "Material name is required",
+      "sku": "SKU (Optional)",
+      "supplier": "Supplier (Optional)",
+      "unit": "Unit of Measure",
+      "unitRequired": "Unit is required",
+      "initialQty": "Initial Quantity",
+      "initialCostPerUnit": "Initial Cost per Unit (₪)",
+      "reorderThreshold": "Reorder Threshold (Optional)",
+      "create": "Add Material",
+      "update": "Save Changes",
+      "cancel": "Cancel"
+    },
+    "units": {
+      "sheets": "Sheets",
+      "kg": "Kg",
+      "units": "Units",
+      "meters": "Meters",
+      "liters": "Liters",
+      "pieces": "Pieces"
+    },
+    "toast": {
+      "created": "Material added successfully",
+      "updated": "Material updated",
+      "createError": "Failed to add material",
+      "updateError": "Failed to update material"
     }
   },
   "components": {

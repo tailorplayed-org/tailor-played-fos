@@ -1,19 +1,72 @@
 // ─────────────────────────────────────────────
-// Placeholder page styling
+// Inventory Page Styles
 // ─────────────────────────────────────────────
 
-.placeholder {
-  @include placeholder-page;
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  padding-block-end: $space-xl;
 }
 
-.icon {
-  @include placeholder-icon;
+// ─── Header ─────────────────────────────────
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  flex-wrap: wrap;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.titleIcon {
+  color: $gold;
 }
 
 .title {
-  @include placeholder-title;
+  color: $gold;
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  margin: 0;
 }
 
-.description {
-  @include placeholder-description;
+// ─── Empty State ────────────────────────────
+
+.emptyState {
+  @include flex-column-center;
+  gap: $space-md;
+  padding: $space-2xl;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: $text-muted;
+}
+
+.emptyText {
+  color: $gold;
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  margin: 0;
+}
+
+.emptyHint {
+  color: $text-secondary;
+  font-size: $text-sm;
+  margin: 0;
+}
+
+// ─── Error State ────────────────────────────
+
+.errorState {
+  @include flex-column-center;
+  padding: $space-2xl;
+  color: $error;
+  text-align: center;
 }

@@ -49,10 +49,6 @@
     "workOrderDetail": {
       "title": "פרטי הזמנת עבודה"
     },
-    "inventory": {
-      "title": "מלאי",
-      "placeholder": "נהל את המרכיבים ורמות המלאי שלך כאן."
-    },
     "overhead": {
       "title": "הוצאות קבועות",
       "placeholder": "עקוב אחר הוצאות חודשיות ועלויות קבועות כאן."
@@ -293,6 +289,53 @@
         "Design": "עיצוב",
         "Production": "ייצור"
       }
+    }
+  },
+  "inventory": {
+    "title": "מלאי",
+    "addMaterial": "הוספת חומר",
+    "editMaterial": "עריכת חומר",
+    "emptyState": "הוסף את החומר הראשון שלך",
+    "emptyStateHint": "עקוב אחרי חומרים משותפים, רמות מלאי ועלויות",
+    "lowStock": "מלאי נמוך",
+    "searchPlaceholder": "סינון חומרים...",
+    "columns": {
+      "name": "שם",
+      "sku": "מק״ט",
+      "supplier": "ספק",
+      "currentQty": "כמות",
+      "wacPerUnit": "עלות/יחידה",
+      "totalValue": "ערך כולל",
+      "reorderThreshold": "סף הזמנה",
+      "unit": "יחידה"
+    },
+    "form": {
+      "name": "שם החומר",
+      "nameRequired": "שם חומר נדרש",
+      "sku": "מק״ט (אופציונלי)",
+      "supplier": "ספק (אופציונלי)",
+      "unit": "יחידת מידה",
+      "unitRequired": "יחידה נדרשת",
+      "initialQty": "כמות התחלתית",
+      "initialCostPerUnit": "עלות ליחידה (₪)",
+      "reorderThreshold": "סף הזמנה מחדש (אופציונלי)",
+      "create": "הוספת חומר",
+      "update": "שמירת שינויים",
+      "cancel": "ביטול"
+    },
+    "units": {
+      "sheets": "גיליונות",
+      "kg": "ק״ג",
+      "units": "יחידות",
+      "meters": "מטרים",
+      "liters": "ליטרים",
+      "pieces": "חלקים"
+    },
+    "toast": {
+      "created": "החומר נוסף בהצלחה",
+      "updated": "החומר עודכן",
+      "createError": "הוספת חומר נכשלה",
+      "updateError": "עדכון חומר נכשל"
     }
   },
   "components": {

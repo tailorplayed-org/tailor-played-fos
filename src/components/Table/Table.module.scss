@@ -1,0 +1,105 @@
+// ─────────────────────────────────────────────
+// Shared Data Table Styles
+// ─────────────────────────────────────────────
+
+.tableWrapper {
+  border-radius: $radius-md;
+  border: 1px solid $border-subtle;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+// ─── Header ─────────────────────────────────
+
+.th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: $bg-elevated;
+  padding: $space-sm;
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: start;
+  white-space: nowrap;
+  border-block-end: 1px solid $border-subtle;
+}
+
+// ─── Body ───────────────────────────────────
+
+.tr {
+  min-height: 44px;
+  transition: background $transition-fast;
+
+  &:not(:last-child) {
+    border-block-end: 1px solid $border-subtle;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    background: $bg-secondary;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.td {
+  padding: $space-sm;
+  font-size: $text-sm;
+  color: $text-primary;
+  vertical-align: middle;
+}
+
+// ─── Alignment ──────────────────────────────
+
+.align-end {
+  text-align: end;
+}
+
+.align-center {
+  text-align: center;
+}
+
+// ─── Sortable Header ────────────────────────
+
+.sortableHeader {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.sortIcon {
+  display: inline-flex;
+  align-items: center;
+  color: $gold;
+}
+
+// ─── Mobile Responsive ─────────────────────
+
+.hideOnMobile {
+  @media (max-width: #{$bp-md - 1px}) {
+    display: none;
+  }
+}

@@ -1,0 +1,13 @@
+// ─────────────────────────────────────────────
+// InventoryTable Styles
+// ─────────────────────────────────────────────
+
+.nameCell {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.lowStockRow {
+  border-inline-start: 3px solid $warning;
+}
