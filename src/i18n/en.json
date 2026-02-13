@@ -170,6 +170,22 @@
       "lastReviewAt": "Last reviewed {{time}}",
       "mailboxSource": "via {{mailbox}}"
     },
+    "ghostText": {
+      "confirmed": "Transaction confirmed",
+      "confirmError": "Failed to confirm transaction",
+      "confirm": "Confirm",
+      "edit": "Edit",
+      "reject": "Reject",
+      "viewOriginal": "View original document",
+      "aiReasoning": "AI Reasoning",
+      "confidence": "Confidence",
+      "category": "Category",
+      "project": "Project",
+      "estimated": "Estimated",
+      "editComingSoon": "Edit mode coming in next update",
+      "rejectComingSoon": "Reject mode coming in next update",
+      "noMoreItems": "No more pending items"
+    },
     "error": {
       "title": "Failed to load review queue"
     }

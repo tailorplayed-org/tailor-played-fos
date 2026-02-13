@@ -1,0 +1,266 @@
+// ─────────────────────────────────────────────
+// Ghost Text Card — Core Review Card
+// ─────────────────────────────────────────────
+@use '@/styles/mixins' as *;
+
+.ghostTextCard {
+  max-width: 500px;
+  width: 100%;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  background-color: $bg-secondary;
+  border: 1px solid $border-subtle;
+  box-shadow: $shadow-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+
+  @include motion-safe {
+    animation: scaleIn $transition-normal both;
+  }
+
+  // ─── Confirmation animation phases ───
+  &.glowing {
+    @include motion-safe {
+      animation: goldGlow 200ms ease both;
+    }
+  }
+
+  &.solidifying {
+    box-shadow: $shadow-glow;
+  }
+
+  &.exiting {
+    @include motion-safe {
+      animation: slideDownFadeOut 300ms ease both;
+    }
+  }
+
+  // ─── Mobile: full-width ───
+  @media (max-width: #{$bp-md - 1}) {
+    max-width: 100%;
+    padding: $space-md;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════════
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.headerMain {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.headerIcon {
+  color: $gold;
+  flex-shrink: 0;
+}
+
+.vendorName {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  @include truncate;
+}
+
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex-wrap: wrap;
+}
+
+.date {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.amount {
+  font-size: $text-base;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+// ═══════════════════════════════════════════════
+// GHOST TEXT FIELDS
+// ═══════════════════════════════════════════════
+
+.ghostFields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.ghostField {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-sm $space-md;
+  border: 1px dashed $border-subtle;
+  border-radius: $radius-sm;
+  background-color: $bg-tertiary;
+  transition: color $transition-normal, border-color $transition-normal,
+    background-color $transition-normal, font-style $transition-normal;
+
+  &.solidified {
+    border-style: solid;
+    border-color: $gold;
+    background-color: $bg-secondary;
+
+    .ghostFieldValue {
+      color: $text-primary;
+      font-style: normal;
+      font-weight: $font-medium;
+    }
+  }
+}
+
+.ghostFieldLabel {
+  font-size: $text-xs;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ghostFieldValue {
+  font-size: $text-base;
+  color: $text-muted;
+  font-style: italic;
+  transition: color $transition-normal, font-style $transition-normal;
+}
+
+// ═══════════════════════════════════════════════
+// CONFIDENCE BAR
+// ═══════════════════════════════════════════════
+
+.confidenceSection {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.confidenceLabel {
+  font-size: $text-xs;
+  color: $text-muted;
+  flex-shrink: 0;
+}
+
+.confidenceBarTrack {
+  flex: 1;
+  height: 8px;
+  background-color: $bg-tertiary;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.confidenceBarFill {
+  height: 100%;
+  border-radius: $radius-full;
+  transition: width $transition-normal;
+
+  &.high {
+    background-color: $success;
+  }
+
+  &.low {
+    background-color: $warning;
+  }
+}
+
+.confidencePercent {
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  min-width: 3ch;
+  text-align: end;
+
+  &.high {
+    color: $success;
+  }
+
+  &.low {
+    color: $warning;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// AI REASONING
+// ═══════════════════════════════════════════════
+
+.aiReasoning {
+  padding: $space-sm $space-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+  border-inline-start: 3px solid $gold;
+}
+
+.aiReasoningLabel {
+  font-size: $text-xs;
+  color: $text-muted;
+  display: block;
+  margin-block-end: $space-xs;
+}
+
+.aiReasoningText {
+  font-size: $text-sm;
+  color: $text-secondary;
+  line-height: $leading-relaxed;
+  margin: 0;
+}
+
+// ═══════════════════════════════════════════════
+// ACTION BUTTONS
+// ═══════════════════════════════════════════════
+
+.actionButtons {
+  display: flex;
+  gap: $space-sm;
+
+  // Desktop: row layout
+  @include md {
+    flex-direction: row;
+
+    > * {
+      flex: 1;
+    }
+  }
+
+  // Mobile: stacked, full-width, 44px min touch
+  @media (max-width: #{$bp-md - 1}) {
+    flex-direction: column;
+
+    > * {
+      min-height: 44px;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// VIEW ORIGINAL LINK
+// ═══════════════════════════════════════════════
+
+.viewOriginal {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $text-xs;
+  color: $text-muted;
+  text-decoration: none;
+  transition: color $transition-fast;
+  align-self: flex-start;
+
+  &:hover {
+    color: $gold;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

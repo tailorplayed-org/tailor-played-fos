@@ -170,6 +170,22 @@
       "lastReviewAt": "נבדק לאחרונה {{time}}",
       "mailboxSource": "דרך {{mailbox}}"
     },
+    "ghostText": {
+      "confirmed": "העסקה אושרה",
+      "confirmError": "שגיאה באישור העסקה",
+      "confirm": "אישור",
+      "edit": "עריכה",
+      "reject": "דחייה",
+      "viewOriginal": "צפייה במסמך המקורי",
+      "aiReasoning": "נימוק AI",
+      "confidence": "רמת ביטחון",
+      "category": "קטגוריה",
+      "project": "פרויקט",
+      "estimated": "מוערך",
+      "editComingSoon": "מצב עריכה יגיע בעדכון הבא",
+      "rejectComingSoon": "מצב דחייה יגיע בעדכון הבא",
+      "noMoreItems": "אין עוד פריטים ממתינים"
+    },
     "error": {
       "title": "טעינת תור הביקורת נכשלה"
     }
