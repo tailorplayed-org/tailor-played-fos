@@ -1,0 +1,90 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.bar {
+  position: sticky;
+  bottom: 0;
+  background: $bg-elevated;
+  border-top: 2px solid $gold;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $space-md $space-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  box-shadow: $shadow-lg;
+  z-index: 10;
+
+  // Mobile: sit above BottomNav
+  @media (max-width: 767px) {
+    bottom: 64px; // BottomNav height
+    border-radius: 0;
+  }
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  min-width: 0;
+}
+
+.count {
+  color: $text-primary;
+  font-weight: $font-semibold;
+  font-size: $text-base;
+}
+
+.amount {
+  color: $text-secondary;
+  font-size: $text-sm;
+}
+
+.approveButton {
+  min-height: 44px;
+  min-width: 44px; // Touch target
+  flex-shrink: 0;
+}
+
+// ─── Confirmation state ───
+
+.confirmContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-md;
+  width: 100%;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: $space-sm;
+  }
+}
+
+.confirmText {
+  color: $text-primary;
+  font-weight: $font-semibold;
+  font-size: $text-base;
+  flex: 1;
+  min-width: 0;
+}
+
+.confirmActions {
+  display: flex;
+  gap: $space-sm;
+  flex-shrink: 0;
+
+  @media (max-width: 767px) {
+    width: 100%;
+
+    > * {
+      flex: 1;
+    }
+  }
+}
+
+.confirmButton,
+.cancelButton {
+  min-height: 44px;
+  min-width: 44px;
+}

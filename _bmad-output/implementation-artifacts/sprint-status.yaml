@@ -81,7 +81,7 @@ development_status:
   5-2-ghost-text-card-core-confirmation-flow: done
   5-3-ghost-text-field-editing-rejection: done
   5-4-post-approval-side-effects-real-time-updates: done
-  5-5-batch-approval-approve-all-mobile-review: backlog
+  5-5-batch-approval-approve-all-mobile-review: done
   epic-5-retrospective: optional
 
   # Epic 6: Inventory Management & WAC Engine

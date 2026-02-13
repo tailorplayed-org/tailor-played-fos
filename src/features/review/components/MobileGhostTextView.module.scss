@@ -1,0 +1,138 @@
+@use '@/styles/variables' as *;
+
+.fullScreen {
+  position: fixed;
+  inset: 0;
+  background: $bg-primary;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-md;
+  border-bottom: 1px solid $border-subtle;
+  flex-shrink: 0;
+}
+
+.backButton {
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  color: $text-primary;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  transition: background $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    background: $bg-secondary;
+  }
+}
+
+.counter {
+  color: $text-secondary;
+  font-size: $text-sm;
+}
+
+.cardContainer {
+  flex: 1;
+  padding: $space-md;
+  overflow-y: auto;
+}
+
+// ─── Collapsible invoice preview ───
+
+.invoiceSection {
+  padding: 0 $space-md;
+  flex-shrink: 0;
+}
+
+.invoiceToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: $bg-secondary;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  padding: $space-sm $space-md;
+  color: $text-secondary;
+  font-size: $text-sm;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    background: $bg-tertiary;
+  }
+}
+
+.invoiceLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.invoiceHint {
+  color: $text-muted;
+  font-size: $text-xs;
+}
+
+.invoicePreview {
+  margin-top: $space-sm;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  max-height: 300px;
+
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.invoiceErrorText {
+  padding: $space-md;
+  color: $text-muted;
+  font-size: $text-sm;
+  text-align: center;
+}
+
+// ─── All caught up state ───
+
+.allCaughtUp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: $space-md;
+  padding: $space-xl;
+  text-align: center;
+}
+
+.allCaughtUpIcon {
+  color: $success;
+}
+
+.allCaughtUpTitle {
+  color: $text-primary;
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+}
+
+.allCaughtUpMessage {
+  color: $text-secondary;
+  font-size: $text-sm;
+}

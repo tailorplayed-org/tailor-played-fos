@@ -191,6 +191,27 @@
       "editMode": "Edit mode",
       "fieldEdited": "Edited"
     },
+    "batchApproval": {
+      "itemsReady": "{{count}} items ready",
+      "itemsReady_one": "1 item ready",
+      "totalAmount": "totaling {{amount}}",
+      "approveAll": "Approve All",
+      "confirmTitle": "Approve {{count}} items totaling {{amount}}?",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "success": "{{count}} items approved",
+      "success_one": "1 item approved",
+      "error": "Failed to batch approve"
+    },
+    "mobile": {
+      "reviewCounter": "Review {{current}} of {{total}}",
+      "back": "Back",
+      "allCaughtUp": "All caught up!",
+      "allCaughtUpMessage": "No more pending items to review",
+      "invoicePreview": "Invoice preview",
+      "tapToExpand": "Tap to expand",
+      "tapToCollapse": "Tap to collapse"
+    },
     "error": {
       "title": "Failed to load review queue"
     }

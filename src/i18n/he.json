@@ -191,6 +191,27 @@
       "editMode": "מצב עריכה",
       "fieldEdited": "נערך"
     },
+    "batchApproval": {
+      "itemsReady": "{{count}} פריטים מוכנים",
+      "itemsReady_one": "פריט אחד מוכן",
+      "totalAmount": "בסך {{amount}}",
+      "approveAll": "אשר הכל",
+      "confirmTitle": "לאשר {{count}} פריטים בסך {{amount}}?",
+      "confirm": "אישור",
+      "cancel": "ביטול",
+      "success": "{{count}} פריטים אושרו",
+      "success_one": "פריט אחד אושר",
+      "error": "אישור קבוצתי נכשל"
+    },
+    "mobile": {
+      "reviewCounter": "סקירה {{current}} מתוך {{total}}",
+      "back": "חזרה",
+      "allCaughtUp": "הכל מעודכן!",
+      "allCaughtUpMessage": "אין עוד פריטים ממתינים לסקירה",
+      "invoicePreview": "תצוגת חשבונית",
+      "tapToExpand": "לחץ להרחבה",
+      "tapToCollapse": "לחץ לכיווץ"
+    },
     "error": {
       "title": "טעינת תור הביקורת נכשלה"
     }

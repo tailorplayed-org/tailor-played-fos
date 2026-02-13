@@ -108,10 +108,15 @@ vi.mock('@/components/Input/Select', () => ({
 // Mock firebase/firestore
 const mockUpdateDoc = vi.fn().mockResolvedValue(undefined);
 const mockDoc = vi.fn((_db, _collection, id) => ({ path: `transactions/${id}` }));
+const mockWriteBatch = vi.fn(() => ({
+  update: vi.fn(),
+  commit: vi.fn().mockResolvedValue(undefined),
+}));
 vi.mock('firebase/firestore', () => ({
   updateDoc: (...args: unknown[]) => mockUpdateDoc(...args),
   doc: (...args: unknown[]) => mockDoc(...args),
   serverTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
+  writeBatch: (...args: unknown[]) => mockWriteBatch(...args),
 }));
 
 vi.mock('@/services', () => ({
@@ -135,6 +140,15 @@ vi.mock('./hooks', async (importOriginal) => {
     useRejectTransaction: () => ({
       reject: mockReject,
       isRejecting: false,
+    }),
+    useBatchApproval: () => ({
+      batchEligible: [],
+      totalAmountIlsAgora: 0,
+      isBatchApproving: false,
+      showBatchConfirm: false,
+      requestBatchApproval: vi.fn(),
+      cancelBatchApproval: vi.fn(),
+      confirmBatchApproval: vi.fn(),
     }),
   };
 });

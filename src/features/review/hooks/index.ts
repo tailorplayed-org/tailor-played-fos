@@ -5,3 +5,4 @@ export type { UseGhostTextKeyboardOptions } from './useGhostTextKeyboard';
 export { useConfirmTransaction } from './useConfirmTransaction';
 export type { ConfirmOverrides } from './useConfirmTransaction';
 export { useRejectTransaction } from './useRejectTransaction';
+export { useBatchApproval } from './useBatchApproval';

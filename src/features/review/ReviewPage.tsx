@@ -4,8 +4,8 @@ import { WarningCircle } from '@phosphor-icons/react';
 import { toast } from '@/stores/useUIStore';
 import type { TransactionCategory } from '@/types';
 import type { AnimationPhase } from './components';
-import { usePendingReview, useGhostTextKeyboard, useConfirmTransaction, useRejectTransaction } from './hooks';
-import { ReviewQueue, GhostTextOverlay } from './components';
+import { usePendingReview, useGhostTextKeyboard, useConfirmTransaction, useRejectTransaction, useBatchApproval } from './hooks';
+import { ReviewQueue, GhostTextOverlay, ApproveAllBar, MobileGhostTextView } from './components';
 import styles from './ReviewPage.module.scss';
 
 export function ReviewPage() {
@@ -14,6 +14,41 @@ export function ReviewPage() {
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>('idle');
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // ─── Mobile detection ───
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia('(max-width: 767px)').matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mql = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
+  // ─── Batch approval ───
+  const {
+    batchEligible,
+    totalAmountIlsAgora,
+    isBatchApproving,
+    showBatchConfirm,
+    requestBatchApproval,
+    cancelBatchApproval,
+    confirmBatchApproval,
+  } = useBatchApproval(pendingTransactions);
+
+  // ─── Focus management: return focus to queue after batch approval ───
+  const prevBatchApprovingRef = useRef(false);
+  useEffect(() => {
+    if (prevBatchApprovingRef.current && !isBatchApproving) {
+      contentRef.current?.focus();
+    }
+    prevBatchApprovingRef.current = isBatchApproving;
+  }, [isBatchApproving]);
 
   // ─── Edit state ───
   const [isEditing, setIsEditing] = useState(false);
@@ -189,6 +224,18 @@ export function ReviewPage() {
     }
   }, [pendingTransactions, selectedTransactionId, resetEditState]);
 
+  // ─── Mobile review state ───
+  const currentIndex = useMemo(
+    () => pendingTransactions.findIndex((tx) => tx.id === selectedTransactionId),
+    [pendingTransactions, selectedTransactionId],
+  );
+
+  const handleMobileBack = useCallback(() => {
+    setSelectedTransactionId(null);
+    setAnimationPhase('idle');
+    resetEditState();
+  }, [resetEditState]);
+
   // ─── Keyboard shortcuts ───
   useGhostTextKeyboard({
     isOpen: selectedTransaction !== null,
@@ -215,7 +262,7 @@ export function ReviewPage() {
           <p className={styles.errorDetail}>{error}</p>
         </div>
       ) : (
-        <div className={styles.content}>
+        <div className={styles.content} ref={contentRef} tabIndex={-1}>
           <ReviewQueue
             transactions={pendingTransactions}
             loading={loading}
@@ -225,7 +272,42 @@ export function ReviewPage() {
         </div>
       )}
 
-      {selectedTransaction && (
+      {/* Approve All Bar */}
+      {!error && (
+        <ApproveAllBar
+          batchEligible={batchEligible}
+          totalAmountIlsAgora={totalAmountIlsAgora}
+          isBatchApproving={isBatchApproving}
+          showBatchConfirm={showBatchConfirm}
+          onApproveAll={requestBatchApproval}
+          onConfirm={confirmBatchApproval}
+          onCancel={cancelBatchApproval}
+        />
+      )}
+
+      {/* Ghost Text: mobile full-screen or desktop overlay */}
+      {selectedTransaction && isMobile ? (
+        <MobileGhostTextView
+          transaction={selectedTransaction}
+          currentIndex={currentIndex}
+          totalCount={pendingTransactions.length}
+          onBack={handleMobileBack}
+          onConfirm={handleConfirm}
+          onEdit={handleEdit}
+          onReject={showRejectConfirm ? handleRejectConfirm : handleReject}
+          isConfirming={isConfirming}
+          animationPhase={animationPhase}
+          editMode={isEditing}
+          editedCategory={editedCategory}
+          editedProjectId={editedProjectId}
+          onCategoryChange={handleCategoryChange}
+          onProjectChange={handleProjectChange}
+          onDropdownToggle={handleDropdownToggle}
+          showRejectConfirm={showRejectConfirm}
+          onRejectCancel={handleRejectCancel}
+          isRejecting={isRejecting}
+        />
+      ) : selectedTransaction ? (
         <GhostTextOverlay
           transaction={selectedTransaction}
           onConfirm={handleConfirm}
@@ -244,7 +326,7 @@ export function ReviewPage() {
           onRejectCancel={handleRejectCancel}
           isRejecting={isRejecting}
         />
-      )}
+      ) : null}
     </div>
   );
 }
