@@ -140,6 +140,24 @@
   }
 }
 
+// NOTE: Uses hardcoded $error (#ff4d6d) because this partial is loaded via
+// @use and doesn't receive Vite's additionalData auto-import.
+// Keep in sync with $error in _variables.scss.
+@keyframes rejectFlash {
+  0% {
+    border-color: inherit;
+  }
+
+  50% {
+    border-color: #ff4d6d;
+    box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+  }
+
+  100% {
+    border-color: #ff4d6d;
+  }
+}
+
 // ═══════════════════════════════════════════════
 // STAGGER DELAY UTILITIES
 // ═══════════════════════════════════════════════

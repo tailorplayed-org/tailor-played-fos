@@ -152,4 +152,76 @@ describe('useConfirmTransaction', () => {
       await firstConfirm!;
     });
   });
+
+  // ─── Override tests ───
+
+  it('includes category override in updateDoc payload', async () => {
+    const { result } = renderHook(() => useConfirmTransaction('txn-123'));
+
+    await act(async () => {
+      await result.current.confirm({ category: 'Overhead' });
+    });
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+      { path: 'transactions/txn-123' },
+      {
+        status: 'approved',
+        updatedAt: 'SERVER_TIMESTAMP',
+        category: 'Overhead',
+      },
+    );
+  });
+
+  it('includes workOrderId override and sets suggestedWorkOrderId', async () => {
+    const { result } = renderHook(() => useConfirmTransaction('txn-123'));
+
+    await act(async () => {
+      await result.current.confirm({ workOrderId: 'wo-99' });
+    });
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+      { path: 'transactions/txn-123' },
+      {
+        status: 'approved',
+        updatedAt: 'SERVER_TIMESTAMP',
+        workOrderId: 'wo-99',
+        suggestedWorkOrderId: 'wo-99',
+      },
+    );
+  });
+
+  it('includes both category and workOrderId overrides', async () => {
+    const { result } = renderHook(() => useConfirmTransaction('txn-123'));
+
+    await act(async () => {
+      await result.current.confirm({ category: 'Revenue', workOrderId: 'wo-55' });
+    });
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+      { path: 'transactions/txn-123' },
+      {
+        status: 'approved',
+        updatedAt: 'SERVER_TIMESTAMP',
+        category: 'Revenue',
+        workOrderId: 'wo-55',
+        suggestedWorkOrderId: 'wo-55',
+      },
+    );
+  });
+
+  it('sends base payload when confirm called without overrides', async () => {
+    const { result } = renderHook(() => useConfirmTransaction('txn-123'));
+
+    await act(async () => {
+      await result.current.confirm();
+    });
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+      { path: 'transactions/txn-123' },
+      {
+        status: 'approved',
+        updatedAt: 'SERVER_TIMESTAMP',
+      },
+    );
+  });
 });

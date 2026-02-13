@@ -9,11 +9,14 @@ vi.mock('@phosphor-icons/react', () => ({
 }));
 
 // Mock useWorkOrderStore
-const mockWorkOrder = { name: 'David\'s Game' };
+const mockWorkOrder = { name: "David's Game" };
 const mockSelectWorkOrderById = vi.fn(() => () => mockWorkOrder);
 vi.mock('@/stores', () => ({
   useWorkOrderStore: (selector: (state: unknown) => unknown) => selector({
-    workOrders: [{ id: 'wo-1', name: 'David\'s Game' }],
+    workOrders: [
+      { id: 'wo-1', name: "David's Game", status: 'Production' },
+      { id: 'wo-2', name: 'Logo Design', status: 'Design' },
+    ],
   }),
   selectWorkOrderById: (...args: unknown[]) => mockSelectWorkOrderById(...args),
 }));
@@ -64,6 +67,41 @@ vi.mock('@/components/Button', () => ({
   ),
 }));
 
+// Mock Select component (used inside GhostTextField)
+vi.mock('@/components/Input/Select', () => ({
+  Select: ({
+    options,
+    value,
+    onChange,
+    searchable,
+  }: {
+    options: Array<{ value: string; label: string }>;
+    value?: string;
+    onChange?: (val: string) => void;
+    searchable?: boolean;
+    label: string;
+    hideLabel?: boolean;
+  }) => (
+    <div data-testid="select-dropdown" data-searchable={searchable}>
+      <button data-testid="select-trigger">
+        {options.find((o) => o.value === value)?.label ?? ''}
+      </button>
+      <ul role="listbox">
+        {options.map((opt) => (
+          <li
+            key={opt.value}
+            role="option"
+            aria-selected={opt.value === value}
+            onClick={() => onChange?.(opt.value)}
+          >
+            {opt.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ),
+}));
+
 import type { Transaction } from '@/types';
 import { GhostTextCard } from './GhostTextCard';
 
@@ -87,7 +125,7 @@ function createMockTransaction(overrides?: Partial<Transaction>): Transaction {
     updatedAt: new Date(),
     suggestedWorkOrderId: 'wo-1',
     suggestedInventoryItemId: null,
-    classificationReasoning: 'Matched to David\'s Game — vendor linked 3 times previously',
+    classificationReasoning: "Matched to David's Game — vendor linked 3 times previously",
     isEstimatedConversion: false,
     conversionRate: null,
     conversionRateDate: null,
@@ -103,6 +141,8 @@ const defaultProps = {
 };
 
 describe('GhostTextCard', () => {
+  // ─── Existing tests ───
+
   it('renders header with vendor name, date, and amount', () => {
     render(
       <GhostTextCard transaction={createMockTransaction()} {...defaultProps} />,
@@ -122,7 +162,7 @@ describe('GhostTextCard', () => {
     expect(screen.getByText('review.ghostText.category')).toBeInTheDocument();
     expect(screen.getByText('transactions.category.DirectCost')).toBeInTheDocument();
     expect(screen.getByText('review.ghostText.project')).toBeInTheDocument();
-    expect(screen.getByText('David\'s Game')).toBeInTheDocument();
+    expect(screen.getByText("David's Game")).toBeInTheDocument();
   });
 
   it('renders confidence bar with high confidence styling', () => {
@@ -134,10 +174,7 @@ describe('GhostTextCard', () => {
     );
 
     expect(screen.getByText('92%')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toHaveAttribute(
-      'aria-valuenow',
-      '92',
-    );
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '92');
   });
 
   it('renders confidence bar with low confidence styling', () => {
@@ -158,9 +195,7 @@ describe('GhostTextCard', () => {
 
     expect(screen.getByText('review.ghostText.aiReasoning')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Matched to David\'s Game — vendor linked 3 times previously',
-      ),
+      screen.getByText("Matched to David's Game — vendor linked 3 times previously"),
     ).toBeInTheDocument();
   });
 
@@ -184,18 +219,9 @@ describe('GhostTextCard', () => {
     expect(screen.getByTestId('btn-secondary')).toBeInTheDocument();
     expect(screen.getByTestId('btn-danger')).toBeInTheDocument();
 
-    expect(screen.getByTestId('btn-primary')).toHaveAttribute(
-      'data-shortcut',
-      'Enter',
-    );
-    expect(screen.getByTestId('btn-secondary')).toHaveAttribute(
-      'data-shortcut',
-      'E',
-    );
-    expect(screen.getByTestId('btn-danger')).toHaveAttribute(
-      'data-shortcut',
-      'Del',
-    );
+    expect(screen.getByTestId('btn-primary')).toHaveAttribute('data-shortcut', 'Enter');
+    expect(screen.getByTestId('btn-secondary')).toHaveAttribute('data-shortcut', 'E');
+    expect(screen.getByTestId('btn-danger')).toHaveAttribute('data-shortcut', 'Del');
   });
 
   it('calls onConfirm when confirm button is clicked', () => {
@@ -260,9 +286,7 @@ describe('GhostTextCard', () => {
       />,
     );
 
-    expect(
-      screen.queryByText(/review\.ghostText\.viewOriginal/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/review\.ghostText\.viewOriginal/)).not.toBeInTheDocument();
   });
 
   it('renders "Estimated" badge when isEstimatedConversion is true', () => {
@@ -332,9 +356,99 @@ describe('GhostTextCard', () => {
     );
 
     expect(screen.getByText('0%')).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toHaveAttribute(
-      'aria-valuenow',
-      '0',
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+  });
+
+  // ─── Edit mode tests ───
+
+  it('renders GhostTextField components when editMode is true', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction()}
+        {...defaultProps}
+        editMode={true}
+      />,
     );
+
+    // Should render GhostTextField components (have data-testid="ghost-text-field")
+    const fields = screen.getAllByTestId('ghost-text-field');
+    expect(fields).toHaveLength(2);
+  });
+
+  it('renders static ghost fields when editMode is false', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction()}
+        {...defaultProps}
+        editMode={false}
+      />,
+    );
+
+    // Should NOT render GhostTextField components
+    expect(screen.queryByTestId('ghost-text-field')).not.toBeInTheDocument();
+    // Should show static text
+    expect(screen.getByText('transactions.category.DirectCost')).toBeInTheDocument();
+  });
+
+  it('passes isEdited=true to category GhostTextField when editedCategory is set', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction()}
+        {...defaultProps}
+        editMode={true}
+        editedCategory="Overhead"
+      />,
+    );
+
+    // When editedCategory is set, the category field should show a checkmark
+    expect(screen.getByText('✓')).toBeInTheDocument();
+  });
+
+  it('passes edited values to GhostTextField components', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction({ category: 'DirectCost' })}
+        {...defaultProps}
+        editMode={true}
+        editedCategory="Overhead"
+        editedProjectId="wo-2"
+      />,
+    );
+
+    // Both fields should show checkmarks since both have edits
+    const checkmarks = screen.getAllByText('✓');
+    expect(checkmarks).toHaveLength(2);
+  });
+
+  // ─── Reject confirmation dialog tests ───
+
+  it('renders RejectConfirmDialog when showRejectConfirm is true', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction()}
+        {...defaultProps}
+        showRejectConfirm={true}
+        onRejectCancel={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    // Confirm button should be replaced (action buttons area hidden)
+    expect(screen.queryByTestId('btn-primary')).not.toBeInTheDocument();
+    // Reject confirm dialog has its own secondary (Cancel) and danger (Reject) buttons
+    expect(screen.getByText('review.ghostText.cancel')).toBeInTheDocument();
+  });
+
+  it('renders action buttons when showRejectConfirm is false', () => {
+    render(
+      <GhostTextCard
+        transaction={createMockTransaction()}
+        {...defaultProps}
+        showRejectConfirm={false}
+      />,
+    );
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('btn-primary')).toBeInTheDocument();
   });
 });

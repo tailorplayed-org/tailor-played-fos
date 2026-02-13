@@ -1,0 +1,93 @@
+// ─────────────────────────────────────────────
+// Ghost Text Field — Editable ghost field wrapper
+// ─────────────────────────────────────────────
+@use '@/styles/mixins' as *;
+
+.ghostTextField {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+  padding: $space-sm $space-md;
+  border: 1px dashed $border-subtle;
+  border-radius: $radius-sm;
+  background-color: $bg-tertiary;
+  cursor: pointer;
+  min-height: 44px;
+  position: relative;
+  transition: border-color $transition-fast, background-color $transition-normal;
+
+  // ─── Hover state: brighten border slightly ───
+  &:hover:not(.readonly):not(.editing):not(.userEdited) {
+    border-color: rgba($gold-light, 0.4);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  // ─── Editing state: solid gold border ───
+  &.editing {
+    border-style: solid;
+    border-color: $gold;
+    background-color: $bg-secondary;
+    cursor: default;
+  }
+
+  // ─── User-edited state: solid gold + checkmark ───
+  &.userEdited {
+    border-style: solid;
+    border-color: $gold;
+    background-color: $bg-secondary;
+
+    .value {
+      color: $text-primary;
+      font-style: normal;
+      font-weight: $font-medium;
+    }
+  }
+
+  // ─── Read-only state: solid muted border, no interaction ───
+  &.readonly {
+    border-style: solid;
+    border-color: $border-subtle;
+    cursor: default;
+
+    &:hover {
+      border-color: $border-subtle;
+    }
+  }
+
+  // ─── Mobile responsive ───
+  @media (max-width: #{$bp-md - 1}) {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+.label {
+  font-size: $text-xs;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.value {
+  font-size: $text-base;
+  color: $text-muted;
+  font-style: italic;
+  transition: color $transition-normal, font-style $transition-normal;
+}
+
+.checkmark {
+  position: absolute;
+  inset-inline-end: $space-sm;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $gold;
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+}
+
+.selectContainer {
+  width: 100%;
+}

@@ -36,6 +36,13 @@
     }
   }
 
+  &.rejectExiting {
+    @include motion-safe {
+      border-color: $error;
+      animation: rejectFlash 200ms ease, slideDownFadeOut 300ms ease 200ms both;
+    }
+  }
+
   // ─── Mobile: full-width ───
   @media (max-width: #{$bp-md - 1}) {
     max-width: 100%;

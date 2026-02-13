@@ -6,7 +6,7 @@ vi.mock('@phosphor-icons/react', () => ({
   CheckCircle: ({ className }: { size?: number; weight?: string; className?: string }) => (
     <svg data-testid="icon-CheckCircle" className={className} />
   ),
-  WarningCircle: ({ className }: { size?: number; className?: string }) => (
+  WarningCircle: ({ className }: { size?: number; weight?: string; className?: string }) => (
     <svg data-testid="icon-WarningCircle" className={className} />
   ),
   FileText: ({ className }: { size?: number; className?: string }) => (
@@ -26,7 +26,7 @@ vi.mock('@/stores/useUIStore', () => ({
 
 vi.mock('@/stores', () => ({
   useWorkOrderStore: (selector: (state: unknown) => unknown) =>
-    selector({ workOrders: [] }),
+    selector({ workOrders: [{ id: 'wo-1', name: "David's Game", status: 'Production' }] }),
   selectWorkOrderById: () => () => undefined,
 }));
 
@@ -71,10 +71,46 @@ vi.mock('@/components/Button', () => ({
   ),
 }));
 
+// Mock Select
+vi.mock('@/components/Input/Select', () => ({
+  Select: ({
+    options,
+    value,
+    onChange,
+  }: {
+    options: Array<{ value: string; label: string }>;
+    value?: string;
+    onChange?: (val: string) => void;
+    searchable?: boolean;
+    label: string;
+    hideLabel?: boolean;
+  }) => (
+    <div data-testid="select-dropdown">
+      <button data-testid="select-trigger">
+        {options.find((o) => o.value === value)?.label ?? ''}
+      </button>
+      <ul role="listbox">
+        {options.map((opt) => (
+          <li
+            key={opt.value}
+            role="option"
+            aria-selected={opt.value === value}
+            onClick={() => onChange?.(opt.value)}
+          >
+            {opt.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ),
+}));
+
 // Mock firebase/firestore
+const mockUpdateDoc = vi.fn().mockResolvedValue(undefined);
+const mockDoc = vi.fn((_db, _collection, id) => ({ path: `transactions/${id}` }));
 vi.mock('firebase/firestore', () => ({
-  updateDoc: vi.fn().mockResolvedValue(undefined),
-  doc: vi.fn((_db, _collection, id) => ({ path: `transactions/${id}` })),
+  updateDoc: (...args: unknown[]) => mockUpdateDoc(...args),
+  doc: (...args: unknown[]) => mockDoc(...args),
   serverTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
 }));
 
@@ -84,11 +120,22 @@ vi.mock('@/services', () => ({
 
 // Mock the hooks
 const mockUsePendingReview = vi.fn();
+const mockConfirm = vi.fn().mockResolvedValue(undefined);
+const mockReject = vi.fn().mockResolvedValue(undefined);
+
 vi.mock('./hooks', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return {
     ...actual,
     usePendingReview: () => mockUsePendingReview(),
+    useConfirmTransaction: () => ({
+      confirm: mockConfirm,
+      isConfirming: false,
+    }),
+    useRejectTransaction: () => ({
+      reject: mockReject,
+      isRejecting: false,
+    }),
   };
 });
 
@@ -152,7 +199,12 @@ const { ReviewPage } = await import('./ReviewPage');
 describe('ReviewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUpdateDoc.mockResolvedValue(undefined);
+    mockConfirm.mockResolvedValue(undefined);
+    mockReject.mockResolvedValue(undefined);
   });
+
+  // ─── Existing tests ───
 
   it('renders page title', () => {
     mockUsePendingReview.mockReturnValue({
@@ -200,10 +252,8 @@ describe('ReviewPage', () => {
 
     render(<ReviewPage />);
 
-    // Click an item — triggers state update
     fireEvent.click(screen.getByTestId('item-sel-1'));
 
-    // Wait for React state update to propagate
     await waitFor(() => {
       expect(screen.getByTestId('review-queue').dataset.selected).toBe('sel-1');
     });
@@ -247,10 +297,8 @@ describe('ReviewPage', () => {
 
     render(<ReviewPage />);
 
-    // Select the item
     fireEvent.click(screen.getByTestId('item-txn-1'));
 
-    // Overlay should appear
     await waitFor(() => {
       expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
     });
@@ -265,13 +313,11 @@ describe('ReviewPage', () => {
 
     render(<ReviewPage />);
 
-    // Select item to open overlay
     fireEvent.click(screen.getByTestId('item-txn-1'));
     await waitFor(() => {
       expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
     });
 
-    // Press Escape
     fireEvent.keyDown(document, { key: 'Escape' });
 
     await waitFor(() => {
@@ -288,13 +334,11 @@ describe('ReviewPage', () => {
 
     render(<ReviewPage />);
 
-    // Select item
     fireEvent.click(screen.getByTestId('item-txn-1'));
     await waitFor(() => {
       expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
     });
 
-    // Click overlay background
     fireEvent.click(screen.getByTestId('ghost-text-overlay'));
 
     await waitFor(() => {
@@ -312,5 +356,118 @@ describe('ReviewPage', () => {
     render(<ReviewPage />);
 
     expect(screen.queryByTestId('ghost-text-overlay')).not.toBeInTheDocument();
+  });
+
+  // ─── Edit Mode Integration Tests ───
+
+  it('enters edit mode when E key is pressed', async () => {
+    mockUsePendingReview.mockReturnValue({
+      pendingTransactions: [createMockTransaction('txn-1', 'Test Vendor')],
+      loading: false,
+      error: null,
+    });
+
+    render(<ReviewPage />);
+
+    // Select item to open overlay
+    fireEvent.click(screen.getByTestId('item-txn-1'));
+    await waitFor(() => {
+      expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
+    });
+
+    // Press E to enter edit mode
+    fireEvent.keyDown(document, { key: 'E' });
+
+    // Ghost text fields should now be interactive (GhostTextField components rendered)
+    await waitFor(() => {
+      const fields = screen.getAllByTestId('ghost-text-field');
+      expect(fields.length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  // ─── Reject Flow Integration Tests ───
+
+  it('shows reject confirmation dialog when reject is triggered', async () => {
+    mockUsePendingReview.mockReturnValue({
+      pendingTransactions: [createMockTransaction('txn-1', 'Test Vendor')],
+      loading: false,
+      error: null,
+    });
+
+    render(<ReviewPage />);
+
+    // Select item
+    fireEvent.click(screen.getByTestId('item-txn-1'));
+    await waitFor(() => {
+      expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
+    });
+
+    // Press Delete to trigger reject
+    fireEvent.keyDown(document, { key: 'Delete' });
+
+    // Reject confirmation dialog should appear
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+  });
+
+  it('cancels rejection when cancel is clicked in reject dialog', async () => {
+    mockUsePendingReview.mockReturnValue({
+      pendingTransactions: [createMockTransaction('txn-1', 'Test Vendor')],
+      loading: false,
+      error: null,
+    });
+
+    render(<ReviewPage />);
+
+    // Select item and trigger reject
+    fireEvent.click(screen.getByTestId('item-txn-1'));
+    await waitFor(() => {
+      expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
+    });
+
+    fireEvent.keyDown(document, { key: 'Delete' });
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+
+    // Click Cancel (the secondary button in the reject dialog)
+    const cancelBtn = screen.getByText('review.ghostText.cancel');
+    fireEvent.click(cancelBtn.closest('button')!);
+
+    // Dialog should close, action buttons should return
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('does NOT approve transaction when Enter is pressed while reject dialog is showing', async () => {
+    mockUsePendingReview.mockReturnValue({
+      pendingTransactions: [createMockTransaction('txn-1', 'Test Vendor')],
+      loading: false,
+      error: null,
+    });
+
+    render(<ReviewPage />);
+
+    // Select item
+    fireEvent.click(screen.getByTestId('item-txn-1'));
+    await waitFor(() => {
+      expect(screen.getByTestId('ghost-text-overlay')).toBeInTheDocument();
+    });
+
+    // Trigger reject dialog
+    fireEvent.keyDown(document, { key: 'Delete' });
+    await waitFor(() => {
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
+
+    // Press Enter while reject dialog is showing — should NOT approve
+    fireEvent.keyDown(document, { key: 'Enter' });
+
+    // confirm should NOT have been called
+    expect(mockConfirm).not.toHaveBeenCalled();
+    // Reject dialog should still be visible
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 });

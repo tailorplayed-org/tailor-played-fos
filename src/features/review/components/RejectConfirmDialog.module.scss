@@ -1,0 +1,35 @@
+// ─────────────────────────────────────────────
+// Reject Confirm Dialog — Inline rejection confirmation
+// ─────────────────────────────────────────────
+@use '@/styles/mixins' as *;
+
+.rejectDialog {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+  padding: $space-sm;
+  border-radius: $radius-sm;
+  background-color: rgba($error, 0.08);
+  border: 1px solid rgba($error, 0.25);
+}
+
+.message {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin: 0;
+
+  strong {
+    color: $text-primary;
+    font-weight: $font-semibold;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: $space-sm;
+
+  > * {
+    flex: 1;
+    min-height: 44px;
+  }
+}

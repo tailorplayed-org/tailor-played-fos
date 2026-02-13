@@ -10,6 +10,7 @@ function createCallbacks() {
     onClose: vi.fn(),
     onNext: vi.fn(),
     onPrevious: vi.fn(),
+    onCloseDropdown: vi.fn(),
   };
 }
 
@@ -27,6 +28,8 @@ describe('useGhostTextKeyboard', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
+
+  // ─── Normal mode (existing tests) ───
 
   it('calls onConfirm on Enter key', () => {
     renderHook(() =>
@@ -124,7 +127,6 @@ describe('useGhostTextKeyboard', () => {
     document.body.appendChild(input);
     input.focus();
 
-    // Dispatch event with input as target
     const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
     Object.defineProperty(event, 'target', { value: input });
     document.dispatchEvent(event);
@@ -177,5 +179,120 @@ describe('useGhostTextKeyboard', () => {
     // Listener should be cleaned up
     fireKey('Enter');
     expect(callbacks.onConfirm).toHaveBeenCalledTimes(1); // Still 1, not 2
+  });
+
+  // ─── Edit mode tests ───
+
+  it('does NOT intercept E key when isEditing is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('E');
+    fireKey('e');
+    expect(callbacks.onEdit).not.toHaveBeenCalled();
+  });
+
+  it('does NOT intercept Delete key when isEditing is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Delete');
+    expect(callbacks.onReject).not.toHaveBeenCalled();
+  });
+
+  it('does NOT intercept ArrowRight/ArrowLeft when isEditing is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('ArrowRight');
+    fireKey('ArrowLeft');
+    expect(callbacks.onNext).not.toHaveBeenCalled();
+    expect(callbacks.onPrevious).not.toHaveBeenCalled();
+  });
+
+  it('still handles Enter when isEditing is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Enter');
+    expect(callbacks.onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it('still handles Escape when isEditing is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Escape');
+    expect(callbacks.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  // ─── Escape layering (dropdown) tests ───
+
+  it('calls onCloseDropdown when Escape pressed and isDropdownOpen is true', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isDropdownOpen: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Escape');
+    expect(callbacks.onCloseDropdown).toHaveBeenCalledTimes(1);
+    expect(callbacks.onClose).not.toHaveBeenCalled();
+  });
+
+  it('calls onClose when Escape pressed and isDropdownOpen is false', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isDropdownOpen: false,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Escape');
+    expect(callbacks.onClose).toHaveBeenCalledTimes(1);
+    expect(callbacks.onCloseDropdown).not.toHaveBeenCalled();
+  });
+
+  it('calls onCloseDropdown on Escape when editing with dropdown open', () => {
+    renderHook(() =>
+      useGhostTextKeyboard({
+        isOpen: true,
+        isEditing: true,
+        isDropdownOpen: true,
+        ...callbacks,
+      }),
+    );
+
+    fireKey('Escape');
+    expect(callbacks.onCloseDropdown).toHaveBeenCalledTimes(1);
+    expect(callbacks.onClose).not.toHaveBeenCalled();
   });
 });

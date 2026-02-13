@@ -1,12 +1,18 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText } from '@phosphor-icons/react';
 import { Button } from '@/components/Button';
 import { Badge } from '@/components/Badge';
+import type { SelectOption } from '@/components/Input/Select';
 import { formatCurrency } from '@/lib/currency';
 import { relativeTime } from '@/lib/dates';
 import { useWorkOrderStore, selectWorkOrderById } from '@/stores';
 import type { Transaction, TransactionCategory } from '@/types';
+import { GhostTextField } from './GhostTextField';
+import { RejectConfirmDialog } from './RejectConfirmDialog';
 import styles from './GhostTextCard.module.scss';
+
+export type AnimationPhase = 'idle' | 'glowing' | 'solidifying' | 'exiting' | 'rejectExiting';
 
 export interface GhostTextCardProps {
   transaction: Transaction;
@@ -14,7 +20,25 @@ export interface GhostTextCardProps {
   onEdit: () => void;
   onReject: () => void;
   isConfirming?: boolean;
-  animationPhase?: 'idle' | 'glowing' | 'solidifying' | 'exiting';
+  animationPhase?: AnimationPhase;
+  /** When true, ghost text fields become editable */
+  editMode?: boolean;
+  /** User-edited category value (null = not edited) */
+  editedCategory?: TransactionCategory | null;
+  /** User-edited project/work order ID (null = not edited) */
+  editedProjectId?: string | null;
+  /** Called when user selects a new category */
+  onCategoryChange?: (value: TransactionCategory) => void;
+  /** Called when user selects a new project */
+  onProjectChange?: (projectId: string) => void;
+  /** Reports dropdown open/close for Escape key layering */
+  onDropdownToggle?: (isOpen: boolean) => void;
+  /** When true, shows inline reject confirmation dialog */
+  showRejectConfirm?: boolean;
+  /** Called when user cancels rejection */
+  onRejectCancel?: () => void;
+  /** Whether reject operation is in progress */
+  isRejecting?: boolean;
 }
 
 const CATEGORY_KEYS: Record<TransactionCategory, string> = {
@@ -32,6 +56,15 @@ export function GhostTextCard({
   onReject,
   isConfirming = false,
   animationPhase = 'idle',
+  editMode = false,
+  editedCategory = null,
+  editedProjectId = null,
+  onCategoryChange,
+  onProjectChange,
+  onDropdownToggle,
+  showRejectConfirm = false,
+  onRejectCancel,
+  isRejecting = false,
 }: GhostTextCardProps) {
   const { t } = useTranslation();
 
@@ -41,8 +74,35 @@ export function GhostTextCard({
   const projectName =
     workOrder?.name ?? transaction.suggestedWorkOrderId ?? '—';
 
+  const workOrders = useWorkOrderStore((state) => state.workOrders);
+
   const confidenceValue = transaction.aiConfidence ?? 0;
   const isHighConfidence = confidenceValue >= 85;
+
+  // Category options for searchable dropdown
+  const categoryOptions: SelectOption[] = useMemo(
+    () =>
+      Object.entries(CATEGORY_KEYS).map(([value, key]) => ({
+        value,
+        label: t(key),
+      })),
+    [t],
+  );
+
+  // Project options from work orders
+  const projectOptions: SelectOption[] = useMemo(
+    () =>
+      workOrders.map((wo) => ({
+        value: wo.id,
+        label: `${wo.name} (${wo.status})`,
+      })),
+    [workOrders],
+  );
+
+  // Current display values (account for edits)
+  const displayCategory = editedCategory ?? transaction.category;
+  const displayProjectId =
+    editedProjectId ?? transaction.suggestedWorkOrderId ?? '';
 
   const cardClassNames = [
     styles.ghostTextCard,
@@ -86,20 +146,45 @@ export function GhostTextCard({
 
       {/* Ghost Text Fields */}
       <div className={styles.ghostFields}>
-        <div className={ghostFieldClassNames}>
-          <span className={styles.ghostFieldLabel}>
-            {t('review.ghostText.category')}
-          </span>
-          <span className={styles.ghostFieldValue}>
-            {t(CATEGORY_KEYS[transaction.category])}
-          </span>
-        </div>
-        <div className={ghostFieldClassNames}>
-          <span className={styles.ghostFieldLabel}>
-            {t('review.ghostText.project')}
-          </span>
-          <span className={styles.ghostFieldValue}>{projectName}</span>
-        </div>
+        {editMode ? (
+          <>
+            <GhostTextField
+              label={t('review.ghostText.category')}
+              value={displayCategory}
+              type="category"
+              options={categoryOptions}
+              isEdited={editedCategory !== null}
+              onChange={(val) => onCategoryChange?.(val as TransactionCategory)}
+              onDropdownToggle={onDropdownToggle}
+            />
+            <GhostTextField
+              label={t('review.ghostText.project')}
+              value={displayProjectId}
+              type="project"
+              options={projectOptions}
+              isEdited={editedProjectId !== null}
+              onChange={(val) => onProjectChange?.(val)}
+              onDropdownToggle={onDropdownToggle}
+            />
+          </>
+        ) : (
+          <>
+            <div className={ghostFieldClassNames}>
+              <span className={styles.ghostFieldLabel}>
+                {t('review.ghostText.category')}
+              </span>
+              <span className={styles.ghostFieldValue}>
+                {t(CATEGORY_KEYS[displayCategory])}
+              </span>
+            </div>
+            <div className={ghostFieldClassNames}>
+              <span className={styles.ghostFieldLabel}>
+                {t('review.ghostText.project')}
+              </span>
+              <span className={styles.ghostFieldValue}>{projectName}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Confidence Bar */}
@@ -137,24 +222,32 @@ export function GhostTextCard({
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className={styles.actionButtons}>
-        <Button
-          variant="primary"
-          shortcut="Enter"
-          onClick={onConfirm}
-          loading={isConfirming}
-          disabled={isConfirming}
-        >
-          {t('review.ghostText.confirm')}
-        </Button>
-        <Button variant="secondary" shortcut="E" onClick={onEdit}>
-          {t('review.ghostText.edit')}
-        </Button>
-        <Button variant="danger" shortcut="Del" onClick={onReject}>
-          {t('review.ghostText.reject')}
-        </Button>
-      </div>
+      {/* Action Buttons / Reject Confirmation */}
+      {showRejectConfirm ? (
+        <RejectConfirmDialog
+          onCancel={onRejectCancel ?? (() => {})}
+          onConfirm={onReject}
+          isRejecting={isRejecting}
+        />
+      ) : (
+        <div className={styles.actionButtons}>
+          <Button
+            variant="primary"
+            shortcut="Enter"
+            onClick={onConfirm}
+            loading={isConfirming}
+            disabled={isConfirming}
+          >
+            {t('review.ghostText.confirm')}
+          </Button>
+          <Button variant="secondary" shortcut="E" onClick={onEdit}>
+            {t('review.ghostText.edit')}
+          </Button>
+          <Button variant="danger" shortcut="Del" onClick={onReject}>
+            {t('review.ghostText.reject')}
+          </Button>
+        </div>
+      )}
 
       {/* Footer */}
       {transaction.originalFileUrl && (

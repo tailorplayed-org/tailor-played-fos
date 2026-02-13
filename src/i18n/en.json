@@ -182,9 +182,14 @@
       "category": "Category",
       "project": "Project",
       "estimated": "Estimated",
-      "editComingSoon": "Edit mode coming in next update",
-      "rejectComingSoon": "Reject mode coming in next update",
-      "noMoreItems": "No more pending items"
+      "noMoreItems": "No more pending items",
+      "rejected": "Transaction rejected",
+      "rejectError": "Failed to reject transaction",
+      "rejectConfirmTitle": "Reject this item?",
+      "rejectConfirmMessage": "It will be archived.",
+      "cancel": "Cancel",
+      "editMode": "Edit mode",
+      "fieldEdited": "Edited"
     },
     "error": {
       "title": "Failed to load review queue"

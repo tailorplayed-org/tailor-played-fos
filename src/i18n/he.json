@@ -182,9 +182,14 @@
       "category": "קטגוריה",
       "project": "פרויקט",
       "estimated": "מוערך",
-      "editComingSoon": "מצב עריכה יגיע בעדכון הבא",
-      "rejectComingSoon": "מצב דחייה יגיע בעדכון הבא",
-      "noMoreItems": "אין עוד פריטים ממתינים"
+      "noMoreItems": "אין עוד פריטים ממתינים",
+      "rejected": "העסקה נדחתה",
+      "rejectError": "שגיאה בדחיית העסקה",
+      "rejectConfirmTitle": "לדחות פריט זה?",
+      "rejectConfirmMessage": "הוא יועבר לארכיון.",
+      "cancel": "ביטול",
+      "editMode": "מצב עריכה",
+      "fieldEdited": "נערך"
     },
     "error": {
       "title": "טעינת תור הביקורת נכשלה"
