@@ -29,3 +29,35 @@ export const createInventoryItemSchema = z.object({
 });
 
 export type CreateInventoryItemInput = z.infer<typeof createInventoryItemSchema>;
+
+// --- Inventory Log (Story 6.2) ---
+
+export const INVENTORY_LOG_ACTIONS = ['restock', 'consume', 'waste'] as const;
+
+export const inventoryLogSchema = z.object({
+  id: z.string(),
+  itemId: z.string(),
+  action: z.enum(INVENTORY_LOG_ACTIONS),
+  qtyChange: z.number(), // positive for restock, negative for consume/waste
+  costSnapshotAgora: z.number().int(), // total cost of this action in agora
+  wacBeforeAgora: z.number().int(),
+  wacAfterAgora: z.number().int(),
+  workOrderRef: z.string().nullable().default(null), // only for consume/waste
+  reason: z.string().nullable().default(null), // only for waste
+  actorUid: z.string(),
+  timestamp: z.date(),
+});
+
+export type InventoryLogEntry = z.infer<typeof inventoryLogSchema>;
+
+// --- Restock Form Input (Story 6.2) ---
+// No .default() — form provides defaults via defaultValues to avoid Zod 4 input/output type divergence
+// totalCostIls is in ILS display value — convert to agora via toMinorUnits() on submit
+
+export const restockInputSchema = z.object({
+  itemId: z.string().min(1, { error: 'Material is required' }),
+  quantity: z.number().positive({ error: 'Quantity must be greater than 0' }),
+  totalCostIls: z.number().positive({ error: 'Total cost must be greater than 0' }),
+});
+
+export type RestockInput = z.infer<typeof restockInputSchema>;

@@ -1,18 +1,24 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Package, Plus } from '@phosphor-icons/react';
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/services';
+import { collection, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { db, auth } from '@/services';
 import { toMinorUnits } from '@/lib/currency';
+import { calculateWAC } from '@/lib/wac';
 import { toast } from '@/stores/useUIStore';
 import { useInventory } from './hooks/useInventory';
 import { InventoryTable } from './components/InventoryTable';
 import { InventoryForm } from './components/InventoryForm';
+import { RestockForm } from './components/RestockForm';
 import { Button, Card } from '@/components';
-import type { InventoryItem, CreateInventoryItemInput } from '@/types';
+import type { InventoryItem, CreateInventoryItemInput, RestockInput } from '@/types';
 import styles from './InventoryPage.module.scss';
 
-type FormMode = { type: 'closed' } | { type: 'create' } | { type: 'edit'; item: InventoryItem };
+type FormMode =
+  | { type: 'closed' }
+  | { type: 'create' }
+  | { type: 'edit'; item: InventoryItem }
+  | { type: 'restock'; item?: InventoryItem };
 
 export function InventoryPage() {
   const { t } = useTranslation();
@@ -56,6 +62,56 @@ export function InventoryPage() {
       toast.error(t('inventory.toast.updateError'));
     }
   }, [formMode, t]);
+
+  const handleRestock = useCallback(async (data: RestockInput) => {
+    const currentUid = auth.currentUser?.uid;
+    if (!currentUid) {
+      toast.error(t('inventory.restock.error'));
+      return;
+    }
+
+    const item = inventory.find((i) => i.id === data.itemId);
+    if (!item) return;
+
+    const totalCostAgora = toMinorUnits(data.totalCostIls);
+    const newWAC = calculateWAC(item.currentQty, item.wacAgora, data.quantity, totalCostAgora);
+
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Update inventory item
+      batch.update(doc(db, 'inventory', item.id), {
+        currentQty: item.currentQty + data.quantity,
+        wacAgora: newWAC,
+        updatedAt: serverTimestamp(),
+      });
+
+      // 2. Create inventory_log entry
+      const logRef = doc(collection(db, 'inventory_log'));
+      batch.set(logRef, {
+        itemId: item.id,
+        action: 'restock',
+        qtyChange: data.quantity,
+        costSnapshotAgora: totalCostAgora,
+        wacBeforeAgora: item.wacAgora,
+        wacAfterAgora: newWAC,
+        workOrderRef: null,
+        reason: null,
+        actorUid: currentUid,
+        timestamp: serverTimestamp(),
+      });
+
+      await batch.commit();
+      toast.success(t('inventory.restock.success'));
+      setFormMode({ type: 'closed' });
+    } catch {
+      toast.error(t('inventory.restock.error'));
+    }
+  }, [inventory, t]);
+
+  const handleRestockClick = useCallback((item: InventoryItem) => {
+    setFormMode({ type: 'restock', item });
+  }, []);
 
   const handleRowClick = useCallback((item: InventoryItem) => {
     setFormMode({ type: 'edit', item });
@@ -122,10 +178,20 @@ export function InventoryPage() {
         />
       )}
 
+      {formMode.type === 'restock' && (
+        <RestockForm
+          item={formMode.item}
+          inventoryItems={inventory}
+          onSubmit={handleRestock}
+          onCancel={handleCancel}
+        />
+      )}
+
       <InventoryTable
         items={inventory}
         loading={loading}
         onRowClick={handleRowClick}
+        onRestock={handleRestockClick}
         emptyState={emptyState}
       />
     </div>

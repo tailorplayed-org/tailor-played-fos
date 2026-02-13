@@ -336,6 +336,21 @@
       "updated": "החומר עודכן",
       "createError": "הוספת חומר נכשלה",
       "updateError": "עדכון חומר נכשל"
+    },
+    "restock": {
+      "title": "חידוש מלאי",
+      "action": "חידוש",
+      "material": "חומר",
+      "materialRequired": "חומר נדרש",
+      "quantity": "כמות שנוספה",
+      "quantityError": "הכמות חייבת להיות גדולה מ-0",
+      "totalCost": "עלות כוללת (₪)",
+      "totalCostError": "העלות הכוללת חייבת להיות גדולה מ-0",
+      "unitCost": "עלות ליחידה (מחושב)",
+      "submit": "שלח חידוש",
+      "cancel": "ביטול",
+      "success": "החידוש נרשם בהצלחה",
+      "error": "רישום החידוש נכשל"
     }
   },
   "components": {

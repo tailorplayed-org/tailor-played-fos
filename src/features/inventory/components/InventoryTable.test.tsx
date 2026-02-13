@@ -2,10 +2,35 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { InventoryItem } from '@/types';
 
-vi.mock('@phosphor-icons/react', () => ({
-  ArrowUp: () => <svg data-testid="icon-ArrowUp" />,
-  ArrowDown: () => <svg data-testid="icon-ArrowDown" />,
-}));
+// Mock Phosphor icons — include all icons used transitively
+vi.mock('@phosphor-icons/react', () => {
+  const iconStub = (name: string) =>
+    function MockIcon({ className }: { size?: number; className?: string; weight?: string }) {
+      return <svg data-testid={`icon-${name}`} className={className} />;
+    };
+
+  return {
+    ArrowUp: iconStub('ArrowUp'),
+    ArrowDown: iconStub('ArrowDown'),
+    ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
+    // Toast icons (imported transitively via Button → components barrel)
+    CheckCircle: iconStub('CheckCircle'),
+    XCircle: iconStub('XCircle'),
+    Warning: iconStub('Warning'),
+    Info: iconStub('Info'),
+    X: iconStub('X'),
+    // Layout icons
+    Bell: iconStub('Bell'),
+    ChartBar: iconStub('ChartBar'),
+    ClipboardText: iconStub('ClipboardText'),
+    GearSix: iconStub('GearSix'),
+    Tray: iconStub('Tray'),
+    MagnifyingGlass: iconStub('MagnifyingGlass'),
+    Package: iconStub('Package'),
+    Plus: iconStub('Plus'),
+    PencilSimple: iconStub('PencilSimple'),
+  };
+});
 
 const { InventoryTable } = await import('./InventoryTable');
 
@@ -108,5 +133,46 @@ describe('InventoryTable', () => {
     render(<InventoryTable items={items} loading={false} />);
     const row = screen.getByText('LowItem').closest('tr')!;
     expect(row.className).toContain('lowStockRow');
+  });
+
+  it('renders Restock button when onRestock provided', () => {
+    const onRestock = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onRestock={onRestock} />,
+    );
+    const restockButtons = screen.getAllByText('inventory.restock.action');
+    expect(restockButtons).toHaveLength(testItems.length);
+  });
+
+  it('calls onRestock with correct item when Restock button clicked', () => {
+    const onRestock = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onRestock={onRestock} />,
+    );
+    const restockButtons = screen.getAllByText('inventory.restock.action');
+    fireEvent.click(restockButtons[0]);
+    expect(onRestock).toHaveBeenCalledWith(testItems[0]);
+  });
+
+  it('does not render Restock button when onRestock not provided', () => {
+    render(<InventoryTable items={testItems} loading={false} />);
+    expect(screen.queryByText('inventory.restock.action')).not.toBeInTheDocument();
+  });
+
+  it('restock button click does not trigger row click', () => {
+    const onRowClick = vi.fn();
+    const onRestock = vi.fn();
+    render(
+      <InventoryTable
+        items={testItems}
+        loading={false}
+        onRowClick={onRowClick}
+        onRestock={onRestock}
+      />,
+    );
+    const restockButtons = screen.getAllByText('inventory.restock.action');
+    fireEvent.click(restockButtons[0]);
+    expect(onRestock).toHaveBeenCalled();
+    expect(onRowClick).not.toHaveBeenCalled();
   });
 });

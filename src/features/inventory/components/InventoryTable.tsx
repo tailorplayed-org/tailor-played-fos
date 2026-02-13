@@ -1,7 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ArrowCounterClockwise } from '@phosphor-icons/react';
 import { Table, type Column } from '@/components/Table';
 import { Badge } from '@/components/Badge/Badge';
+import { Button } from '@/components';
 import { formatCurrency } from '@/lib/currency';
 import type { InventoryItem } from '@/types';
 import styles from './InventoryTable.module.scss';
@@ -10,6 +12,7 @@ interface InventoryTableProps {
   items: InventoryItem[];
   loading: boolean;
   onRowClick?: (item: InventoryItem) => void;
+  onRestock?: (item: InventoryItem) => void;
   emptyState?: React.ReactNode;
 }
 
@@ -20,7 +23,7 @@ function isLowStock(item: InventoryItem): boolean {
   return item.reorderThreshold != null && item.currentQty <= item.reorderThreshold;
 }
 
-export function InventoryTable({ items, loading, onRowClick, emptyState }: InventoryTableProps) {
+export function InventoryTable({ items, loading, onRowClick, onRestock, emptyState }: InventoryTableProps) {
   const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -116,8 +119,30 @@ export function InventoryTable({ items, loading, onRowClick, emptyState }: Inven
         align: 'end',
         render: (item) => item.reorderThreshold ?? '—',
       },
+      ...(onRestock
+        ? [
+            {
+              key: 'actions' as const,
+              header: '',
+              align: 'end' as const,
+              render: (item: InventoryItem) => (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    onRestock(item);
+                  }}
+                  aria-label={t('inventory.restock.action')}
+                >
+                  <ArrowCounterClockwise size={16} /> {t('inventory.restock.action')}
+                </Button>
+              ),
+            },
+          ]
+        : []),
     ],
-    [t]
+    [t, onRestock]
   );
 
   const rowClassName = useCallback(

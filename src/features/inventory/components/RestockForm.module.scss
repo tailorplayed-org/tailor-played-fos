@@ -1,0 +1,75 @@
+// ─────────────────────────────────────────────
+// Restock Form — restock material layout
+// Follows InventoryForm.module.scss patterns
+// ─────────────────────────────────────────────
+
+.form {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.formTitle {
+  font-size: $font-lg;
+  font-weight: $font-semibold;
+  margin-block-end: $space-md;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.preselectedItem {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.preselectedLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.preselectedValue {
+  font-size: $font-md;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+.unitCostPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-sm $space-md;
+  background: $surface-secondary;
+  border-radius: $radius-md;
+}
+
+.unitCostLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.unitCostValue {
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    > * {
+      inline-size: 100%;
+    }
+  }
+}

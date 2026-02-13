@@ -336,6 +336,21 @@
       "updated": "Material updated",
       "createError": "Failed to add material",
       "updateError": "Failed to update material"
+    },
+    "restock": {
+      "title": "Restock Material",
+      "action": "Restock",
+      "material": "Material",
+      "materialRequired": "Material is required",
+      "quantity": "Quantity Added",
+      "quantityError": "Quantity must be greater than 0",
+      "totalCost": "Total Cost (₪)",
+      "totalCostError": "Total cost must be greater than 0",
+      "unitCost": "Unit Cost (calculated)",
+      "submit": "Submit Restock",
+      "cancel": "Cancel",
+      "success": "Restock recorded successfully",
+      "error": "Failed to record restock"
     }
   },
   "components": {

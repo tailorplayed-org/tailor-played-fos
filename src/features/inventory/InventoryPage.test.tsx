@@ -15,6 +15,7 @@ vi.mock('@phosphor-icons/react', () => {
     PencilSimple: iconStub('PencilSimple'),
     ArrowUp: iconStub('ArrowUp'),
     ArrowDown: iconStub('ArrowDown'),
+    ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
     // Toast
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -39,16 +40,26 @@ vi.mock('firebase/firestore', async () => {
     ...actual,
     addDoc: vi.fn().mockResolvedValue({ id: 'new-item-id' }),
     updateDoc: vi.fn().mockResolvedValue(undefined),
-    doc: vi.fn((_db: unknown, collectionName: string, id: string) => ({ path: `${collectionName}/${id}` })),
+    writeBatch: vi.fn(() => ({
+      update: vi.fn(),
+      set: vi.fn(),
+      commit: vi.fn().mockResolvedValue(undefined),
+    })),
+    doc: vi.fn((_db: unknown, collectionName: string, id?: string) => ({ path: id ? `${collectionName}/${id}` : collectionName })),
     collection: vi.fn((_db: unknown, name: string) => ({ path: name })),
     serverTimestamp: vi.fn(() => 'mock-server-timestamp'),
   };
 });
 
+// Mock WAC calculation
+vi.mock('@/lib/wac', () => ({
+  calculateWAC: vi.fn(() => 5000),
+}));
+
 // Mock services
 vi.mock('@/services', () => ({
   db: {},
-  auth: { currentUser: null },
+  auth: { currentUser: { uid: 'test-user-123' } },
 }));
 
 // Mock useInventory
@@ -193,5 +204,86 @@ describe('InventoryPage', () => {
     await waitFor(() => {
       expect(addDoc).toHaveBeenCalled();
     });
+  });
+
+  it('renders Restock action button in table rows', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    expect(screen.getByText('inventory.restock.action')).toBeInTheDocument();
+  });
+
+  it('opens restock form when Restock button clicked', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    fireEvent.click(screen.getByText('inventory.restock.action'));
+    expect(screen.getByText('inventory.restock.title')).toBeInTheDocument();
+    // Pre-selected item name appears in both restock form and table
+    const fabricElements = screen.getAllByText('Fabric');
+    expect(fabricElements.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('closes restock form when cancel clicked', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    fireEvent.click(screen.getByText('inventory.restock.action'));
+    expect(screen.getByText('inventory.restock.title')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('inventory.restock.cancel'));
+    expect(screen.queryByText('inventory.restock.title')).not.toBeInTheDocument();
+  });
+
+  it('calls writeBatch on restock form submit with correct arguments', async () => {
+    const { writeBatch } = await import('firebase/firestore');
+    const mockCommit = vi.fn().mockResolvedValue(undefined);
+    const mockBatchUpdate = vi.fn();
+    const mockBatchSet = vi.fn();
+    (writeBatch as ReturnType<typeof vi.fn>).mockReturnValue({
+      update: mockBatchUpdate,
+      set: mockBatchSet,
+      commit: mockCommit,
+    });
+
+    mockInventoryState.inventory = [makeItem({ id: 'item-1', name: 'Fabric', currentQty: 100, wacAgora: 350 })];
+    render(<InventoryPage />);
+
+    // Open restock form
+    fireEvent.click(screen.getByText('inventory.restock.action'));
+
+    // Fill restock form
+    const qtyInput = screen.getByLabelText('inventory.restock.quantity');
+    fireEvent.change(qtyInput, { target: { value: '50' } });
+
+    const costInput = screen.getByLabelText('inventory.restock.totalCost');
+    fireEvent.change(costInput, { target: { value: '125.00' } });
+
+    // Submit
+    fireEvent.click(screen.getByText('inventory.restock.submit'));
+
+    await waitFor(() => {
+      expect(writeBatch).toHaveBeenCalled();
+    });
+
+    // Verify inventory item update (currentQty incremented, wacAgora set)
+    expect(mockBatchUpdate).toHaveBeenCalledWith(
+      expect.anything(), // doc ref
+      expect.objectContaining({
+        currentQty: 150, // 100 + 50
+        updatedAt: 'mock-server-timestamp',
+      }),
+    );
+
+    // Verify inventory_log entry created
+    expect(mockBatchSet).toHaveBeenCalledWith(
+      expect.anything(), // doc ref
+      expect.objectContaining({
+        itemId: 'item-1',
+        action: 'restock',
+        qtyChange: 50,
+        wacBeforeAgora: 350,
+        actorUid: 'test-user-123',
+        timestamp: 'mock-server-timestamp',
+      }),
+    );
+
+    expect(mockCommit).toHaveBeenCalled();
   });
 });

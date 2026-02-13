@@ -8,3 +8,4 @@ export { onEmailReceived } from './email/onEmailReceived.js';
 export { processDocument } from './ai/processDocument.js';
 export { retryFailedProcessing } from './scheduled/retryFailedProcessing.js';
 export { onTransactionStatusChanged } from './triggers/onTransactionApproved.js';
+export { verifyWAC } from './triggers/verifyWAC.js';

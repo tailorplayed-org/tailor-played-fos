@@ -118,3 +118,22 @@ export const auditLogSchema = z.object({
 });
 
 export type AuditLog = z.infer<typeof auditLogSchema>;
+
+// --- Inventory Log schema (Story 6.2) ---
+// Server-side inventory log schema (uses z.any() for Firestore Timestamps)
+export const INVENTORY_LOG_ACTIONS = ['restock', 'consume', 'waste'] as const;
+
+export const inventoryLogSchema = z.object({
+  itemId: z.string(),
+  action: z.enum(INVENTORY_LOG_ACTIONS),
+  qtyChange: z.number(),
+  costSnapshotAgora: z.number().int(),
+  wacBeforeAgora: z.number().int(),
+  wacAfterAgora: z.number().int(),
+  workOrderRef: z.string().nullable(),
+  reason: z.string().nullable(),
+  actorUid: z.string(),
+  timestamp: z.any(), // Firestore Timestamp
+});
+
+export type InventoryLogEntry = z.infer<typeof inventoryLogSchema>;

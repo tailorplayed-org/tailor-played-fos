@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { inventoryItemSchema, createInventoryItemSchema } from './inventory';
+import {
+  inventoryItemSchema,
+  createInventoryItemSchema,
+  inventoryLogSchema,
+  restockInputSchema,
+} from './inventory';
 
 describe('inventoryItemSchema', () => {
   const validItem = {
@@ -144,6 +149,168 @@ describe('createInventoryItemSchema', () => {
       sku: 'MAT-001',
       supplier: 'SupplierCo',
       reorderThreshold: 10,
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('inventoryLogSchema', () => {
+  const validLog = {
+    id: 'log-1',
+    itemId: 'item-1',
+    action: 'restock' as const,
+    qtyChange: 50,
+    costSnapshotAgora: 25000,
+    wacBeforeAgora: 350,
+    wacAfterAgora: 400,
+    workOrderRef: null,
+    reason: null,
+    actorUid: 'user-123',
+    timestamp: new Date('2026-02-14'),
+  };
+
+  it('validates a complete restock log entry', () => {
+    const result = inventoryLogSchema.safeParse(validLog);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual(validLog);
+    }
+  });
+
+  it('applies defaults for nullable fields', () => {
+    const minimal = {
+      id: 'log-2',
+      itemId: 'item-1',
+      action: 'restock',
+      qtyChange: 10,
+      costSnapshotAgora: 5000,
+      wacBeforeAgora: 0,
+      wacAfterAgora: 500,
+      actorUid: 'user-1',
+      timestamp: new Date(),
+    };
+    const result = inventoryLogSchema.safeParse(minimal);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.workOrderRef).toBeNull();
+      expect(result.data.reason).toBeNull();
+    }
+  });
+
+  it('accepts consume action with negative qtyChange', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      action: 'consume',
+      qtyChange: -10,
+      workOrderRef: 'wo-123',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts waste action with reason', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      action: 'waste',
+      qtyChange: -5,
+      reason: 'Expired material',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects invalid action', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      action: 'invalid',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects non-integer costSnapshotAgora', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      costSnapshotAgora: 100.5,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects non-integer wacBeforeAgora', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      wacBeforeAgora: 350.5,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects non-integer wacAfterAgora', () => {
+    const result = inventoryLogSchema.safeParse({
+      ...validLog,
+      wacAfterAgora: 400.5,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing actorUid', () => {
+    const { actorUid: _, ...noActor } = validLog;
+    const result = inventoryLogSchema.safeParse(noActor);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing itemId', () => {
+    const { itemId: _, ...noItemId } = validLog;
+    const result = inventoryLogSchema.safeParse(noItemId);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('restockInputSchema', () => {
+  const validInput = {
+    itemId: 'item-1',
+    quantity: 50,
+    totalCostIls: 125.00,
+  };
+
+  it('validates a complete restock input', () => {
+    const result = restockInputSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty itemId', () => {
+    const result = restockInputSchema.safeParse({ ...validInput, itemId: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects zero quantity', () => {
+    const result = restockInputSchema.safeParse({ ...validInput, quantity: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative quantity', () => {
+    const result = restockInputSchema.safeParse({ ...validInput, quantity: -5 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects zero totalCostIls', () => {
+    const result = restockInputSchema.safeParse({ ...validInput, totalCostIls: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative totalCostIls', () => {
+    const result = restockInputSchema.safeParse({ ...validInput, totalCostIls: -10 });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts decimal totalCostIls (ILS display value)', () => {
+    const result = restockInputSchema.safeParse({
+      ...validInput,
+      totalCostIls: 82.50,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts small positive quantity', () => {
+    const result = restockInputSchema.safeParse({
+      ...validInput,
+      quantity: 0.5,
     });
     expect(result.success).toBe(true);
   });
