@@ -11,7 +11,7 @@
 }
 
 .formTitle {
-  font-size: $font-lg;
+  font-size: $text-lg;
   font-weight: $font-semibold;
   margin-block-end: $space-md;
 }
@@ -30,12 +30,12 @@
 }
 
 .preselectedLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .preselectedValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-medium;
   color: $text-primary;
 }
@@ -50,12 +50,12 @@
 }
 
 .unitCostLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .unitCostValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $text-primary;
 }

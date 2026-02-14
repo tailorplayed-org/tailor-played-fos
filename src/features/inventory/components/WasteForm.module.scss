@@ -11,7 +11,7 @@
 }
 
 .formTitle {
-  font-size: $font-lg;
+  font-size: $text-lg;
   font-weight: $font-semibold;
   margin-block-end: $space-md;
 }
@@ -30,12 +30,12 @@
 }
 
 .preselectedLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .preselectedValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-medium;
   color: $text-primary;
 }
@@ -50,18 +50,18 @@
 }
 
 .stockLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .stockValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $text-primary;
 }
 
 .stockValueError {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $error;
 }
@@ -76,12 +76,12 @@
 }
 
 .costLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .costValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $error;
 }

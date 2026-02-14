@@ -19,7 +19,7 @@ $action-consume: #3b82f6; // blue per architecture spec
 }
 
 .panelTitle {
-  font-size: $font-lg;
+  font-size: $text-lg;
   font-weight: $font-semibold;
   display: flex;
   align-items: center;
@@ -38,7 +38,7 @@ $action-consume: #3b82f6; // blue per architecture spec
   background: $surface-secondary;
   border-radius: $radius-md;
   margin-block-end: $space-md;
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
@@ -91,7 +91,7 @@ $action-consume: #3b82f6; // blue per architecture spec
 
 .logItemName {
   color: $text-secondary;
-  font-size: $font-sm;
+  font-size: $text-sm;
 }
 
 .logQty {
@@ -112,7 +112,7 @@ $action-consume: #3b82f6; // blue per architecture spec
 
 .logTimestamp {
   color: $text-muted;
-  font-size: $font-xs;
+  font-size: $text-xs;
   margin-inline-start: auto;
 }
 
@@ -131,7 +131,7 @@ $action-consume: #3b82f6; // blue per architecture spec
   width: 100%;
   padding-inline-start: calc(24px + $space-sm); // align with content after icon
   padding-block-start: $space-xs;
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 
   @media (max-width: $bp-sm) {

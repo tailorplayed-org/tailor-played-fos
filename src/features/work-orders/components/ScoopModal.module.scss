@@ -31,7 +31,7 @@
 }
 
 .title {
-  font-size: $font-lg;
+  font-size: $text-lg;
   font-weight: $font-semibold;
   margin-block-end: $space-md;
 }
@@ -58,24 +58,24 @@
 }
 
 .infoLabel {
-  font-size: $font-sm;
+  font-size: $text-sm;
   color: $text-secondary;
 }
 
 .infoValue {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $text-primary;
 }
 
 .infoValueError {
-  font-size: $font-md;
+  font-size: $text-base;
   font-weight: $font-semibold;
   color: $error;
 }
 
 .infoSuffix {
-  font-size: $font-sm;
+  font-size: $text-sm;
   font-weight: $font-regular;
   color: $text-secondary;
 }
