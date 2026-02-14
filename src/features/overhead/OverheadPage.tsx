@@ -4,7 +4,7 @@ import { Receipt, Plus } from '@phosphor-icons/react';
 import { addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { Button, Skeleton } from '@/components';
 import { formatCurrency, toMinorUnits } from '@/lib/currency';
-import { useOverheadStore, selectCurrentMonth, selectPreviousMonth, calculateBurn } from '@/stores';
+import { calculateBurn } from '@/stores';
 import { OVERHEAD_CATEGORIES } from '@/types';
 import type { Overhead, CreateOverheadInput } from '@/types';
 import { db } from '@/services';
@@ -45,9 +45,31 @@ export function OverheadPage() {
   const { overhead, loading } = useOverhead();
   const [formMode, setFormMode] = useState<FormMode>({ type: 'closed' });
 
-  // Current & previous month entries (for burn rate and delta)
-  const currentMonthEntries = useOverheadStore(selectCurrentMonth);
-  const previousMonthEntries = useOverheadStore(selectPreviousMonth);
+  // SAFER pattern: derive filtered data via useMemo from the full overhead array
+  // (avoids React 19 + Zustand v5 infinite loop from selectors returning new arrays)
+  const currentMonthEntries = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    return overhead.filter((item) => {
+      if (item.recurrence === 'one_time') {
+        return item.date.getFullYear() === year && item.date.getMonth() === month;
+      }
+      return item.isActive;
+    });
+  }, [overhead]);
+
+  const previousMonthEntries = useMemo(() => {
+    const now = new Date();
+    const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    return overhead.filter((item) => {
+      if (item.recurrence === 'one_time') {
+        return item.date.getFullYear() === prevYear && item.date.getMonth() === prevMonth;
+      }
+      return item.isActive;
+    });
+  }, [overhead]);
 
   const currentBurnAgora = useMemo(() => calculateBurn(currentMonthEntries), [currentMonthEntries]);
   const previousBurnAgora = useMemo(() => calculateBurn(previousMonthEntries), [previousMonthEntries]);

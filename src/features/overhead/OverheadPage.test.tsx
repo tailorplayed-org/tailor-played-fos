@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { Overhead } from '@/types';
 
@@ -66,7 +66,7 @@ vi.mock('@/lib/currency', () => ({
   toMinorUnits: (amount: number) => Math.round(amount * 100),
 }));
 
-// Mock useOverhead hook
+// Mock useOverhead hook — the component derives current/previous month from this
 const mockOverheadState = {
   overhead: [] as Overhead[],
   loading: false,
@@ -80,31 +80,15 @@ vi.mock('./hooks', () => ({
   useOverhead: () => mockOverheadState,
 }));
 
-// Mock useOverheadStore with selectCurrentMonth and selectPreviousMonth
-const mockCurrentMonthEntries: Overhead[] = [];
-const mockPreviousMonthEntries: Overhead[] = [];
-let selectorCallIndex = 0;
-vi.mock('@/stores', async () => {
-  const actual = await vi.importActual('@/stores/useOverheadStore');
-  return {
-    ...actual,
-    useOverheadStore: (selector?: (state: unknown) => unknown) => {
-      if (selector) {
-        // First selector call = selectCurrentMonth, second = selectPreviousMonth
-        const idx = selectorCallIndex++;
-        return idx % 2 === 0 ? mockCurrentMonthEntries : mockPreviousMonthEntries;
-      }
-      return mockOverheadState;
-    },
-    selectCurrentMonth: vi.fn(),
-    selectPreviousMonth: vi.fn(),
-    calculateBurn: (entries: Overhead[]) =>
-      entries.reduce((sum: number, item: Overhead) => {
-        if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
-        return sum + item.amountAgora;
-      }, 0),
-  };
-});
+// Mock @/stores — only calculateBurn is imported by the component now
+// (useOverheadStore selectors are no longer used — SAFER pattern via useMemo)
+vi.mock('@/stores', () => ({
+  calculateBurn: (entries: Overhead[]) =>
+    entries.reduce((sum: number, item: Overhead) => {
+      if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
+      return sum + item.amountAgora;
+    }, 0),
+}));
 
 const { OverheadPage } = await import('./OverheadPage');
 
@@ -127,12 +111,15 @@ const makeOverhead = (overrides: Partial<Overhead> = {}): Overhead => ({
 describe('OverheadPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 1, 7, 10, 0)); // Feb 7, 2026
     mockOverheadState.overhead = [];
     mockOverheadState.loading = false;
     mockOverheadState.error = null;
-    mockCurrentMonthEntries.length = 0;
-    mockPreviousMonthEntries.length = 0;
-    selectorCallIndex = 0;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('shows loading skeleton initially', () => {
@@ -148,7 +135,6 @@ describe('OverheadPage', () => {
       makeOverhead({ id: '2', category: 'meals', amountAgora: 2000 }),
     ];
     mockOverheadState.overhead = entries;
-    mockCurrentMonthEntries.push(...entries);
 
     render(<OverheadPage />);
     expect(screen.getByText('overhead.breakdown.title')).toBeInTheDocument();
@@ -166,7 +152,6 @@ describe('OverheadPage', () => {
       }),
     ];
     mockOverheadState.overhead = entries;
-    mockCurrentMonthEntries.push(...entries);
 
     render(<OverheadPage />);
     expect(screen.getByText('Adobe subscription')).toBeInTheDocument();
@@ -204,10 +189,9 @@ describe('OverheadPage', () => {
     const entries = [
       makeOverhead({ id: '1', recurrence: 'monthly' }),
       makeOverhead({ id: '2', recurrence: 'yearly' }),
-      makeOverhead({ id: '3', recurrence: 'one_time' }),
+      makeOverhead({ id: '3', recurrence: 'one_time', date: new Date(2026, 1, 5) }),
     ];
     mockOverheadState.overhead = entries;
-    mockCurrentMonthEntries.push(...entries);
 
     render(<OverheadPage />);
     expect(screen.getByText('overhead.recurrence.monthly')).toBeInTheDocument();
@@ -220,7 +204,6 @@ describe('OverheadPage', () => {
       makeOverhead({ id: '2', source: 'manual', category: 'meals' }),
     ];
     mockOverheadState.overhead = entries;
-    mockCurrentMonthEntries.push(...entries);
 
     render(<OverheadPage />);
     expect(screen.getByText('AI')).toBeInTheDocument();
@@ -228,11 +211,12 @@ describe('OverheadPage', () => {
   });
 
   it('shows delta badge when previous month has data — red (burnDeltaNegative) for increase', () => {
-    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
-    const previous = [makeOverhead({ id: '2', amountAgora: 5000, recurrence: 'monthly' })];
-    mockOverheadState.overhead = current;
-    mockCurrentMonthEntries.push(...current);
-    mockPreviousMonthEntries.push(...previous);
+    // Current month (Feb): one_time 10000, Previous month (Jan): one_time 5000
+    // Delta: (10000-5000)/5000 * 100 = 100% increase → red (negative for overhead)
+    mockOverheadState.overhead = [
+      makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'one_time', date: new Date(2026, 1, 5) }),
+      makeOverhead({ id: '2', amountAgora: 5000, recurrence: 'one_time', date: new Date(2026, 0, 15) }),
+    ];
 
     render(<OverheadPage />);
     const delta = screen.getByTestId('burn-delta');
@@ -245,11 +229,12 @@ describe('OverheadPage', () => {
   });
 
   it('shows delta badge green (burnDeltaPositive) for decrease', () => {
-    const current = [makeOverhead({ id: '1', amountAgora: 5000, recurrence: 'monthly' })];
-    const previous = [makeOverhead({ id: '2', amountAgora: 10000, recurrence: 'monthly' })];
-    mockOverheadState.overhead = current;
-    mockCurrentMonthEntries.push(...current);
-    mockPreviousMonthEntries.push(...previous);
+    // Current month (Feb): one_time 5000, Previous month (Jan): one_time 10000
+    // Delta: (5000-10000)/10000 * 100 = -50% → green (positive for overhead)
+    mockOverheadState.overhead = [
+      makeOverhead({ id: '1', amountAgora: 5000, recurrence: 'one_time', date: new Date(2026, 1, 5) }),
+      makeOverhead({ id: '2', amountAgora: 10000, recurrence: 'one_time', date: new Date(2026, 0, 15) }),
+    ];
 
     render(<OverheadPage />);
     const delta = screen.getByTestId('burn-delta');
@@ -262,30 +247,31 @@ describe('OverheadPage', () => {
   });
 
   it('shows previous month amount below current', () => {
-    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
-    const previous = [makeOverhead({ id: '2', amountAgora: 8000, recurrence: 'monthly' })];
-    mockOverheadState.overhead = current;
-    mockCurrentMonthEntries.push(...current);
-    mockPreviousMonthEntries.push(...previous);
+    // Both months have data so previous month line is visible
+    mockOverheadState.overhead = [
+      makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'one_time', date: new Date(2026, 1, 5) }),
+      makeOverhead({ id: '2', amountAgora: 8000, recurrence: 'one_time', date: new Date(2026, 0, 15) }),
+    ];
 
     render(<OverheadPage />);
     expect(screen.getByText(/overhead\.burn\.previousMonth/)).toBeInTheDocument();
   });
 
   it('hides delta badge when no previous month data', () => {
-    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
-    mockOverheadState.overhead = current;
-    mockCurrentMonthEntries.push(...current);
-    // mockPreviousMonthEntries is empty
+    // Only current month one_time entry — no previous month data
+    mockOverheadState.overhead = [
+      makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'one_time', date: new Date(2026, 1, 5) }),
+    ];
 
     render(<OverheadPage />);
     expect(screen.queryByTestId('burn-delta')).not.toBeInTheDocument();
   });
 
   it('uses calculateBurn for total (verifies yearly proration)', () => {
-    const current = [makeOverhead({ id: '1', amountAgora: 12000, recurrence: 'yearly' })];
-    mockOverheadState.overhead = current;
-    mockCurrentMonthEntries.push(...current);
+    // Yearly entry — useMemo includes it as active recurring
+    mockOverheadState.overhead = [
+      makeOverhead({ id: '1', amountAgora: 12000, recurrence: 'yearly' }),
+    ];
 
     render(<OverheadPage />);
     // yearly 12000 / 12 = 1000 agora = ₪10.00
