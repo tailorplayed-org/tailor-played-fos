@@ -197,12 +197,23 @@ describe('DashboardPage', () => {
     expect(screen.getByText('dashboard.kpi.activeProjectsSubtitle')).toBeInTheDocument();
   });
 
-  it('renders Monthly Overhead KPI card with delta', () => {
+  it('renders Monthly Overhead KPI card with delta from overhead collection', () => {
     render(<DashboardPage />);
     expect(screen.getByText('dashboard.kpi.monthlyOverhead')).toBeInTheDocument();
     expect(screen.getByText('₪1500.00')).toBeInTheDocument();
-    // (150000 - 140000) / 140000 * 100 ≈ 7%
+    // (150000 - 140000) / 140000 * 100 ≈ 7% — delta inverted for overhead
     expect(screen.getByText(/7%/)).toBeInTheDocument();
+  });
+
+  it('overhead delta is inverted — decrease shows positive (green), increase shows negative (red)', () => {
+    // Overhead decreased: 100_000 → 150_000 previous was more, current is less
+    Object.assign(mockDashboardData, {
+      monthlyOverheadAgora: 100_000,
+      previousMonthOverheadAgora: 150_000,
+    });
+    render(<DashboardPage />);
+    // (100000 - 150000) / 150000 * 100 = -33% → inverted to positive
+    expect(screen.getByText(/33%/)).toBeInTheDocument();
   });
 
   it('renders Pending Review KPI card with breakdown', () => {

@@ -4,7 +4,7 @@ import { Receipt, Plus } from '@phosphor-icons/react';
 import { addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { Button, Skeleton } from '@/components';
 import { formatCurrency, toMinorUnits } from '@/lib/currency';
-import { useOverheadStore, selectCurrentMonth } from '@/stores';
+import { useOverheadStore, selectCurrentMonth, selectPreviousMonth, calculateBurn } from '@/stores';
 import { OVERHEAD_CATEGORIES } from '@/types';
 import type { Overhead, CreateOverheadInput } from '@/types';
 import { db } from '@/services';
@@ -45,17 +45,27 @@ export function OverheadPage() {
   const { overhead, loading } = useOverhead();
   const [formMode, setFormMode] = useState<FormMode>({ type: 'closed' });
 
-  // Current month entries (for totals and display)
+  // Current & previous month entries (for burn rate and delta)
   const currentMonthEntries = useOverheadStore(selectCurrentMonth);
-  const totalMonthlyAgora = useMemo(
-    () =>
-      currentMonthEntries.reduce((sum, item) => {
-        if (item.recurrence === 'monthly') return sum + item.amountAgora;
-        if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
-        return sum + item.amountAgora; // one_time
-      }, 0),
-    [currentMonthEntries],
-  );
+  const previousMonthEntries = useOverheadStore(selectPreviousMonth);
+
+  const currentBurnAgora = useMemo(() => calculateBurn(currentMonthEntries), [currentMonthEntries]);
+  const previousBurnAgora = useMemo(() => calculateBurn(previousMonthEntries), [previousMonthEntries]);
+
+  // Delta for overhead: decrease = positive (green), increase = negative (red)
+  // This is INVERTED from revenue delta because lower costs are good
+  const burnDelta = useMemo(() => {
+    if (previousBurnAgora === 0) return null;
+    const change = ((currentBurnAgora - previousBurnAgora) / Math.abs(previousBurnAgora)) * 100;
+    const value = Math.abs(Math.round(change));
+    if (value === 0) return null;
+    // INVERTED: increase = negative (red), decrease = positive (green)
+    return {
+      value,
+      type: (change >= 0 ? 'negative' : 'positive') as 'positive' | 'negative',
+      direction: (change >= 0 ? 'up' : 'down') as 'up' | 'down',
+    };
+  }, [currentBurnAgora, previousBurnAgora]);
 
   const handleAddOverhead = useCallback(async (data: CreateOverheadInput) => {
     try {
@@ -123,9 +133,26 @@ export function OverheadPage() {
 
       {overhead.length > 0 && (
         <>
-          <div className={styles.monthlyTotal}>
-            <span className={styles.monthlyTotalLabel}>{t('overhead.monthlyTotalLabel')}</span>
-            <span className={styles.monthlyTotalAmount}>{formatCurrency(totalMonthlyAgora)}</span>
+          <div className={styles.burnSummary}>
+            <span className={styles.burnLabel}>{t('overhead.burn.currentMonth')}</span>
+            <span className={styles.burnAmount}>{formatCurrency(currentBurnAgora)}</span>
+
+            {burnDelta && (
+              <span
+                className={`${styles.burnDelta} ${
+                  burnDelta.type === 'positive' ? styles.burnDeltaPositive : styles.burnDeltaNegative
+                }`}
+                data-testid="burn-delta"
+              >
+                {burnDelta.direction === 'up' ? '↑' : '↓'} {burnDelta.value}%
+              </span>
+            )}
+
+            {previousBurnAgora > 0 && (
+              <span className={styles.burnPreviousMonth}>
+                {t('overhead.burn.previousMonth')}: {formatCurrency(previousBurnAgora)}
+              </span>
+            )}
           </div>
 
           <CategoryBreakdown overhead={currentMonthEntries} />

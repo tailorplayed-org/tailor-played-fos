@@ -412,7 +412,7 @@
   "overhead": {
     "pageTitle": "Overhead",
     "addButton": "Add Overhead",
-    "monthlyTotalLabel": "Current Month Total",
+
     "emptyTitle": "No overhead tracked yet",
     "emptyDescription": "Track your business expenses by category — subscriptions, software, meals, office, and general costs.",
     "addSuccess": "Overhead entry added",
@@ -451,6 +451,13 @@
     "breakdown": {
       "title": "Category Breakdown",
       "entries": "{{count}} entries"
+    },
+    "burn": {
+      "currentMonth": "Current Month Burn",
+      "previousMonth": "Previous Month",
+      "noChange": "No change",
+      "increase": "increase",
+      "decrease": "decrease"
     }
   },
   "components": {

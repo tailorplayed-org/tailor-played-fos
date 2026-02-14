@@ -80,17 +80,29 @@ vi.mock('./hooks', () => ({
   useOverhead: () => mockOverheadState,
 }));
 
-// Mock useOverheadStore with selectCurrentMonth
+// Mock useOverheadStore with selectCurrentMonth and selectPreviousMonth
 const mockCurrentMonthEntries: Overhead[] = [];
+const mockPreviousMonthEntries: Overhead[] = [];
+let selectorCallIndex = 0;
 vi.mock('@/stores', async () => {
   const actual = await vi.importActual('@/stores/useOverheadStore');
   return {
     ...actual,
     useOverheadStore: (selector?: (state: unknown) => unknown) => {
-      if (selector) return mockCurrentMonthEntries;
+      if (selector) {
+        // First selector call = selectCurrentMonth, second = selectPreviousMonth
+        const idx = selectorCallIndex++;
+        return idx % 2 === 0 ? mockCurrentMonthEntries : mockPreviousMonthEntries;
+      }
       return mockOverheadState;
     },
     selectCurrentMonth: vi.fn(),
+    selectPreviousMonth: vi.fn(),
+    calculateBurn: (entries: Overhead[]) =>
+      entries.reduce((sum: number, item: Overhead) => {
+        if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
+        return sum + item.amountAgora;
+      }, 0),
   };
 });
 
@@ -119,6 +131,8 @@ describe('OverheadPage', () => {
     mockOverheadState.loading = false;
     mockOverheadState.error = null;
     mockCurrentMonthEntries.length = 0;
+    mockPreviousMonthEntries.length = 0;
+    selectorCallIndex = 0;
   });
 
   it('shows loading skeleton initially', () => {
@@ -211,5 +225,72 @@ describe('OverheadPage', () => {
     render(<OverheadPage />);
     expect(screen.getByText('AI')).toBeInTheDocument();
     expect(screen.getByText('overhead.sourceManual')).toBeInTheDocument();
+  });
+
+  it('shows delta badge when previous month has data — red (burnDeltaNegative) for increase', () => {
+    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
+    const previous = [makeOverhead({ id: '2', amountAgora: 5000, recurrence: 'monthly' })];
+    mockOverheadState.overhead = current;
+    mockCurrentMonthEntries.push(...current);
+    mockPreviousMonthEntries.push(...previous);
+
+    render(<OverheadPage />);
+    const delta = screen.getByTestId('burn-delta');
+    expect(delta).toBeInTheDocument();
+    expect(delta.textContent).toContain('↑');
+    expect(delta.textContent).toContain('100%');
+    // Overhead increase = negative (red) — inverted from revenue
+    expect(delta.className).toContain('burnDeltaNegative');
+    expect(delta.className).not.toContain('burnDeltaPositive');
+  });
+
+  it('shows delta badge green (burnDeltaPositive) for decrease', () => {
+    const current = [makeOverhead({ id: '1', amountAgora: 5000, recurrence: 'monthly' })];
+    const previous = [makeOverhead({ id: '2', amountAgora: 10000, recurrence: 'monthly' })];
+    mockOverheadState.overhead = current;
+    mockCurrentMonthEntries.push(...current);
+    mockPreviousMonthEntries.push(...previous);
+
+    render(<OverheadPage />);
+    const delta = screen.getByTestId('burn-delta');
+    expect(delta).toBeInTheDocument();
+    expect(delta.textContent).toContain('↓');
+    expect(delta.textContent).toContain('50%');
+    // Overhead decrease = positive (green) — inverted from revenue
+    expect(delta.className).toContain('burnDeltaPositive');
+    expect(delta.className).not.toContain('burnDeltaNegative');
+  });
+
+  it('shows previous month amount below current', () => {
+    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
+    const previous = [makeOverhead({ id: '2', amountAgora: 8000, recurrence: 'monthly' })];
+    mockOverheadState.overhead = current;
+    mockCurrentMonthEntries.push(...current);
+    mockPreviousMonthEntries.push(...previous);
+
+    render(<OverheadPage />);
+    expect(screen.getByText(/overhead\.burn\.previousMonth/)).toBeInTheDocument();
+  });
+
+  it('hides delta badge when no previous month data', () => {
+    const current = [makeOverhead({ id: '1', amountAgora: 10000, recurrence: 'monthly' })];
+    mockOverheadState.overhead = current;
+    mockCurrentMonthEntries.push(...current);
+    // mockPreviousMonthEntries is empty
+
+    render(<OverheadPage />);
+    expect(screen.queryByTestId('burn-delta')).not.toBeInTheDocument();
+  });
+
+  it('uses calculateBurn for total (verifies yearly proration)', () => {
+    const current = [makeOverhead({ id: '1', amountAgora: 12000, recurrence: 'yearly' })];
+    mockOverheadState.overhead = current;
+    mockCurrentMonthEntries.push(...current);
+
+    render(<OverheadPage />);
+    // yearly 12000 / 12 = 1000 agora = ₪10.00
+    // Appears in both burn summary and category breakdown (both prorate)
+    const amounts = screen.getAllByText('₪10.00');
+    expect(amounts.length).toBeGreaterThanOrEqual(1);
   });
 });

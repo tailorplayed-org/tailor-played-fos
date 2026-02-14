@@ -412,7 +412,7 @@
   "overhead": {
     "pageTitle": "הוצאות קבועות",
     "addButton": "הוסף הוצאה",
-    "monthlyTotalLabel": "סה\"כ חודש נוכחי",
+
     "emptyTitle": "אין הוצאות קבועות עדיין",
     "emptyDescription": "עקוב אחר הוצאות העסק לפי קטגוריה — מנויים, תוכנה, ארוחות, משרד והוצאות כלליות.",
     "addSuccess": "הוצאה נוספה",
@@ -451,6 +451,13 @@
     "breakdown": {
       "title": "פילוח לפי קטגוריה",
       "entries": "{{count}} רשומות"
+    },
+    "burn": {
+      "currentMonth": "צריכה חודשית נוכחית",
+      "previousMonth": "חודש קודם",
+      "noChange": "ללא שינוי",
+      "increase": "עלייה",
+      "decrease": "ירידה"
     }
   },
   "components": {

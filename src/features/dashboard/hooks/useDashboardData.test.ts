@@ -72,16 +72,45 @@ const mockConfigStore = {
   setError: vi.fn(),
 };
 
+const mockOhStore = {
+  overhead: [] as Array<{
+    id: string;
+    category: string;
+    amountAgora: number;
+    currency: string;
+    date: Date;
+    description: string | null;
+    recurrence: 'one_time' | 'monthly' | 'yearly';
+    source: string;
+    transactionId: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }>,
+  loading: false,
+  error: null as string | null,
+  setOverhead: vi.fn(),
+  setLoading: vi.fn(),
+  setError: vi.fn(),
+};
+
 vi.mock('@/stores', () => ({
   useWorkOrderStore: () => mockWoStore,
   useTransactionStore: () => mockTxnStore,
   useSystemConfigStore: () => mockConfigStore,
+  useOverheadStore: () => mockOhStore,
+  calculateBurn: (entries: Array<{ amountAgora: number; recurrence: string }>) =>
+    entries.reduce((sum, item) => {
+      if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
+      return sum + item.amountAgora;
+    }, 0),
 }));
 
 vi.mock('@/types', () => ({
   workOrderSchema: {},
   transactionSchema: {},
   systemConfigSchema: {},
+  overheadSchema: {},
 }));
 
 const mockToIlsAgora = vi.fn((amount: number) => amount);
@@ -142,6 +171,10 @@ describe('useDashboardData', () => {
     mockConfigStore.config = null;
     mockConfigStore.loading = false;
     mockConfigStore.error = null;
+
+    mockOhStore.overhead = [];
+    mockOhStore.loading = false;
+    mockOhStore.error = null;
   });
 
   afterEach(() => {
@@ -333,6 +366,59 @@ describe('useDashboardData', () => {
     mockWoStore.loading = false;
     mockTxnStore.loading = false;
     mockConfigStore.loading = true;
+
+    const { result } = renderHook(() => useDashboardData());
+    expect(result.current.loading).toBe(true);
+    expect(result.current.loaded).toBe(false);
+  });
+
+  it('computes monthlyOverheadAgora from overhead collection using calculateBurn', () => {
+    mockOhStore.overhead = [
+      {
+        id: 'oh-1', category: 'software', amountAgora: 5000, currency: 'ILS',
+        date: new Date(2026, 1, 1), description: null, recurrence: 'monthly' as const,
+        source: 'manual', transactionId: null, isActive: true,
+        createdAt: new Date(), updatedAt: new Date(),
+      },
+      {
+        id: 'oh-2', category: 'office', amountAgora: 12000, currency: 'ILS',
+        date: new Date(2025, 5, 1), description: null, recurrence: 'yearly' as const,
+        source: 'manual', transactionId: null, isActive: true,
+        createdAt: new Date(), updatedAt: new Date(),
+      },
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    // monthly 5000 + yearly Math.round(12000/12) = 5000 + 1000 = 6000
+    expect(result.current.monthlyOverheadAgora).toBe(6000);
+  });
+
+  it('computes previousMonthOverheadAgora for recurring items', () => {
+    mockOhStore.overhead = [
+      {
+        id: 'oh-1', category: 'software', amountAgora: 3000, currency: 'ILS',
+        date: new Date(2026, 0, 15), description: null, recurrence: 'one_time' as const,
+        source: 'manual', transactionId: null, isActive: true,
+        createdAt: new Date(), updatedAt: new Date(),
+      },
+      {
+        id: 'oh-2', category: 'office', amountAgora: 2000, currency: 'ILS',
+        date: new Date(2025, 5, 1), description: null, recurrence: 'monthly' as const,
+        source: 'manual', transactionId: null, isActive: true,
+        createdAt: new Date(), updatedAt: new Date(),
+      },
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    // Previous month (Jan 2026): one_time 3000 + monthly 2000 = 5000
+    expect(result.current.previousMonthOverheadAgora).toBe(5000);
+  });
+
+  it('returns ohStore.loading in composite loading state', () => {
+    mockWoStore.loading = false;
+    mockTxnStore.loading = false;
+    mockConfigStore.loading = false;
+    mockOhStore.loading = true;
 
     const { result } = renderHook(() => useDashboardData());
     expect(result.current.loading).toBe(true);

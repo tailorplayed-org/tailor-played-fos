@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useFirestoreCollection, useFirestoreDoc } from '@/hooks';
-import { useWorkOrderStore, useTransactionStore, useSystemConfigStore } from '@/stores';
-import { workOrderSchema, transactionSchema, systemConfigSchema } from '@/types';
+import { useWorkOrderStore, useTransactionStore, useSystemConfigStore, useOverheadStore, calculateBurn } from '@/stores';
+import { workOrderSchema, transactionSchema, systemConfigSchema, overheadSchema } from '@/types';
 import type { Transaction } from '@/types';
 import { toIlsAgora, calculateTaxReserve } from '@/lib';
 
@@ -18,6 +18,7 @@ export function useDashboardData() {
   const woStore = useWorkOrderStore();
   const txnStore = useTransactionStore();
   const configStore = useSystemConfigStore();
+  const ohStore = useOverheadStore();
 
   // Subscribe to Firestore collections (same pattern as useWorkOrders/useTransactions)
   useFirestoreCollection('work_orders', workOrderSchema, {
@@ -30,6 +31,13 @@ export function useDashboardData() {
     onData: txnStore.setTransactions,
     onError: txnStore.setError,
     onLoading: txnStore.setLoading,
+  });
+
+  // Subscribe to overhead collection for burn rate KPI (Story 7.2)
+  useFirestoreCollection('overhead', overheadSchema, {
+    onData: ohStore.setOverhead,
+    onError: ohStore.setError,
+    onLoading: ohStore.setLoading,
   });
 
   // Subscribe to system_config/app document for dynamic tax and currency settings
@@ -93,13 +101,21 @@ export function useDashboardData() {
       (wo) => wo.status === 'Production',
     ).length;
 
-    // Monthly Overhead — sum of Overhead category for current month
-    const monthlyOverheadAgora = currentMonthApproved
-      .filter((t) => t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
-    const previousMonthOverheadAgora = prevMonthApproved
-      .filter((t) => t.category === 'Overhead')
-      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
+    // Monthly Overhead — from overhead collection with burn rate proration (Story 7.2)
+    const currentMonthOverhead = ohStore.overhead.filter((item) => {
+      if (item.recurrence === 'one_time') {
+        return item.date.getFullYear() === currentYear && item.date.getMonth() === currentMonth;
+      }
+      return item.isActive;
+    });
+    const prevMonthOverhead = ohStore.overhead.filter((item) => {
+      if (item.recurrence === 'one_time') {
+        return item.date.getFullYear() === prevYear && item.date.getMonth() === prevMonth;
+      }
+      return item.isActive;
+    });
+    const monthlyOverheadAgora = calculateBurn(currentMonthOverhead);
+    const previousMonthOverheadAgora = calculateBurn(prevMonthOverhead);
 
     // Pending Review breakdown
     const pendingReview = txnStore.transactions.filter(
@@ -122,18 +138,18 @@ export function useDashboardData() {
       taxMethod,
       activeProjectCount,
       monthlyOverheadAgora,
-      previousMonthOverheadAgora: hasPreviousMonth ? previousMonthOverheadAgora : null,
+      previousMonthOverheadAgora: prevMonthOverhead.length > 0 ? previousMonthOverheadAgora : null,
       pendingReviewCount: pendingReview.length,
       pendingGreenCount,
       pendingCheckCount,
       osPaturWarning,
     };
-  }, [woStore.workOrders, txnStore.transactions, configStore.config, currentMonth, currentYear]);
+  }, [woStore.workOrders, txnStore.transactions, ohStore.overhead, configStore.config, currentMonth, currentYear]);
 
   return {
     ...metrics,
     workOrders: woStore.workOrders,
-    loading: woStore.loading || txnStore.loading || configStore.loading,
-    loaded: !woStore.loading && !txnStore.loading && !configStore.loading,
+    loading: woStore.loading || txnStore.loading || ohStore.loading || configStore.loading,
+    loaded: !woStore.loading && !txnStore.loading && !ohStore.loading && !configStore.loading,
   };
 }

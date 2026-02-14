@@ -37,5 +37,32 @@ export const selectCurrentMonth = (state: OverheadStore) => {
   });
 };
 
+export const selectPreviousMonth = (state: OverheadStore) => {
+  const now = new Date();
+  const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+  const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+  return state.overhead.filter((item) => {
+    if (item.recurrence === 'one_time') {
+      return item.date.getFullYear() === prevYear && item.date.getMonth() === prevMonth;
+    }
+    return item.isActive;
+  });
+};
+
 export const selectRecurring = (state: OverheadStore) =>
   state.overhead.filter((item) => item.recurrence !== 'one_time' && item.isActive);
+
+/**
+ * Calculate monthly burn rate from overhead entries.
+ * Rules:
+ * - one_time: full amountAgora
+ * - monthly: full amountAgora
+ * - yearly: Math.round(amountAgora / 12)
+ * Entries should already be filtered to the target period.
+ */
+export function calculateBurn(entries: Overhead[]): number {
+  return entries.reduce((sum, item) => {
+    if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
+    return sum + item.amountAgora; // one_time + monthly
+  }, 0);
+}

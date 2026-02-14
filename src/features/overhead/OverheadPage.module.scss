@@ -20,23 +20,51 @@
   color: $gold;
 }
 
-.monthlyTotal {
+// ── Burn Summary (replaces monthlyTotal) ──
+.burnSummary {
   @include card-surface;
   padding: $space-lg;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-xs;
 }
 
-.monthlyTotalLabel {
+.burnLabel {
   font-size: $text-sm;
   color: $text-secondary;
-  margin-block-end: $space-xs;
-  display: block;
 }
 
-.monthlyTotalAmount {
+.burnAmount {
   font-size: $text-2xl;
   font-weight: $font-semibold;
   color: $gold;
+}
+
+.burnDelta {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  padding: 2px $space-sm;
+  border-radius: $radius-full;
+}
+
+.burnDeltaPositive {
+  color: $success;
+  background: rgba($success, 0.12);
+}
+
+.burnDeltaNegative {
+  color: $error;
+  background: rgba($error, 0.12);
+}
+
+.burnPreviousMonth {
+  font-size: $text-xs;
+  color: $text-muted;
 }
 
 .categorySection {

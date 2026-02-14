@@ -32,7 +32,14 @@ export function DashboardPage() {
 
   const userName = auth.currentUser?.displayName ?? '';
 
-  const overheadDelta = getDelta(monthlyOverheadAgora, previousMonthOverheadAgora);
+  // Invert delta sense for overhead: increase = BAD (red), decrease = GOOD (green)
+  const rawOverheadDelta = getDelta(monthlyOverheadAgora, previousMonthOverheadAgora);
+  const overheadDelta = rawOverheadDelta
+    ? {
+        value: rawOverheadDelta.value,
+        type: (rawOverheadDelta.type === 'positive' ? 'negative' : 'positive') as 'positive' | 'negative',
+      }
+    : null;
 
   const pendingSubtitle =
     pendingReviewCount === 0
