@@ -79,6 +79,8 @@ const mockDashboardData = {
   pendingGreenCount: 3,
   pendingCheckCount: 2,
   osPaturWarning: false,
+  osPaturPercent: 40,
+  osPaturThresholdAgora: 12_000_000,
   workOrders: [
     {
       id: 'wo-1',
@@ -134,6 +136,8 @@ describe('DashboardPage', () => {
       pendingGreenCount: 3,
       pendingCheckCount: 2,
       osPaturWarning: false,
+      osPaturPercent: 40,
+      osPaturThresholdAgora: 12_000_000,
       workOrders: [
         {
           id: 'wo-1',
@@ -318,5 +322,33 @@ describe('DashboardPage', () => {
     const { container } = render(<DashboardPage />);
     const fadeInElements = container.querySelectorAll('.fadeIn');
     expect(fadeInElements.length).toBe(0);
+  });
+
+  it('shows OsPaturBanner when osPaturWarning is true', () => {
+    sessionStorage.clear();
+    Object.assign(mockDashboardData, {
+      osPaturWarning: true,
+      osPaturPercent: 85,
+      osPaturThresholdAgora: 12_000_000,
+    });
+    render(<DashboardPage />);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('hides OsPaturBanner when osPaturWarning is false', () => {
+    Object.assign(mockDashboardData, { osPaturWarning: false });
+    render(<DashboardPage />);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('banner shows correct percentage', () => {
+    sessionStorage.clear();
+    Object.assign(mockDashboardData, {
+      osPaturWarning: true,
+      osPaturPercent: 92,
+      osPaturThresholdAgora: 12_000_000,
+    });
+    render(<DashboardPage />);
+    expect(screen.getByText(/92/)).toBeInTheDocument();
   });
 });

@@ -9,6 +9,7 @@ export const systemConfigSchema = z.object({
     EUR: z.number(),
   }),
   osPaturThresholdAgora: z.number().int(),
+  osPaturAlertPercent: z.number().min(0).max(1).default(0.80),
 });
 
 export type SystemConfig = z.infer<typeof systemConfigSchema>;

@@ -20,6 +20,34 @@
   color: $gold;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.settingsButton {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  color: $text-secondary;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $bg-tertiary;
+    color: $gold;
+  }
+
+  &[aria-expanded="true"] {
+    color: $gold;
+    background: $bg-tertiary;
+  }
+}
+
 // ── Burn Summary (replaces monthlyTotal) ──
 .burnSummary {
   @include card-surface;

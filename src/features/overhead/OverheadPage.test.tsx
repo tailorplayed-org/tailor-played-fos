@@ -80,14 +80,40 @@ vi.mock('./hooks', () => ({
   useOverhead: () => mockOverheadState,
 }));
 
-// Mock @/stores — only calculateBurn is imported by the component now
-// (useOverheadStore selectors are no longer used — SAFER pattern via useMemo)
+// Mock @/stores — calculateBurn + transaction/config stores for TaxJarSettings
 vi.mock('@/stores', () => ({
   calculateBurn: (entries: Overhead[]) =>
     entries.reduce((sum: number, item: Overhead) => {
       if (item.recurrence === 'yearly') return sum + Math.round(item.amountAgora / 12);
       return sum + item.amountAgora;
     }, 0),
+  useTransactionStore: vi.fn(() => ({
+    transactions: [],
+    loading: false,
+    error: null,
+    setTransactions: vi.fn(),
+    setLoading: vi.fn(),
+    setError: vi.fn(),
+  })),
+  useSystemConfigStore: vi.fn(() => ({
+    config: {
+      taxMethod: 'flat' as const,
+      flatRate: 0.35,
+      currencyRates: { ILS: 1, USD: 3.6, EUR: 3.9 },
+      osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.80,
+    },
+    loading: false,
+    error: null,
+    setConfig: vi.fn(),
+    setLoading: vi.fn(),
+    setError: vi.fn(),
+  })),
+}));
+
+// Mock @/lib — toIlsAgora imported by OverheadPage for net profit calculation
+vi.mock('@/lib', () => ({
+  toIlsAgora: (amount: number) => amount,
 }));
 
 const { OverheadPage } = await import('./OverheadPage');
@@ -278,5 +304,30 @@ describe('OverheadPage', () => {
     // Appears in both burn summary and category breakdown (both prorate)
     const amounts = screen.getAllByText('₪10.00');
     expect(amounts.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders GearSix settings button', () => {
+    render(<OverheadPage />);
+    const settingsBtn = screen.getByLabelText('settings.taxJar.title');
+    expect(settingsBtn).toBeInTheDocument();
+    expect(settingsBtn.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('toggles TaxJarSettings when GearSix is clicked', () => {
+    render(<OverheadPage />);
+    const settingsBtn = screen.getByLabelText('settings.taxJar.title');
+
+    // Initially not visible
+    expect(screen.queryByText('settings.taxJar.method')).not.toBeInTheDocument();
+
+    // Click to open
+    fireEvent.click(settingsBtn);
+    expect(settingsBtn.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByText('settings.taxJar.method')).toBeInTheDocument();
+
+    // Click again to close
+    fireEvent.click(settingsBtn);
+    expect(settingsBtn.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.queryByText('settings.taxJar.method')).not.toBeInTheDocument();
   });
 });

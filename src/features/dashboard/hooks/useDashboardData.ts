@@ -126,10 +126,12 @@ export function useDashboardData() {
     ).length;
     const pendingCheckCount = pendingReview.length - pendingGreenCount;
 
-    // Osek Patur threshold alert — warn at 80% of annual threshold
+    // Osek Patur threshold alert — warn at configurable % of annual threshold
     const threshold = configStore.config?.osPaturThresholdAgora ?? 12_000_000;
+    const alertPercent = configStore.config?.osPaturAlertPercent ?? 0.80;
     const annualRevenueEstimate = currentRevenue * 12;
-    const osPaturWarning = annualRevenueEstimate >= threshold * 0.8;
+    const osPaturWarning = annualRevenueEstimate >= threshold * alertPercent;
+    const osPaturPercent = threshold > 0 ? Math.round((annualRevenueEstimate / threshold) * 100) : 0;
 
     return {
       netProfitAgora,
@@ -143,6 +145,8 @@ export function useDashboardData() {
       pendingGreenCount,
       pendingCheckCount,
       osPaturWarning,
+      osPaturPercent,
+      osPaturThresholdAgora: threshold,
     };
   }, [woStore.workOrders, txnStore.transactions, ohStore.overhead, configStore.config, currentMonth, currentYear]);
 

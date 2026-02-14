@@ -199,6 +199,7 @@ describe('useDashboardData', () => {
       flatRate: 0.20,
       currencyRates: { ILS: 1, USD: 3.5, EUR: 3.8 },
       osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.80,
     };
     mockTxnStore.transactions = [
       createTransaction({ amountAgora: 1_000_000, category: 'Revenue' }),
@@ -228,6 +229,7 @@ describe('useDashboardData', () => {
       flatRate: 0.35,
       currencyRates: { ILS: 1, USD: 3.5, EUR: 3.8 },
       osPaturThresholdAgora: 12_000_000, // ₪120,000
+      osPaturAlertPercent: 0.80,
     };
     // Monthly revenue = 900,000 agora (₪9,000) → annualized = 10,800,000
     // 80% of 12,000,000 = 9,600,000
@@ -238,6 +240,8 @@ describe('useDashboardData', () => {
 
     const { result } = renderHook(() => useDashboardData());
     expect(result.current.osPaturWarning).toBe(true);
+    expect(result.current.osPaturPercent).toBe(90); // (10,800,000 / 12,000,000) * 100 = 90
+    expect(result.current.osPaturThresholdAgora).toBe(12_000_000);
   });
 
   it('returns osPaturWarning=false when revenue is below threshold', () => {
@@ -246,6 +250,7 @@ describe('useDashboardData', () => {
       flatRate: 0.35,
       currencyRates: { ILS: 1, USD: 3.5, EUR: 3.8 },
       osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.80,
     };
     // Monthly revenue = 50,000 agora → annualized = 600,000
     // 80% of 12,000,000 = 9,600,000
@@ -256,6 +261,35 @@ describe('useDashboardData', () => {
 
     const { result } = renderHook(() => useDashboardData());
     expect(result.current.osPaturWarning).toBe(false);
+    expect(result.current.osPaturPercent).toBe(5); // (600,000 / 12,000,000) * 100 = 5
+  });
+
+  it('uses configurable osPaturAlertPercent instead of hardcoded 0.80', () => {
+    mockConfigStore.config = {
+      taxMethod: 'flat',
+      flatRate: 0.35,
+      currencyRates: { ILS: 1, USD: 3.5, EUR: 3.8 },
+      osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.90, // Custom: 90% instead of default 80%
+    };
+    // Monthly revenue = 900,000 agora → annualized = 10,800,000
+    // 90% of 12,000,000 = 10,800,000
+    // 10,800,000 >= 10,800,000 → true (exactly at threshold)
+    mockTxnStore.transactions = [
+      createTransaction({ amountAgora: 900_000, category: 'Revenue' }),
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    expect(result.current.osPaturWarning).toBe(true);
+
+    // Now with slightly lower revenue: 899,000 → annualized = 10,788,000
+    // 10,788,000 < 10,800,000 → false
+    mockTxnStore.transactions = [
+      createTransaction({ amountAgora: 899_000, category: 'Revenue' }),
+    ];
+
+    const { result: result2 } = renderHook(() => useDashboardData());
+    expect(result2.current.osPaturWarning).toBe(false);
   });
 
   it('returns loaded=false while any store is loading', () => {
@@ -351,6 +385,7 @@ describe('useDashboardData', () => {
       flatRate: 0.35,
       currencyRates: { ILS: 1, USD: 3.5, EUR: 3.8 },
       osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.80,
     };
     mockTxnStore.transactions = [
       createTransaction({ amountAgora: 1_000_000, category: 'Revenue' }),
@@ -432,6 +467,7 @@ describe('useDashboardData', () => {
       flatRate: 0.35,
       currencyRates: customRates,
       osPaturThresholdAgora: 12_000_000,
+      osPaturAlertPercent: 0.80,
     };
     mockTxnStore.transactions = [
       createTransaction({ amountAgora: 100_000, category: 'Revenue', currency: 'USD' }),

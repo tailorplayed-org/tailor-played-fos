@@ -1,16 +1,17 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Receipt, Plus } from '@phosphor-icons/react';
+import { Receipt, Plus, GearSix } from '@phosphor-icons/react';
 import { addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { Button, Skeleton } from '@/components';
 import { formatCurrency, toMinorUnits } from '@/lib/currency';
-import { calculateBurn } from '@/stores';
+import { toIlsAgora } from '@/lib';
+import { calculateBurn, useTransactionStore, useSystemConfigStore } from '@/stores';
 import { OVERHEAD_CATEGORIES } from '@/types';
 import type { Overhead, CreateOverheadInput } from '@/types';
 import { db } from '@/services';
 import { toast } from '@/stores/useUIStore';
 import { useOverhead } from './hooks';
-import { CategoryBreakdown, OverheadForm } from './components';
+import { CategoryBreakdown, OverheadForm, TaxJarSettings } from './components';
 import styles from './OverheadPage.module.scss';
 
 type FormMode = { type: 'closed' } | { type: 'create' };
@@ -44,6 +45,11 @@ export function OverheadPage() {
   const { t } = useTranslation();
   const { overhead, loading } = useOverhead();
   const [formMode, setFormMode] = useState<FormMode>({ type: 'closed' });
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Read full store state — safe, no selector-returning-array issue (SAFER pattern)
+  const txnStore = useTransactionStore();
+  const configStore = useSystemConfigStore();
 
   // SAFER pattern: derive filtered data via useMemo from the full overhead array
   // (avoids React 19 + Zustand v5 infinite loop from selectors returning new arrays)
@@ -89,6 +95,30 @@ export function OverheadPage() {
     };
   }, [currentBurnAgora, previousBurnAgora]);
 
+  // SAFER pattern: derive net profit via useMemo from full transaction array
+  const currentNetProfitAgora = useMemo(() => {
+    if (txnStore.transactions.length === 0) return null;
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const rates = configStore.config?.currencyRates;
+
+    const approved = txnStore.transactions.filter((t) => t.status === 'approved');
+    const currentMonthApproved = approved.filter(
+      (t) => t.date.getMonth() === currentMonth && t.date.getFullYear() === currentYear,
+    );
+
+    const revenue = currentMonthApproved
+      .filter((t) => t.category === 'Revenue')
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
+    const costs = currentMonthApproved
+      .filter((t) => t.category === 'DirectCost' || t.category === 'Overhead')
+      .reduce((sum, t) => sum + toIlsAgora(t.amountAgora, t.currency, rates), 0);
+
+    return revenue - costs;
+  }, [txnStore.transactions, configStore.config]);
+
   const handleAddOverhead = useCallback(async (data: CreateOverheadInput) => {
     try {
       await addDoc(collection(db, 'overhead'), {
@@ -128,11 +158,28 @@ export function OverheadPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.pageTitle}>{t('overhead.pageTitle')}</h1>
-        <Button onClick={() => setFormMode({ type: 'create' })}>
-          <Plus size={18} weight="bold" />
-          {t('overhead.addButton')}
-        </Button>
+        <div className={styles.headerActions}>
+          <button
+            onClick={() => setShowSettings((prev) => !prev)}
+            className={styles.settingsButton}
+            aria-label={t('settings.taxJar.title')}
+            aria-expanded={showSettings}
+          >
+            <GearSix size={22} weight={showSettings ? 'fill' : 'regular'} />
+          </button>
+          <Button onClick={() => setFormMode({ type: 'create' })}>
+            <Plus size={18} weight="bold" />
+            {t('overhead.addButton')}
+          </Button>
+        </div>
       </div>
+
+      {showSettings && (
+        <TaxJarSettings
+          currentNetProfitAgora={currentNetProfitAgora != null && currentNetProfitAgora > 0 ? currentNetProfitAgora : null}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
 
       {formMode.type === 'create' && (
         <OverheadForm

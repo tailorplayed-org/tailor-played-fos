@@ -278,6 +278,11 @@
       "pendingBreakdown": "{{green}} ירוקים, {{check}} לבדיקה",
       "allCaughtUp": "הכל מעודכן"
     },
+    "osPatur": {
+      "warning": "הכנסות שנתיות ב-{{percent}}% מסף עוסק פטור ({{threshold}}). מומלץ להתייעץ עם רואה החשבון לגבי מעבר לעוסק מורשה.",
+      "advice": "חריגה מהסף משנה את חובות המס שלך באופן משמעותי.",
+      "dismiss": "סגור התרעה"
+    },
     "projectHealth": {
       "title": "בריאות פרויקטים",
       "count": "{{count}} פרויקטים",
@@ -458,6 +463,25 @@
       "noChange": "ללא שינוי",
       "increase": "עלייה",
       "decrease": "ירידה"
+    }
+  },
+  "settings": {
+    "taxJar": {
+      "title": "הגדרות צנצנת מס",
+      "method": "שיטת חישוב",
+      "flat": "שיעור קבוע",
+      "bracket": "מדרגות מס",
+      "flatRateLabel": "שיעור מס",
+      "flatHint": "{{rate}}% מהרווח הנקי החודשי",
+      "preview": "צנצנת מס נוכחית",
+      "bracketBreakdown": "פירוט מדרגות (שנתי)",
+      "bracketRange": "מדרגה",
+      "bracketTax": "מס",
+      "monthlyReserve": "הפרשה חודשית",
+      "save": "שמור הגדרות",
+      "saving": "שומר...",
+      "saveSuccess": "הגדרות צנצנת המס עודכנו",
+      "saveError": "שגיאה בעדכון ההגדרות"
     }
   },
   "components": {

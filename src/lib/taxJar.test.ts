@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateTaxReserve } from './taxJar';
+import { calculateTaxReserve, calculateTaxBreakdown } from './taxJar';
 
 describe('calculateTaxReserve', () => {
   describe('flat mode', () => {
@@ -94,5 +94,111 @@ describe('calculateTaxReserve', () => {
     it('handles flat rate of 1 (100%)', () => {
       expect(calculateTaxReserve(100_000, 'flat', 1)).toBe(100_000);
     });
+  });
+});
+
+describe('calculateTaxBreakdown', () => {
+  it('returns empty rows for zero net profit', () => {
+    const result = calculateTaxBreakdown(0, 'flat');
+    expect(result.totalTaxAgora).toBe(0);
+    expect(result.rows).toHaveLength(0);
+    expect(result.method).toBe('flat');
+  });
+
+  it('returns empty rows for negative net profit', () => {
+    const result = calculateTaxBreakdown(-50000, 'bracket');
+    expect(result.totalTaxAgora).toBe(0);
+    expect(result.rows).toHaveLength(0);
+    expect(result.method).toBe('bracket');
+  });
+
+  it('flat mode — single row with default 35% rate', () => {
+    const netProfit = 100_000; // ₪1,000 monthly
+    const result = calculateTaxBreakdown(netProfit, 'flat');
+
+    expect(result.method).toBe('flat');
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].rate).toBe(0.35);
+    expect(result.rows[0].taxableAgora).toBe(100_000);
+    expect(result.rows[0].taxAgora).toBe(35_000);
+    expect(result.totalTaxAgora).toBe(35_000);
+    expect(result.rows[0].label).toBe('35%');
+  });
+
+  it('flat mode — respects custom flat rate', () => {
+    const netProfit = 200_000;
+    const result = calculateTaxBreakdown(netProfit, 'flat', 0.25);
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].rate).toBe(0.25);
+    expect(result.rows[0].taxAgora).toBe(50_000);
+    expect(result.totalTaxAgora).toBe(50_000);
+    expect(result.rows[0].label).toBe('25%');
+  });
+
+  it('bracket mode — returns multiple bracket rows', () => {
+    // Monthly income that annualizes above the first bracket
+    // ₪100,000/month = ₪1,200,000/year → spans multiple brackets
+    const netProfit = 10_000_000; // 100,000 ILS/month in agora
+    const result = calculateTaxBreakdown(netProfit, 'bracket');
+
+    expect(result.method).toBe('bracket');
+    expect(result.rows.length).toBeGreaterThan(1);
+    // All rows should have positive taxable amounts
+    result.rows.forEach((row) => {
+      expect(row.taxableAgora).toBeGreaterThan(0);
+      expect(row.taxAgora).toBeGreaterThan(0);
+      expect(row.rate).toBeGreaterThan(0);
+    });
+  });
+
+  it('bracket mode — only includes brackets with taxable amounts', () => {
+    // Small income: ₪5,000/month = ₪60,000/year — only first bracket
+    const netProfit = 500_000; // 5,000 ILS/month in agora
+    const result = calculateTaxBreakdown(netProfit, 'bracket');
+
+    // ₪60,000/year is well within the first bracket (up to ₪86,220)
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0].rate).toBe(0.10);
+  });
+
+  it('bracket mode — total matches calculateTaxReserve output', () => {
+    const testAmounts = [500_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000];
+
+    for (const netProfit of testAmounts) {
+      const breakdown = calculateTaxBreakdown(netProfit, 'bracket');
+      const reserve = calculateTaxReserve(netProfit, 'bracket');
+
+      // Both should return the same monthly tax amount
+      expect(breakdown.totalTaxAgora).toBe(reserve);
+    }
+  });
+
+  it('flat mode — total matches calculateTaxReserve output', () => {
+    const testAmounts = [100_000, 500_000, 1_000_000];
+
+    for (const netProfit of testAmounts) {
+      const breakdown = calculateTaxBreakdown(netProfit, 'flat', 0.35);
+      const reserve = calculateTaxReserve(netProfit, 'flat', 0.35);
+
+      expect(breakdown.totalTaxAgora).toBe(reserve);
+    }
+  });
+
+  it('bracket mode — first bracket label says "up to"', () => {
+    const netProfit = 500_000;
+    const result = calculateTaxBreakdown(netProfit, 'bracket');
+    expect(result.rows[0].label).toMatch(/^10% \(up to/);
+  });
+
+  it('bracket mode — middle bracket labels have range format', () => {
+    // Income high enough to span at least 3 brackets
+    const netProfit = 10_000_000; // ₪100,000/month
+    const result = calculateTaxBreakdown(netProfit, 'bracket');
+
+    // Second bracket should have range format
+    expect(result.rows.length).toBeGreaterThanOrEqual(3);
+    expect(result.rows[1].label).toMatch(/14% \(₪/);
+    expect(result.rows[1].label).toContain('–');
   });
 });

@@ -278,6 +278,11 @@
       "pendingBreakdown": "{{green}} green, {{check}} to check",
       "allCaughtUp": "All caught up"
     },
+    "osPatur": {
+      "warning": "Annual revenue at {{percent}}% of Osek Patur threshold ({{threshold}}). Consider consulting your accountant about transitioning to Osek Murshe.",
+      "advice": "Exceeding the threshold changes your tax obligations significantly.",
+      "dismiss": "Dismiss warning"
+    },
     "projectHealth": {
       "title": "Project Health",
       "count": "{{count}} projects",
@@ -458,6 +463,25 @@
       "noChange": "No change",
       "increase": "increase",
       "decrease": "decrease"
+    }
+  },
+  "settings": {
+    "taxJar": {
+      "title": "Tax Jar Settings",
+      "method": "Calculation Method",
+      "flat": "Flat Rate",
+      "bracket": "Progressive Brackets",
+      "flatRateLabel": "Tax Rate",
+      "flatHint": "{{rate}}% of monthly net profit",
+      "preview": "Current Tax Jar",
+      "bracketBreakdown": "Bracket Breakdown (Annual)",
+      "bracketRange": "Bracket",
+      "bracketTax": "Tax",
+      "monthlyReserve": "Monthly Reserve",
+      "save": "Save Settings",
+      "saving": "Saving...",
+      "saveSuccess": "Tax Jar settings updated",
+      "saveError": "Failed to update settings"
     }
   },
   "components": {

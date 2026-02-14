@@ -1,0 +1,209 @@
+.settingsPanel {
+  @include card-surface;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.settingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    font-size: $text-lg;
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+.closeButton {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  color: $text-muted;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $bg-elevated;
+    color: $text-primary;
+  }
+}
+
+.methodToggle {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.toggleLabel {
+  font-size: $text-sm;
+  color: $text-secondary;
+  font-weight: $font-medium;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 0;
+  border-radius: $radius-md;
+  overflow: hidden;
+  border: 1px solid $border-subtle;
+}
+
+.toggleOption {
+  @include interactive-reset;
+  flex: 1;
+  padding: $space-sm $space-md;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  text-align: center;
+  background: $bg-secondary;
+  color: $text-muted;
+  transition: background-color $transition-fast, color $transition-fast;
+  min-height: 44px;
+
+  &:not(:last-child) {
+    border-inline-end: 1px solid $border-subtle;
+  }
+}
+
+.toggleActive {
+  background: $gold;
+  color: $bg-primary;
+}
+
+.rateInput {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+
+  label {
+    font-size: $text-sm;
+    color: $text-secondary;
+    font-weight: $font-medium;
+  }
+}
+
+.rateInputWrap {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.rateField {
+  width: 80px;
+  padding: $space-sm;
+  font-size: $text-base;
+  font-family: $font-family;
+  background: $bg-secondary;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  color: $text-primary;
+  text-align: center;
+  min-height: 44px;
+
+  &:focus {
+    @include focus-ring;
+  }
+}
+
+.rateSuffix {
+  font-size: $text-lg;
+  color: $text-secondary;
+  font-weight: $font-medium;
+}
+
+.preview {
+  @include elevated-surface;
+  padding: $space-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-xs;
+  text-align: center;
+}
+
+.previewLabel {
+  font-size: $text-sm;
+  color: $text-secondary;
+}
+
+.previewAmount {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
+}
+
+.previewHint {
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.bracketBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.breakdownTitle {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin: 0;
+}
+
+.bracketTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-xs;
+
+  th {
+    text-align: start;
+    padding: $space-xs $space-sm;
+    color: $text-muted;
+    font-weight: $font-medium;
+    border-block-end: 1px solid $border-subtle;
+  }
+
+  td {
+    padding: $space-xs $space-sm;
+    color: $text-secondary;
+    border-block-end: 1px solid rgba($border-subtle, 0.3);
+  }
+
+  // Last column right-aligned for amounts
+  th:last-child,
+  td:last-child {
+    text-align: end;
+  }
+}
+
+.breakdownTotal {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $gold;
+  text-align: end;
+  padding-block-start: $space-xs;
+  border-block-start: 1px solid $border-subtle;
+}
+
+@media (max-width: $bp-sm) {
+  .settingsPanel {
+    padding: $space-md;
+  }
+
+  .bracketTable {
+    font-size: $text-xs;
+
+    th, td {
+      padding: $space-xs;
+    }
+  }
+}

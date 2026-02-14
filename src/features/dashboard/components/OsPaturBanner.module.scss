@@ -1,0 +1,61 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-md;
+  padding: $space-md $space-lg;
+  background: rgba($warning, 0.12);
+  border: 1px solid rgba($warning, 0.3);
+  border-radius: $radius-md;
+  margin-block-end: $space-lg;
+}
+
+.icon {
+  color: $warning;
+  flex-shrink: 0;
+  margin-block-start: 2px;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.message {
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $warning;
+  margin: 0;
+}
+
+.advice {
+  font-size: $text-xs;
+  color: $text-muted;
+  margin: 0;
+}
+
+.dismiss {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  color: $text-muted;
+  flex-shrink: 0;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: rgba($warning, 0.2);
+    color: $warning;
+  }
+}
+
+@media (max-width: $bp-sm) {
+  .banner {
+    padding: $space-sm $space-md;
+    gap: $space-sm;
+  }
+}
