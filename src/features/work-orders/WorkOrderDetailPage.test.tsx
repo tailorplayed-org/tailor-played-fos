@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, within, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import { useWorkOrderStore, useTransactionStore } from '@/stores';
-import type { WorkOrder, Transaction } from '@/types';
+import { useWorkOrderStore, useTransactionStore, useInventoryStore } from '@/stores';
+import type { WorkOrder, Transaction, InventoryItem } from '@/types';
 
 // Mock hooks — same pattern as WorkOrdersPage.test.tsx
 const mockUpdateWorkOrder = vi.fn();
@@ -20,6 +20,56 @@ vi.mock('./hooks', () => ({
     createTransaction: mockCreateTransaction,
   }),
 }));
+
+vi.mock('@/features/inventory/hooks/useInventory', () => ({
+  useInventory: () => useInventoryStore(),
+}));
+
+vi.mock('@/features/inventory/hooks/useInventoryLogs', () => ({
+  useInventoryLogs: () => ({ logs: [], loading: false, error: null }),
+}));
+
+const mockBatchCommit = vi.fn().mockResolvedValue(undefined);
+const mockBatchUpdate = vi.fn();
+const mockBatchSet = vi.fn();
+
+vi.mock('firebase/firestore', async () => {
+  const actual = await vi.importActual('firebase/firestore');
+  return {
+    ...actual,
+    writeBatch: vi.fn(() => ({
+      update: mockBatchUpdate,
+      set: mockBatchSet,
+      commit: mockBatchCommit,
+    })),
+    doc: vi.fn((_, coll, docId) => ({ path: `${coll}/${docId}` })),
+    collection: vi.fn((_, name) => ({ path: name })),
+    serverTimestamp: vi.fn(() => 'mock-server-timestamp'),
+  };
+});
+
+vi.mock('@/services', () => ({
+  db: {},
+  auth: { currentUser: { uid: 'test-user-123' } },
+}));
+
+vi.mock('@/lib/wac', () => ({
+  applyScoopCost: vi.fn((qty: number, wac: number) => qty * wac),
+  calculateWAC: vi.fn(() => 5000),
+}));
+
+vi.mock('@/stores/useUIStore', async () => {
+  const actual = await vi.importActual('@/stores/useUIStore');
+  return {
+    ...actual,
+    toast: {
+      success: vi.fn(),
+      error: vi.fn(),
+      warning: vi.fn(),
+      info: vi.fn(),
+    },
+  };
+});
 
 // Mock zodResolver for forms (WorkOrderForm, TransactionForm)
 vi.mock('@hookform/resolvers/zod', () => ({
@@ -136,6 +186,11 @@ describe('WorkOrderDetailPage', () => {
     });
     useTransactionStore.setState({
       transactions: [],
+      loading: false,
+      error: null,
+    });
+    useInventoryStore.setState({
+      inventory: [],
       loading: false,
       error: null,
     });
@@ -364,5 +419,42 @@ describe('WorkOrderDetailPage', () => {
     renderDetail();
 
     expect(screen.queryByText('workOrderDetail.notFound')).not.toBeInTheDocument();
+  });
+
+  // ── AC Scoop: Scoop button and modal ──
+
+  it('shows Scoop button in transactions section', () => {
+    useWorkOrderStore.setState({ workOrders: [mockWO] });
+    useTransactionStore.setState({ transactions: mockTransactions });
+    renderDetail();
+
+    expect(screen.getByText('inventory.scoop.action')).toBeInTheDocument();
+  });
+
+  it('opens ScoopModal when Scoop button is clicked', async () => {
+    useWorkOrderStore.setState({ workOrders: [mockWO] });
+    useTransactionStore.setState({ transactions: mockTransactions });
+    useInventoryStore.setState({
+      inventory: [
+        {
+          id: 'item-1',
+          name: 'Cardboard',
+          sku: null,
+          supplier: null,
+          currentQty: 100,
+          wacAgora: 350,
+          reorderThreshold: null,
+          unit: 'sheets',
+          createdAt: new Date('2026-01-01'),
+          updatedAt: new Date('2026-01-15'),
+        },
+      ],
+    });
+    renderDetail();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByText('inventory.scoop.action'));
+
+    expect(screen.getByText('inventory.scoop.title')).toBeInTheDocument();
   });
 });

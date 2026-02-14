@@ -351,6 +351,24 @@
       "cancel": "Cancel",
       "success": "Restock recorded successfully",
       "error": "Failed to record restock"
+    },
+    "scoop": {
+      "title": "Scoop — Consume Inventory",
+      "action": "Scoop",
+      "material": "Material",
+      "materialRequired": "Material is required",
+      "quantity": "Quantity to Consume",
+      "quantityError": "Quantity must be greater than 0",
+      "overdraftError": "Only {{available}} available",
+      "workOrder": "Work Order",
+      "workOrderRequired": "Work Order is required",
+      "availableStock": "Available Stock",
+      "remainingAfter": "{{remaining}} remaining after scoop",
+      "calculatedCost": "Calculated Cost",
+      "submit": "Confirm Scoop",
+      "cancel": "Cancel",
+      "success": "Scooped {{qty}} units of {{material}} → {{workOrder}}",
+      "error": "Failed to record scoop"
     }
   },
   "components": {

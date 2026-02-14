@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, PencilSimple, Plus, Receipt, WarningCircle, CalendarBlank } from '@phosphor-icons/react';
+import { ArrowLeft, PencilSimple, Plus, Receipt, WarningCircle, CalendarBlank, ArrowBendDownRight } from '@phosphor-icons/react';
 import { Button, Badge, Skeleton } from '@/components';
 import { useWorkOrders, useWorkOrderActions, useTransactions, useTransactionActions } from './hooks';
-import { StatusStepper, NutritionLabel, TransactionForm, WorkOrderForm } from './components';
+import { StatusStepper, NutritionLabel, TransactionForm, WorkOrderForm, ScoopModal } from './components';
+import { useInventory } from '@/features/inventory/hooks/useInventory';
+import { useInventoryLogs } from '@/features/inventory/hooks/useInventoryLogs';
+import { useScoopAction } from '@/hooks/useScoopAction';
 import { formatCurrency } from '@/lib';
 import type { WorkOrderStatus, CreateWorkOrderInput, CreateTransactionInput } from '@/types';
 import styles from './WorkOrderDetailPage.module.scss';
@@ -25,6 +28,8 @@ export function WorkOrderDetailPage() {
   // Hooks subscribe to Firestore — data flows into Zustand stores
   const { workOrders, loading: woLoading, error: woError } = useWorkOrders();
   const { transactions, loading: txnLoading } = useTransactions();
+  const { inventory } = useInventory();
+  const { logs: allInventoryLogs } = useInventoryLogs();
 
   // Derive specific WO and its transactions from hook data via useMemo
   // (avoids dual Zustand subscription issues with useSyncExternalStore)
@@ -37,13 +42,27 @@ export function WorkOrderDetailPage() {
     [transactions, id],
   );
 
+  // Scoop logs for this work order
+  const woInventoryLogs = useMemo(
+    () => allInventoryLogs.filter((log) => log.workOrderRef === (id ?? '') && log.action === 'consume'),
+    [allInventoryLogs, id],
+  );
+
+  // Map itemId → item name for NutritionLabel display
+  const inventoryItemNames = useMemo(
+    () => Object.fromEntries(inventory.map((i) => [i.id, i.name])),
+    [inventory],
+  );
+
   // Actions
   const { updateWorkOrder } = useWorkOrderActions();
   const { createTransaction } = useTransactionActions();
+  const { executeScoop } = useScoopAction(inventory, workOrders);
 
   // Local state
   const [showEditForm, setShowEditForm] = useState(false);
   const [showTransactionForm, setShowTransactionForm] = useState(false);
+  const [showScoopModal, setShowScoopModal] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   // Sort transactions newest first
@@ -197,6 +216,8 @@ export function WorkOrderDetailPage() {
       <NutritionLabel
         workOrder={workOrder}
         transactions={woTransactions}
+        inventoryLogs={woInventoryLogs}
+        inventoryItemNames={inventoryItemNames}
         loading={txnLoading}
       />
 
@@ -204,16 +225,26 @@ export function WorkOrderDetailPage() {
       <section className={styles.transactionsSection}>
         <div className={styles.transactionsHeader}>
           <h2 className={styles.transactionsTitle}>{t('workOrderDetail.transactionsTitle')}</h2>
-          <Button
-            size="sm"
-            onClick={() => {
-              setShowTransactionForm(true);
-              setShowEditForm(false);
-            }}
-          >
-            <Plus size={18} weight="bold" />
-            <span>{t('workOrderDetail.addTransaction')}</span>
-          </Button>
+          <div className={styles.transactionsActions}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setShowTransactionForm(true);
+                setShowEditForm(false);
+              }}
+            >
+              <Plus size={18} weight="bold" />
+              <span>{t('workOrderDetail.addTransaction')}</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowScoopModal(true)}
+            >
+              <ArrowBendDownRight size={18} weight="bold" />
+              <span>{t('inventory.scoop.action')}</span>
+            </Button>
+          </div>
         </div>
 
         {/* Transaction Form */}
@@ -267,6 +298,18 @@ export function WorkOrderDetailPage() {
           )
         )}
       </section>
+
+      {/* Scoop Modal */}
+      {showScoopModal && (
+        <ScoopModal
+          open={showScoopModal}
+          onClose={() => setShowScoopModal(false)}
+          onSubmit={executeScoop}
+          inventoryItems={inventory}
+          workOrders={workOrders}
+          preselectedWorkOrderId={id}
+        />
+      )}
     </div>
   );
 }

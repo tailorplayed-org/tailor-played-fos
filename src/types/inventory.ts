@@ -61,3 +61,15 @@ export const restockInputSchema = z.object({
 });
 
 export type RestockInput = z.infer<typeof restockInputSchema>;
+
+// --- Scoop Form Input (Story 6.3) ---
+// No .default() — form provides defaults via defaultValues
+// quantity validated against available stock in component (via UI-level check)
+
+export const scoopInputSchema = z.object({
+  itemId: z.string().min(1, { error: 'Material is required' }),
+  quantity: z.number().positive({ error: 'Quantity must be greater than 0' }),
+  workOrderId: z.string().min(1, { error: 'Work Order is required' }),
+});
+
+export type ScoopInput = z.infer<typeof scoopInputSchema>;

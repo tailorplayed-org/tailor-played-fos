@@ -4,6 +4,7 @@ import {
   createInventoryItemSchema,
   inventoryLogSchema,
   restockInputSchema,
+  scoopInputSchema,
 } from './inventory';
 
 describe('inventoryItemSchema', () => {
@@ -313,5 +314,64 @@ describe('restockInputSchema', () => {
       quantity: 0.5,
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('scoopInputSchema', () => {
+  const validInput = {
+    itemId: 'item-1',
+    quantity: 10,
+    workOrderId: 'wo-1',
+  };
+
+  it('validates a complete scoop input', () => {
+    const result = scoopInputSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual(validInput);
+    }
+  });
+
+  it('rejects empty itemId', () => {
+    const result = scoopInputSchema.safeParse({ ...validInput, itemId: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty workOrderId', () => {
+    const result = scoopInputSchema.safeParse({ ...validInput, workOrderId: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects zero quantity', () => {
+    const result = scoopInputSchema.safeParse({ ...validInput, quantity: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative quantity', () => {
+    const result = scoopInputSchema.safeParse({ ...validInput, quantity: -5 });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts decimal quantity', () => {
+    const result = scoopInputSchema.safeParse({ ...validInput, quantity: 2.5 });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing itemId', () => {
+    const { itemId: _, ...noItemId } = validInput;
+    const result = scoopInputSchema.safeParse(noItemId);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing workOrderId', () => {
+    const { workOrderId: _, ...noWoId } = validInput;
+    const result = scoopInputSchema.safeParse(noWoId);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing quantity', () => {
+    const { quantity: _, ...noQty } = validInput;
+    const result = scoopInputSchema.safeParse(noQty);
+    expect(result.success).toBe(false);
   });
 });

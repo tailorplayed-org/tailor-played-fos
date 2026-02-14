@@ -98,4 +98,18 @@ describe('applyScoopCost', () => {
   it('returns 0 for zero WAC', () => {
     expect(applyScoopCost(10, 0)).toBe(0);
   });
+
+  it('rounds to nearest integer for decimal quantities (no floating-point drift)', () => {
+    // 1.3 * 350 = 455.00000000000006 in JS → rounds to 455
+    expect(applyScoopCost(1.3, 350)).toBe(455);
+    // 0.1 * 3 = 0.30000000000000004 → rounds to 0
+    expect(applyScoopCost(0.1, 3)).toBe(0);
+    // 2.5 * 350 = 875 (exact) → 875
+    expect(applyScoopCost(2.5, 350)).toBe(875);
+  });
+
+  it('always returns an integer', () => {
+    const result = applyScoopCost(7.7, 333);
+    expect(Number.isInteger(result)).toBe(true);
+  });
 });

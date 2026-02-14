@@ -90,6 +90,12 @@
   margin: 0;
 }
 
+.transactionsActions {
+  display: flex;
+  gap: $space-sm;
+  align-items: center;
+}
+
 .transactionsList {
   list-style: none;
   padding: 0;

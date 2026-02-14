@@ -13,6 +13,7 @@ vi.mock('@phosphor-icons/react', () => {
     ArrowUp: iconStub('ArrowUp'),
     ArrowDown: iconStub('ArrowDown'),
     ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
+    ArrowBendDownRight: iconStub('ArrowBendDownRight'),
     // Toast icons (imported transitively via Button → components barrel)
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -173,6 +174,57 @@ describe('InventoryTable', () => {
     const restockButtons = screen.getAllByText('inventory.restock.action');
     fireEvent.click(restockButtons[0]);
     expect(onRestock).toHaveBeenCalled();
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it('renders Scoop button when onScoop provided', () => {
+    const onScoop = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onScoop={onScoop} />,
+    );
+    const scoopButtons = screen.getAllByText('inventory.scoop.action');
+    expect(scoopButtons).toHaveLength(testItems.length);
+  });
+
+  it('calls onScoop with correct item when Scoop button clicked', () => {
+    const onScoop = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onScoop={onScoop} />,
+    );
+    const scoopButtons = screen.getAllByText('inventory.scoop.action');
+    fireEvent.click(scoopButtons[0]);
+    expect(onScoop).toHaveBeenCalledWith(testItems[0]);
+  });
+
+  it('does not render Scoop button when onScoop not provided', () => {
+    render(<InventoryTable items={testItems} loading={false} />);
+    expect(screen.queryByText('inventory.scoop.action')).not.toBeInTheDocument();
+  });
+
+  it('disables Scoop button for items with zero stock', () => {
+    const items = [makeItem({ id: '1', name: 'Empty', currentQty: 0 })];
+    const onScoop = vi.fn();
+    render(
+      <InventoryTable items={items} loading={false} onScoop={onScoop} />,
+    );
+    const scoopButton = screen.getByText('inventory.scoop.action').closest('button')!;
+    expect(scoopButton).toBeDisabled();
+  });
+
+  it('scoop button click does not trigger row click', () => {
+    const onRowClick = vi.fn();
+    const onScoop = vi.fn();
+    render(
+      <InventoryTable
+        items={testItems}
+        loading={false}
+        onRowClick={onRowClick}
+        onScoop={onScoop}
+      />,
+    );
+    const scoopButtons = screen.getAllByText('inventory.scoop.action');
+    fireEvent.click(scoopButtons[0]);
+    expect(onScoop).toHaveBeenCalled();
     expect(onRowClick).not.toHaveBeenCalled();
   });
 });

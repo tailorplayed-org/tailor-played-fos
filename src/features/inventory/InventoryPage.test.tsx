@@ -16,6 +16,7 @@ vi.mock('@phosphor-icons/react', () => {
     ArrowUp: iconStub('ArrowUp'),
     ArrowDown: iconStub('ArrowDown'),
     ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
+    ArrowBendDownRight: iconStub('ArrowBendDownRight'),
     // Toast
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -54,6 +55,7 @@ vi.mock('firebase/firestore', async () => {
 // Mock WAC calculation
 vi.mock('@/lib/wac', () => ({
   calculateWAC: vi.fn(() => 5000),
+  applyScoopCost: vi.fn((qty: number, wac: number) => qty * wac),
 }));
 
 // Mock services
@@ -74,6 +76,20 @@ const mockInventoryState = {
 
 vi.mock('./hooks/useInventory', () => ({
   useInventory: () => mockInventoryState,
+}));
+
+// Mock useWorkOrders
+const mockWorkOrdersState = {
+  workOrders: [] as { id: string; clientName: string; inventoryCostAgora: number }[],
+  loading: false,
+  error: null as string | null,
+  setWorkOrders: vi.fn(),
+  setLoading: vi.fn(),
+  setError: vi.fn(),
+};
+
+vi.mock('@/features/work-orders/hooks/useWorkOrders', () => ({
+  useWorkOrders: () => mockWorkOrdersState,
 }));
 
 // Mock toast
@@ -229,6 +245,28 @@ describe('InventoryPage', () => {
     expect(screen.getByText('inventory.restock.title')).toBeInTheDocument();
     fireEvent.click(screen.getByText('inventory.restock.cancel'));
     expect(screen.queryByText('inventory.restock.title')).not.toBeInTheDocument();
+  });
+
+  it('renders Scoop action button in table rows', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    expect(screen.getByText('inventory.scoop.action')).toBeInTheDocument();
+  });
+
+  it('opens ScoopModal when Scoop button clicked', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    fireEvent.click(screen.getByText('inventory.scoop.action'));
+    expect(screen.getByText('inventory.scoop.title')).toBeInTheDocument();
+  });
+
+  it('closes ScoopModal when cancel clicked', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    fireEvent.click(screen.getByText('inventory.scoop.action'));
+    expect(screen.getByText('inventory.scoop.title')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('inventory.scoop.cancel'));
+    expect(screen.queryByText('inventory.scoop.title')).not.toBeInTheDocument();
   });
 
   it('calls writeBatch on restock form submit with correct arguments', async () => {

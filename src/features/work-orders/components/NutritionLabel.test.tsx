@@ -1,8 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { ComponentType } from 'react';
-import type { WorkOrder } from '@/types';
-import type { Transaction } from '@/types';
+import type { WorkOrder, Transaction, InventoryLogEntry } from '@/types';
 import type { NutritionLabelProps } from './NutritionLabel';
 
 // Dynamic import to avoid jsdom hangs with Phosphor icons
@@ -47,6 +46,23 @@ function createTransaction(overrides: Partial<Transaction> = {}): Transaction {
     notes: null,
     createdAt: new Date('2026-01-15'),
     updatedAt: new Date('2026-01-15'),
+    ...overrides,
+  };
+}
+
+function createInventoryLog(overrides: Partial<InventoryLogEntry> = {}): InventoryLogEntry {
+  return {
+    id: 'log-1',
+    itemId: 'item-1',
+    action: 'consume',
+    qtyChange: -10,
+    costSnapshotAgora: 3500,
+    wacBeforeAgora: 350,
+    wacAfterAgora: 350,
+    workOrderRef: 'wo-1',
+    reason: null,
+    actorUid: 'user-1',
+    timestamp: new Date('2026-02-10'),
     ...overrides,
   };
 }
@@ -123,7 +139,7 @@ describe('NutritionLabel', () => {
     expect(screen.getByText('Vendor B')).toBeInTheDocument();
   });
 
-  it('expanding Inventory Costs shows no scoops yet placeholder', () => {
+  it('expanding Inventory Costs shows no scoops placeholder when no logs', () => {
     const wo = createWorkOrder();
     render(<NutritionLabel workOrder={wo} transactions={[]} />);
 
@@ -134,6 +150,57 @@ describe('NutritionLabel', () => {
     fireEvent.click(expandBtn);
 
     expect(screen.getByText('nutritionLabel.noScoops')).toBeInTheDocument();
+  });
+
+  it('expanding Inventory Costs shows scoop entries with item names and costs', () => {
+    const wo = createWorkOrder({ inventoryCostAgora: 7000 });
+    const logs = [
+      createInventoryLog({ id: 'log-1', itemId: 'item-1', costSnapshotAgora: 3500 }),
+      createInventoryLog({ id: 'log-2', itemId: 'item-2', costSnapshotAgora: 3500, timestamp: new Date('2026-02-12') }),
+    ];
+    const itemNames = { 'item-1': 'Cardboard', 'item-2': 'Fabric' };
+
+    render(
+      <NutritionLabel
+        workOrder={wo}
+        transactions={[]}
+        inventoryLogs={logs}
+        inventoryItemNames={itemNames}
+      />,
+    );
+
+    // Click expand inventory
+    const expandBtn = screen.getByRole('button', {
+      name: /nutritionLabel\.expand\|section=nutritionLabel\.inventoryCosts/,
+    });
+    fireEvent.click(expandBtn);
+
+    expect(screen.getByText('Cardboard')).toBeInTheDocument();
+    expect(screen.getByText('Fabric')).toBeInTheDocument();
+    // Cost: 3500 agora = ₪35.00
+    const costs = screen.getAllByText('₪35.00');
+    expect(costs).toHaveLength(2);
+  });
+
+  it('shows itemId when item name not found in inventoryItemNames', () => {
+    const wo = createWorkOrder({ inventoryCostAgora: 3500 });
+    const logs = [createInventoryLog({ id: 'log-1', itemId: 'unknown-item' })];
+
+    render(
+      <NutritionLabel
+        workOrder={wo}
+        transactions={[]}
+        inventoryLogs={logs}
+        inventoryItemNames={{}}
+      />,
+    );
+
+    const expandBtn = screen.getByRole('button', {
+      name: /nutritionLabel\.expand\|section=nutritionLabel\.inventoryCosts/,
+    });
+    fireEvent.click(expandBtn);
+
+    expect(screen.getByText('unknown-item')).toBeInTheDocument();
   });
 
   it('buffer is 5% of total costs', () => {

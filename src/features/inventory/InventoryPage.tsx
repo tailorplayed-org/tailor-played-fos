@@ -7,9 +7,12 @@ import { toMinorUnits } from '@/lib/currency';
 import { calculateWAC } from '@/lib/wac';
 import { toast } from '@/stores/useUIStore';
 import { useInventory } from './hooks/useInventory';
+import { useWorkOrders } from '@/features/work-orders/hooks/useWorkOrders';
+import { useScoopAction } from '@/hooks/useScoopAction';
 import { InventoryTable } from './components/InventoryTable';
 import { InventoryForm } from './components/InventoryForm';
 import { RestockForm } from './components/RestockForm';
+import { ScoopModal } from '@/features/work-orders/components/ScoopModal';
 import { Button, Card } from '@/components';
 import type { InventoryItem, CreateInventoryItemInput, RestockInput } from '@/types';
 import styles from './InventoryPage.module.scss';
@@ -18,11 +21,14 @@ type FormMode =
   | { type: 'closed' }
   | { type: 'create' }
   | { type: 'edit'; item: InventoryItem }
-  | { type: 'restock'; item?: InventoryItem };
+  | { type: 'restock'; item?: InventoryItem }
+  | { type: 'scoop'; item?: InventoryItem };
 
 export function InventoryPage() {
   const { t } = useTranslation();
   const { inventory, loading, error } = useInventory();
+  const { workOrders } = useWorkOrders();
+  const { executeScoop } = useScoopAction(inventory, workOrders);
   const [formMode, setFormMode] = useState<FormMode>({ type: 'closed' });
 
   const handleCreate = useCallback(async (data: CreateInventoryItemInput) => {
@@ -113,6 +119,10 @@ export function InventoryPage() {
     setFormMode({ type: 'restock', item });
   }, []);
 
+  const handleScoopClick = useCallback((item: InventoryItem) => {
+    setFormMode({ type: 'scoop', item });
+  }, []);
+
   const handleRowClick = useCallback((item: InventoryItem) => {
     setFormMode({ type: 'edit', item });
   }, []);
@@ -187,11 +197,23 @@ export function InventoryPage() {
         />
       )}
 
+      {formMode.type === 'scoop' && (
+        <ScoopModal
+          open={formMode.type === 'scoop'}
+          onClose={handleCancel}
+          onSubmit={executeScoop}
+          inventoryItems={inventory}
+          workOrders={workOrders}
+          preselectedItemId={formMode.item?.id}
+        />
+      )}
+
       <InventoryTable
         items={inventory}
         loading={loading}
         onRowClick={handleRowClick}
         onRestock={handleRestockClick}
+        onScoop={handleScoopClick}
         emptyState={emptyState}
       />
     </div>

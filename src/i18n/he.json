@@ -351,6 +351,24 @@
       "cancel": "ביטול",
       "success": "החידוש נרשם בהצלחה",
       "error": "רישום החידוש נכשל"
+    },
+    "scoop": {
+      "title": "סקופ — צריכת מלאי",
+      "action": "סקופ",
+      "material": "חומר",
+      "materialRequired": "חומר נדרש",
+      "quantity": "כמות לצריכה",
+      "quantityError": "הכמות חייבת להיות גדולה מ-0",
+      "overdraftError": "רק {{available}} זמין",
+      "workOrder": "הזמנת עבודה",
+      "workOrderRequired": "הזמנת עבודה נדרשת",
+      "availableStock": "מלאי זמין",
+      "remainingAfter": "{{remaining}} נותר לאחר סקופ",
+      "calculatedCost": "עלות מחושבת",
+      "submit": "אישור סקופ",
+      "cancel": "ביטול",
+      "success": "נצרכו {{qty}} יחידות של {{material}} → {{workOrder}}",
+      "error": "רישום הסקופ נכשל"
     }
   },
   "components": {

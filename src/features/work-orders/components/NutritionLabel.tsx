@@ -2,12 +2,14 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CaretRight, CheckCircle, WarningCircle, ChartBar } from '@phosphor-icons/react';
 import { formatCurrency, calculateMargin, calculateBuffer, getMarginStatus } from '@/lib';
-import type { WorkOrder, Transaction } from '@/types';
+import type { WorkOrder, Transaction, InventoryLogEntry } from '@/types';
 import styles from './NutritionLabel.module.scss';
 
 export interface NutritionLabelProps {
   workOrder: WorkOrder;
   transactions: Transaction[];
+  inventoryLogs?: InventoryLogEntry[];
+  inventoryItemNames?: Record<string, string>;
   loading?: boolean;
 }
 
@@ -18,7 +20,7 @@ function AmountCell({ amount, loading }: { amount: number; loading?: boolean }) 
   return <span>{formatCurrency(amount)}</span>;
 }
 
-export function NutritionLabel({ workOrder, transactions, loading = false }: NutritionLabelProps) {
+export function NutritionLabel({ workOrder, transactions, inventoryLogs = [], inventoryItemNames = {}, loading = false }: NutritionLabelProps) {
   const { t, i18n } = useTranslation();
   const [expandedDirectCosts, setExpandedDirectCosts] = useState(false);
   const [expandedInventoryCosts, setExpandedInventoryCosts] = useState(false);
@@ -138,7 +140,26 @@ export function NutritionLabel({ workOrder, transactions, loading = false }: Nut
       </button>
 
       {expandedInventoryCosts && (
-        <div className={styles.placeholder}>{t('nutritionLabel.noScoops')}</div>
+        <div className={styles.transactionList}>
+          {inventoryLogs.length > 0 ? (
+            inventoryLogs.map((log) => {
+              const itemName = inventoryItemNames[log.itemId] ?? log.itemId;
+              return (
+                <div key={log.id} className={styles.transactionItem}>
+                  <span className={styles.transactionVendor}>{itemName}</span>
+                  <span className={styles.transactionDate}>
+                    {log.timestamp.toLocaleDateString(i18n.language)}
+                  </span>
+                  <span className={styles.transactionAmount}>
+                    {formatCurrency(log.costSnapshotAgora)}
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            <div className={styles.placeholder}>{t('nutritionLabel.noScoops')}</div>
+          )}
+        </div>
       )}
 
       {/* Overhead Allocation — static */}

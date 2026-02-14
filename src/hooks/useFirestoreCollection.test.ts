@@ -70,7 +70,7 @@ describe('useFirestoreCollection', () => {
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
 
-  it('parses documents through schema and calls onData', () => {
+  it('parses documents through schema and calls onData, then sets loading false', () => {
     renderHook(() => useFirestoreCollection('test_items', testSchema, mockCallbacks));
 
     const now = new Date();
@@ -92,15 +92,19 @@ describe('useFirestoreCollection', () => {
     expect(items).toHaveLength(1);
     expect(items[0].id).toBe('doc-1');
     expect(items[0].name).toBe('Test Item');
+    // Verify loading set to false after data received
+    expect(mockCallbacks.onLoading).toHaveBeenCalledWith(false);
   });
 
-  it('handles listener errors', () => {
+  it('handles listener errors and sets loading false', () => {
     renderHook(() => useFirestoreCollection('test_items', testSchema, mockCallbacks));
 
     const error = new Error('Permission denied');
     errorCallback!(error);
 
     expect(mockCallbacks.onError).toHaveBeenCalledWith('Permission denied');
+    // Verify loading set to false after error
+    expect(mockCallbacks.onLoading).toHaveBeenCalledWith(false);
   });
 
   it('skips documents that fail schema validation', () => {

@@ -29,8 +29,8 @@ export function calculateWAC(
 
 /**
  * Calculate the cost of consuming inventory via scoops.
- * Placeholder for Story 6.3 — Scoop Action.
+ * Returns an integer (agora) — rounds to avoid floating-point drift on decimal quantities.
  */
 export function applyScoopCost(qty: number, wacAgora: number): number {
-  return qty * wacAgora;
+  return Math.round(qty * wacAgora);
 }

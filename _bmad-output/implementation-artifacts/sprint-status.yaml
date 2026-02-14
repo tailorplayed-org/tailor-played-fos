@@ -88,7 +88,7 @@ development_status:
   epic-6: in-progress
   6-1-inventory-data-model-item-management: done
   6-2-restock-wac-recalculation: done
-  6-3-scoop-action-consume-inventory-work-orders: backlog
+  6-3-scoop-action-consume-inventory-work-orders: done
   6-4-audit-log-waste-tracking: backlog
   epic-6-retrospective: optional
 

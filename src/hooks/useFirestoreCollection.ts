@@ -65,10 +65,12 @@ export function useFirestoreCollection<T>(
           }
         });
         callbacksRef.current.onData(items);
+        callbacksRef.current.onLoading(false);
       },
       (error) => {
         console.error(`[useFirestoreCollection] Listener error on ${collectionName}:`, error);
         callbacksRef.current.onError(error.message);
+        callbacksRef.current.onLoading(false);
       }
     );
 

@@ -7,3 +7,5 @@ export { TransactionForm } from './TransactionForm';
 export type { TransactionFormProps } from './TransactionForm';
 export { NutritionLabel } from './NutritionLabel';
 export type { NutritionLabelProps } from './NutritionLabel';
+export { ScoopModal } from './ScoopModal';
+export type { ScoopModalProps } from './ScoopModal';
