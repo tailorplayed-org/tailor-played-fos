@@ -409,6 +409,50 @@
       "close": "סגור"
     }
   },
+  "overhead": {
+    "pageTitle": "הוצאות קבועות",
+    "addButton": "הוסף הוצאה",
+    "monthlyTotalLabel": "סה\"כ חודש נוכחי",
+    "emptyTitle": "אין הוצאות קבועות עדיין",
+    "emptyDescription": "עקוב אחר הוצאות העסק לפי קטגוריה — מנויים, תוכנה, ארוחות, משרד והוצאות כלליות.",
+    "addSuccess": "הוצאה נוספה",
+    "addError": "שגיאה בהוספת הוצאה",
+    "categories": {
+      "subscriptions": "מנויים",
+      "software": "תוכנה",
+      "meals": "ארוחות",
+      "office": "משרד",
+      "general": "כללי"
+    },
+    "recurrence": {
+      "one_time": "חד פעמי",
+      "monthly": "חודשי",
+      "yearly": "שנתי"
+    },
+    "source": {
+      "manual": "ידני",
+      "ai": "AI"
+    },
+    "sourceManual": "ידני",
+    "form": {
+      "title": "הוסף הוצאה",
+      "category": "קטגוריה",
+      "categoryRequired": "קטגוריה היא שדה חובה",
+      "amount": "סכום (₪)",
+      "amountError": "הסכום חייב להיות גדול מ-0",
+      "date": "תאריך",
+      "dateRequired": "תאריך הוא שדה חובה",
+      "description": "תיאור",
+      "descriptionPlaceholder": "לדוגמה: מנוי Adobe, ארוחת צוות, ציוד משרדי",
+      "recurrence": "תדירות",
+      "submit": "הוסף הוצאה",
+      "cancel": "ביטול"
+    },
+    "breakdown": {
+      "title": "פילוח לפי קטגוריה",
+      "entries": "{{count}} רשומות"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "משהו השתבש",

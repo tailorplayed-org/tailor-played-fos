@@ -7,6 +7,7 @@ vi.mock('firebase-admin/app', () => ({
 
 // ── Mock firebase-admin/firestore ──
 const mockAuditLogAdd = vi.fn().mockResolvedValue({ id: 'audit-001' });
+const mockOverheadAdd = vi.fn().mockResolvedValue({ id: 'overhead-001' });
 const mockWoUpdate = vi.fn().mockResolvedValue(undefined);
 const mockWoGet = vi.fn().mockResolvedValue({ exists: true });
 const mockWoDocRef = { get: mockWoGet, update: mockWoUpdate };
@@ -18,6 +19,9 @@ const mockCollection = vi.fn().mockImplementation((collectionName: string) => {
   }
   if (collectionName === 'work_orders') {
     return { doc: mockWoDoc };
+  }
+  if (collectionName === 'overhead') {
+    return { add: mockOverheadAdd };
   }
   return {};
 });
@@ -458,6 +462,89 @@ describe('onTransactionStatusChanged — actorUid handling (Story 5.4)', () => {
     expect(mockAuditLogAdd).toHaveBeenCalledWith(
       expect.objectContaining({ actorUid: 'system' }),
     );
+  });
+});
+
+describe('onTransactionStatusChanged — overhead creation (Story 7.1)', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    mockWoGet.mockResolvedValue({ exists: true });
+    await import('../src/triggers/onTransactionApproved.js');
+  });
+
+  it('creates overhead document when Overhead-category transaction is approved (AC #7)', async () => {
+    const before = baseTxnData({ status: 'pending_review', category: 'Overhead', workOrderId: null, vendorName: 'Adobe Inc' });
+    const after = baseTxnData({ status: 'approved', category: 'Overhead', workOrderId: null, vendorName: 'Adobe Inc' });
+
+    const event = createUpdateEvent(before, after, 'txn-overhead-001');
+    await capturedHandler!(event);
+
+    expect(mockOverheadAdd).toHaveBeenCalledWith({
+      category: 'general',
+      amountAgora: 58000,
+      currency: 'ILS',
+      date: expect.anything(),
+      description: 'Adobe Inc',
+      recurrence: 'one_time',
+      source: 'ai',
+      transactionId: 'txn-overhead-001',
+      isActive: true,
+      createdAt: 'SERVER_TIMESTAMP',
+      updatedAt: 'SERVER_TIMESTAMP',
+    });
+  });
+
+  it('sets description to null when vendorName is absent', async () => {
+    const before = baseTxnData({ status: 'pending_review', category: 'Overhead', workOrderId: null, vendorName: undefined });
+    const after = baseTxnData({ status: 'approved', category: 'Overhead', workOrderId: null, vendorName: undefined });
+
+    const event = createUpdateEvent(before, after, 'txn-overhead-002');
+    await capturedHandler!(event);
+
+    expect(mockOverheadAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ description: null }),
+    );
+  });
+
+  it('does NOT create overhead for non-Overhead categories', async () => {
+    const before = baseTxnData({ status: 'pending_review', category: 'DirectCost' });
+    const after = baseTxnData({ status: 'approved', category: 'DirectCost' });
+
+    const event = createUpdateEvent(before, after);
+    await capturedHandler!(event);
+
+    expect(mockOverheadAdd).not.toHaveBeenCalled();
+  });
+
+  it('overhead creation error does not block approval flow', async () => {
+    mockOverheadAdd.mockRejectedValueOnce(new Error('Overhead write failed'));
+
+    const before = baseTxnData({ status: 'pending_review', category: 'Overhead', workOrderId: null });
+    const after = baseTxnData({ status: 'approved', category: 'Overhead', workOrderId: null });
+
+    const event = createUpdateEvent(before, after, 'txn-overhead-err');
+
+    // Should NOT throw
+    await expect(capturedHandler!(event)).resolves.toBeUndefined();
+
+    // Error logged
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      'Failed to create overhead document',
+      expect.objectContaining({ transactionId: 'txn-overhead-err' }),
+    );
+
+    // Audit trail still created
+    expect(mockAuditLogAdd).toHaveBeenCalled();
+  });
+
+  it('does NOT create overhead on rejection', async () => {
+    const before = baseTxnData({ status: 'pending_review', category: 'Overhead', workOrderId: null });
+    const after = baseTxnData({ status: 'rejected', category: 'Overhead', workOrderId: null });
+
+    const event = createUpdateEvent(before, after);
+    await capturedHandler!(event);
+
+    expect(mockOverheadAdd).not.toHaveBeenCalled();
   });
 });
 

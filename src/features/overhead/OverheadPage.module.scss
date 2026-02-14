@@ -1,19 +1,129 @@
 // ─────────────────────────────────────────────
-// Placeholder page styling
+// OverheadPage — full overhead management page
 // ─────────────────────────────────────────────
 
-.placeholder {
-  @include placeholder-page;
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
 }
 
-.icon {
-  @include placeholder-icon;
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.title {
-  @include placeholder-title;
+.pageTitle {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
 }
 
-.description {
-  @include placeholder-description;
+.monthlyTotal {
+  @include card-surface;
+  padding: $space-lg;
+  text-align: center;
+}
+
+.monthlyTotalLabel {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin-block-end: $space-xs;
+  display: block;
+}
+
+.monthlyTotalAmount {
+  font-size: $text-2xl;
+  font-weight: $font-semibold;
+  color: $gold;
+}
+
+.categorySection {
+  margin-block-end: $space-md;
+}
+
+.categoryTitle {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin-block-end: $space-sm;
+}
+
+.entryRow {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-radius: $radius-md;
+  background: $bg-secondary;
+  min-block-size: 44px;
+  margin-block-end: $space-xs;
+
+  @media (max-width: $bp-sm) {
+    flex-wrap: wrap;
+  }
+}
+
+.entryDescription {
+  flex: 1;
+  @include truncate;
+  font-weight: $font-medium;
+}
+
+.entryAmount {
+  font-weight: $font-semibold;
+  white-space: nowrap;
+}
+
+.entryDate {
+  color: $text-muted;
+  font-size: $text-xs;
+}
+
+.recurrenceBadge {
+  font-size: $text-xs;
+  padding: 2px $space-sm;
+  border-radius: $radius-full;
+  background: $bg-tertiary;
+  color: $text-secondary;
+}
+
+.sourceBadge {
+  font-size: $text-xs;
+  padding: 2px $space-sm;
+  border-radius: $radius-full;
+}
+
+.sourceAi {
+  background: rgba($info, 0.15);
+  color: $info;
+}
+
+.sourceManual {
+  background: $bg-tertiary;
+  color: $text-muted;
+}
+
+.emptyState {
+  @include flex-column-center;
+  padding: $space-3xl $space-xl;
+  gap: $space-md;
+}
+
+.emptyIcon {
+  color: $text-muted;
+}
+
+.emptyTitle {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $gold;
+}
+
+.emptyDescription {
+  color: $text-secondary;
+  font-size: $text-base;
+  max-width: 400px;
+  text-align: center;
 }

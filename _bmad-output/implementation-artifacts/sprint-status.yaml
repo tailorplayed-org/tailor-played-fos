@@ -93,8 +93,8 @@ development_status:
   epic-6-retrospective: optional
 
   # Epic 7: Overhead, Tax Intelligence & Forward Projections
-  epic-7: backlog
-  7-1-overhead-data-model-expense-management: backlog
+  epic-7: in-progress
+  7-1-overhead-data-model-expense-management: done
   7-2-monthly-overhead-burn-rate-trends: backlog
   7-3-tax-jar-configuration-osek-patur-alert: backlog
   7-4-forward-financial-projection: backlog

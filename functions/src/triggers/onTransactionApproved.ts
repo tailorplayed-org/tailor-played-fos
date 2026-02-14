@@ -73,6 +73,43 @@ async function updateWorkOrderTotals(
 }
 
 /**
+ * Create an overhead document when an Overhead-category transaction is approved.
+ * Maps the transaction to the overhead collection with source: 'ai'.
+ */
+async function createOverheadFromTransaction(
+  db: FirebaseFirestore.Firestore,
+  transactionId: string,
+  afterData: Record<string, unknown>,
+): Promise<void> {
+  const category = afterData.category as string;
+  if (category !== 'Overhead') return;
+
+  const amountAgora = afterData.amountAgora as number;
+  const currency = (afterData.currency as string) ?? 'ILS';
+  const date = afterData.date ?? FieldValue.serverTimestamp();
+  const vendorName = afterData.vendorName as string | undefined;
+
+  // Default to 'general' — user can recategorize on the Overhead page if needed
+  const overheadCategory = 'general';
+
+  await db.collection('overhead').add({
+    category: overheadCategory,
+    amountAgora,
+    currency,
+    date,
+    description: vendorName ?? null,
+    recurrence: 'one_time',
+    source: 'ai',
+    transactionId,
+    isActive: true,
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  logger.info('Overhead document created from transaction', { transactionId, amountAgora });
+}
+
+/**
  * Handle approved transaction: update Work Order totals + create audit trail.
  * WO update and audit trail run in parallel for lower latency (AC #9).
  */
@@ -106,6 +143,18 @@ async function handleApproval(
           transactionId,
           workOrderId,
           category,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }),
+    );
+  }
+
+  // Create overhead document for Overhead-category transactions
+  if (category === 'Overhead' && amountAgora !== undefined) {
+    operations.push(
+      createOverheadFromTransaction(db, transactionId, afterData).catch((error) => {
+        logger.error('Failed to create overhead document', {
+          transactionId,
           error: error instanceof Error ? error.message : String(error),
         });
       }),

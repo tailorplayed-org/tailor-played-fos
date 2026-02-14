@@ -1,0 +1,38 @@
+// ─────────────────────────────────────────────
+// Overhead Form — add overhead entry layout
+// Follows RestockForm.module.scss patterns
+// ─────────────────────────────────────────────
+
+.form {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.formTitle {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  margin-block-end: $space-md;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    > * {
+      inline-size: 100%;
+    }
+  }
+}

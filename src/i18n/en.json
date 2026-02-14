@@ -409,6 +409,50 @@
       "close": "Close"
     }
   },
+  "overhead": {
+    "pageTitle": "Overhead",
+    "addButton": "Add Overhead",
+    "monthlyTotalLabel": "Current Month Total",
+    "emptyTitle": "No overhead tracked yet",
+    "emptyDescription": "Track your business expenses by category — subscriptions, software, meals, office, and general costs.",
+    "addSuccess": "Overhead entry added",
+    "addError": "Failed to add overhead entry",
+    "categories": {
+      "subscriptions": "Subscriptions",
+      "software": "Software",
+      "meals": "Meals",
+      "office": "Office",
+      "general": "General"
+    },
+    "recurrence": {
+      "one_time": "One-time",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "source": {
+      "manual": "Manual",
+      "ai": "AI"
+    },
+    "sourceManual": "Manual",
+    "form": {
+      "title": "Add Overhead",
+      "category": "Category",
+      "categoryRequired": "Category is required",
+      "amount": "Amount (ILS)",
+      "amountError": "Amount must be greater than 0",
+      "date": "Date",
+      "dateRequired": "Date is required",
+      "description": "Description",
+      "descriptionPlaceholder": "e.g., Adobe subscription, Team lunch, Office supplies",
+      "recurrence": "Recurrence",
+      "submit": "Add Overhead",
+      "cancel": "Cancel"
+    },
+    "breakdown": {
+      "title": "Category Breakdown",
+      "entries": "{{count}} entries"
+    }
+  },
   "components": {
     "errorBoundary": {
       "title": "Something went wrong",

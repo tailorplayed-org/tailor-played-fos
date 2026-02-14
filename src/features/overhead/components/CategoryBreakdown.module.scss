@@ -1,0 +1,57 @@
+// ─────────────────────────────────────────────
+// CategoryBreakdown — per-category overhead cards
+// ─────────────────────────────────────────────
+
+.title {
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin-block-end: $space-md;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-md;
+
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  @include card-surface;
+  padding: $space-md;
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.categoryName {
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-secondary;
+}
+
+.categoryTotal {
+  font-size: $text-xl;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.entryCount {
+  font-size: $text-xs;
+  color: $text-muted;
+}
