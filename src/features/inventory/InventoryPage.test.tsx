@@ -17,6 +17,9 @@ vi.mock('@phosphor-icons/react', () => {
     ArrowDown: iconStub('ArrowDown'),
     ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
     ArrowBendDownRight: iconStub('ArrowBendDownRight'),
+    ArrowFatUp: iconStub('ArrowFatUp'),
+    Trash: iconStub('Trash'),
+    ClockCounterClockwise: iconStub('ClockCounterClockwise'),
     // Toast
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -76,6 +79,11 @@ const mockInventoryState = {
 
 vi.mock('./hooks/useInventory', () => ({
   useInventory: () => mockInventoryState,
+}));
+
+// Mock useInventoryLogs
+vi.mock('./hooks/useInventoryLogs', () => ({
+  useInventoryLogs: () => ({ logs: [], loading: false, error: null }),
 }));
 
 // Mock useWorkOrders
@@ -267,6 +275,33 @@ describe('InventoryPage', () => {
     expect(screen.getByText('inventory.scoop.title')).toBeInTheDocument();
     fireEvent.click(screen.getByText('inventory.scoop.cancel'));
     expect(screen.queryByText('inventory.scoop.title')).not.toBeInTheDocument();
+  });
+
+  it('renders Waste action button in table rows', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    // Waste button in table row + header button
+    const wasteButtons = screen.getAllByText('inventory.waste.action');
+    expect(wasteButtons.length).toBeGreaterThan(0);
+  });
+
+  it('opens WasteForm when Waste button clicked in table', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    // Click the table row Waste button (aria-label)
+    const wasteBtn = screen.getByLabelText('inventory.waste.action');
+    fireEvent.click(wasteBtn);
+    expect(screen.getByText('inventory.waste.title')).toBeInTheDocument();
+  });
+
+  it('opens AuditLogPanel when Audit Log header button clicked', () => {
+    mockInventoryState.inventory = [makeItem({ id: '1', name: 'Fabric' })];
+    render(<InventoryPage />);
+    // Click the header Audit Log button
+    const auditButtons = screen.getAllByText('inventory.audit.title');
+    fireEvent.click(auditButtons[0]);
+    // Panel should show empty state since logs is mocked empty
+    expect(screen.getByText('inventory.audit.emptyState')).toBeInTheDocument();
   });
 
   it('calls writeBatch on restock form submit with correct arguments', async () => {

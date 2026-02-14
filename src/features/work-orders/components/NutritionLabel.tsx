@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CaretRight, CheckCircle, WarningCircle, ChartBar } from '@phosphor-icons/react';
+import { CaretRight, CheckCircle, WarningCircle, ChartBar, Trash } from '@phosphor-icons/react';
 import { formatCurrency, calculateMargin, calculateBuffer, getMarginStatus } from '@/lib';
 import type { WorkOrder, Transaction, InventoryLogEntry } from '@/types';
 import styles from './NutritionLabel.module.scss';
@@ -144,9 +144,13 @@ export function NutritionLabel({ workOrder, transactions, inventoryLogs = [], in
           {inventoryLogs.length > 0 ? (
             inventoryLogs.map((log) => {
               const itemName = inventoryItemNames[log.itemId] ?? log.itemId;
+              const isWaste = log.action === 'waste';
               return (
                 <div key={log.id} className={styles.transactionItem}>
-                  <span className={styles.transactionVendor}>{itemName}</span>
+                  <span className={styles.transactionVendor}>
+                    {isWaste && <Trash size={14} className={styles.wasteIcon} />}
+                    {itemName}{isWaste && log.reason ? ` (${t('nutritionLabel.waste')}: ${log.reason})` : ''}
+                  </span>
                   <span className={styles.transactionDate}>
                     {log.timestamp.toLocaleDateString(i18n.language)}
                   </span>

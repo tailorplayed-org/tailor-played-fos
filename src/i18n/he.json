@@ -248,6 +248,7 @@
     "margin": "מרווח",
     "noTransactions": "אין עלויות ישירות עדיין",
     "noScoops": "אין סקופים עדיין",
+    "waste": "פחת",
     "expand": "הרחב {{section}}",
     "collapse": "כווץ {{section}}",
     "vendor": "ספק",
@@ -369,6 +370,43 @@
       "cancel": "ביטול",
       "success": "נצרכו {{qty}} יחידות של {{material}} → {{workOrder}}",
       "error": "רישום הסקופ נכשל"
+    },
+    "waste": {
+      "title": "רישום פחת",
+      "action": "פחת",
+      "material": "חומר",
+      "materialRequired": "חומר הוא שדה חובה",
+      "quantity": "כמות שאבדה",
+      "quantityError": "הכמות חייבת להיות גדולה מ-0",
+      "overdraftError": "רק {{available}} זמינים",
+      "reason": "סיבה",
+      "reasonPlaceholder": "לדוגמה: פגום, פג תוקף, גרוטאות מחיתוך",
+      "reasonRequired": "סיבה היא שדה חובה",
+      "workOrder": "הזמנת עבודה (אופציונלי)",
+      "workOrderNone": "ללא — הוצאות כלליות",
+      "availableStock": "מלאי זמין",
+      "remainingAfter": "{{remaining}} נותרים לאחר פחת",
+      "calculatedCost": "עלות פחת",
+      "submit": "אישור פחת",
+      "cancel": "ביטול",
+      "success": "פחת נרשם: {{qty}} יחידות של {{material}}",
+      "error": "שגיאה ברישום פחת"
+    },
+    "audit": {
+      "title": "יומן ביקורת",
+      "filterAll": "כל הפריטים",
+      "filterByItem": "סנן לפי פריט",
+      "emptyState": "אין פעולות מלאי שנרשמו עדיין",
+      "runningBalance": "מאזן: {{startQty}} → {{currentQty}}",
+      "actions": {
+        "restock": "מילוי מחדש",
+        "consume": "סקופ",
+        "waste": "פחת"
+      },
+      "cost": "עלות",
+      "wac": "עלות ממוצעת",
+      "workOrder": "הזמנת עבודה",
+      "close": "סגור"
     }
   },
   "components": {

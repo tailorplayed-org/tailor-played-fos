@@ -89,7 +89,7 @@ development_status:
   6-1-inventory-data-model-item-management: done
   6-2-restock-wac-recalculation: done
   6-3-scoop-action-consume-inventory-work-orders: done
-  6-4-audit-log-waste-tracking: backlog
+  6-4-audit-log-waste-tracking: done
   epic-6-retrospective: optional
 
   # Epic 7: Overhead, Tax Intelligence & Forward Projections

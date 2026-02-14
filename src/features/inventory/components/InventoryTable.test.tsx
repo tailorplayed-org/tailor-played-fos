@@ -14,6 +14,7 @@ vi.mock('@phosphor-icons/react', () => {
     ArrowDown: iconStub('ArrowDown'),
     ArrowCounterClockwise: iconStub('ArrowCounterClockwise'),
     ArrowBendDownRight: iconStub('ArrowBendDownRight'),
+    Trash: iconStub('Trash'),
     // Toast icons (imported transitively via Button → components barrel)
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -225,6 +226,57 @@ describe('InventoryTable', () => {
     const scoopButtons = screen.getAllByText('inventory.scoop.action');
     fireEvent.click(scoopButtons[0]);
     expect(onScoop).toHaveBeenCalled();
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it('renders Waste button when onWaste provided', () => {
+    const onWaste = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onWaste={onWaste} />,
+    );
+    const wasteButtons = screen.getAllByText('inventory.waste.action');
+    expect(wasteButtons).toHaveLength(testItems.length);
+  });
+
+  it('calls onWaste with correct item when Waste button clicked', () => {
+    const onWaste = vi.fn();
+    render(
+      <InventoryTable items={testItems} loading={false} onWaste={onWaste} />,
+    );
+    const wasteButtons = screen.getAllByText('inventory.waste.action');
+    fireEvent.click(wasteButtons[0]);
+    expect(onWaste).toHaveBeenCalledWith(testItems[0]);
+  });
+
+  it('does not render Waste button when onWaste not provided', () => {
+    render(<InventoryTable items={testItems} loading={false} />);
+    expect(screen.queryByText('inventory.waste.action')).not.toBeInTheDocument();
+  });
+
+  it('disables Waste button for items with zero stock', () => {
+    const items = [makeItem({ id: '1', name: 'Empty', currentQty: 0 })];
+    const onWaste = vi.fn();
+    render(
+      <InventoryTable items={items} loading={false} onWaste={onWaste} />,
+    );
+    const wasteButton = screen.getByText('inventory.waste.action').closest('button')!;
+    expect(wasteButton).toBeDisabled();
+  });
+
+  it('waste button click does not trigger row click', () => {
+    const onRowClick = vi.fn();
+    const onWaste = vi.fn();
+    render(
+      <InventoryTable
+        items={testItems}
+        loading={false}
+        onRowClick={onRowClick}
+        onWaste={onWaste}
+      />,
+    );
+    const wasteButtons = screen.getAllByText('inventory.waste.action');
+    fireEvent.click(wasteButtons[0]);
+    expect(onWaste).toHaveBeenCalled();
     expect(onRowClick).not.toHaveBeenCalled();
   });
 });

@@ -406,6 +406,47 @@ describe('NutritionLabel', () => {
     expect(negativeEl).not.toBeInTheDocument();
   });
 
+  it('shows waste entries with waste icon and reason in inventory costs', () => {
+    const wo = createWorkOrder({ inventoryCostAgora: 7000 });
+    const wasteLogs: InventoryLogEntry[] = [
+      createInventoryLog({
+        id: 'log-waste',
+        action: 'waste',
+        qtyChange: -5,
+        costSnapshotAgora: 2500,
+        reason: 'Expired',
+        workOrderRef: 'wo-1',
+      }),
+      createInventoryLog({
+        id: 'log-scoop',
+        action: 'consume',
+        qtyChange: -10,
+        costSnapshotAgora: 3500,
+        reason: null,
+        workOrderRef: 'wo-1',
+      }),
+    ];
+    const itemNames: Record<string, string> = { 'item-1': 'Cardboard' };
+
+    render(
+      <NutritionLabel
+        workOrder={wo}
+        transactions={[]}
+        inventoryLogs={wasteLogs}
+        inventoryItemNames={itemNames}
+      />,
+    );
+
+    // Expand Inventory Costs
+    fireEvent.click(screen.getByText('nutritionLabel.inventoryCosts'));
+
+    // Waste entry should show waste label with reason
+    expect(screen.getByText(/Expired/)).toBeInTheDocument();
+    // Scoop entry should show item name without waste label
+    const cardboardEntries = screen.getAllByText(/Cardboard/);
+    expect(cardboardEntries.length).toBe(2); // one scoop, one waste
+  });
+
   it('margin progress bar has accessible label', () => {
     const wo = createWorkOrder();
     render(<NutritionLabel workOrder={wo} transactions={[]} />);

@@ -110,7 +110,15 @@
 
 .transactionVendor {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
   @include truncate;
+}
+
+.wasteIcon {
+  color: $error;
+  flex-shrink: 0;
 }
 
 .transactionDate {

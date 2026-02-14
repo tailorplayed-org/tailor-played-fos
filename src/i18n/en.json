@@ -248,6 +248,7 @@
     "margin": "Margin",
     "noTransactions": "No direct costs yet",
     "noScoops": "No scoops yet",
+    "waste": "waste",
     "expand": "Expand {{section}}",
     "collapse": "Collapse {{section}}",
     "vendor": "Vendor",
@@ -369,6 +370,43 @@
       "cancel": "Cancel",
       "success": "Scooped {{qty}} units of {{material}} → {{workOrder}}",
       "error": "Failed to record scoop"
+    },
+    "waste": {
+      "title": "Log Waste",
+      "action": "Waste",
+      "material": "Material",
+      "materialRequired": "Material is required",
+      "quantity": "Quantity Lost",
+      "quantityError": "Quantity must be greater than 0",
+      "overdraftError": "Only {{available}} available",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g., Damaged, Expired, Scrap from cutting",
+      "reasonRequired": "Reason is required",
+      "workOrder": "Work Order (Optional)",
+      "workOrderNone": "None — general overhead",
+      "availableStock": "Available Stock",
+      "remainingAfter": "{{remaining}} remaining after waste",
+      "calculatedCost": "Waste Cost",
+      "submit": "Confirm Waste",
+      "cancel": "Cancel",
+      "success": "Waste logged: {{qty}} units of {{material}}",
+      "error": "Failed to log waste"
+    },
+    "audit": {
+      "title": "Audit Log",
+      "filterAll": "All Items",
+      "filterByItem": "Filter by Item",
+      "emptyState": "No inventory actions recorded yet",
+      "runningBalance": "Balance: {{startQty}} → {{currentQty}}",
+      "actions": {
+        "restock": "Restock",
+        "consume": "Scoop",
+        "waste": "Waste"
+      },
+      "cost": "Cost",
+      "wac": "WAC",
+      "workOrder": "Work Order",
+      "close": "Close"
     }
   },
   "components": {

@@ -42,9 +42,11 @@ export function WorkOrderDetailPage() {
     [transactions, id],
   );
 
-  // Scoop logs for this work order
+  // Inventory logs for this work order (consume + waste with workOrderRef)
   const woInventoryLogs = useMemo(
-    () => allInventoryLogs.filter((log) => log.workOrderRef === (id ?? '') && log.action === 'consume'),
+    () => allInventoryLogs.filter(
+      (log) => log.workOrderRef === (id ?? '') && (log.action === 'consume' || log.action === 'waste'),
+    ),
     [allInventoryLogs, id],
   );
 

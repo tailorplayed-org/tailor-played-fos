@@ -1,0 +1,101 @@
+// ─────────────────────────────────────────────
+// Waste Form — log inventory waste/loss
+// Follows RestockForm.module.scss patterns
+// ─────────────────────────────────────────────
+
+.form {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.formTitle {
+  font-size: $font-lg;
+  font-weight: $font-semibold;
+  margin-block-end: $space-md;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+  margin-block-end: $space-lg;
+}
+
+.preselectedItem {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.preselectedLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.preselectedValue {
+  font-size: $font-md;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+.stockPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-sm $space-md;
+  background: $surface-secondary;
+  border-radius: $radius-md;
+}
+
+.stockLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.stockValue {
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.stockValueError {
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $error;
+}
+
+.costPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-sm $space-md;
+  background: $surface-secondary;
+  border-radius: $radius-md;
+}
+
+.costLabel {
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.costValue {
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $error;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $space-sm;
+
+  @media (max-width: $bp-sm) {
+    flex-direction: column-reverse;
+
+    > * {
+      inline-size: 100%;
+    }
+  }
+}

@@ -1,0 +1,169 @@
+// ─────────────────────────────────────────────
+// Audit Log Panel — chronological inventory actions
+// ─────────────────────────────────────────────
+
+$action-consume: #3b82f6; // blue per architecture spec
+
+.panel {
+  @include card-surface;
+  padding: $space-lg;
+  border-radius: $radius-lg;
+  animation: slideDown 0.2s ease-out;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: $space-md;
+}
+
+.panelTitle {
+  font-size: $font-lg;
+  font-weight: $font-semibold;
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.filterRow {
+  margin-block-end: $space-md;
+}
+
+.runningBalance {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  background: $surface-secondary;
+  border-radius: $radius-md;
+  margin-block-end: $space-md;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.logList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.logEntry {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm $space-md;
+  border-radius: $radius-md;
+  background: $bg-secondary;
+  min-block-size: 44px; // touch target
+
+  @media (max-width: $bp-sm) {
+    flex-wrap: wrap;
+    cursor: pointer;
+  }
+}
+
+.logIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.iconRestock {
+  color: $success;
+}
+
+.iconConsume {
+  color: $action-consume;
+}
+
+.iconWaste {
+  color: $error;
+}
+
+.logAction {
+  font-weight: $font-medium;
+  min-width: 60px;
+}
+
+.logItemName {
+  color: $text-secondary;
+  font-size: $font-sm;
+}
+
+.logQty {
+  font-weight: $font-semibold;
+  text-align: end;
+  min-width: 60px;
+}
+
+.logCost {
+  color: $text-secondary;
+  text-align: end;
+}
+
+.logWac {
+  color: $text-secondary;
+  text-align: end;
+}
+
+.logTimestamp {
+  color: $text-muted;
+  font-size: $font-xs;
+  margin-inline-start: auto;
+}
+
+.logWorkOrder {
+  color: $gold;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Mobile expandable details
+.logDetails {
+  display: none;
+  width: 100%;
+  padding-inline-start: calc(24px + $space-sm); // align with content after icon
+  padding-block-start: $space-xs;
+  font-size: $font-sm;
+  color: $text-secondary;
+
+  @media (max-width: $bp-sm) {
+    &.expanded {
+      display: flex;
+      flex-direction: column;
+      gap: $space-xs;
+    }
+  }
+}
+
+// Desktop: always show all details inline
+@media (min-width: $bp-sm) {
+  .logCost,
+  .logWac,
+  .logWorkOrder {
+    display: inline;
+  }
+}
+
+// Mobile: hide cost/WAC/WO in main row, show in expanded details
+@media (max-width: $bp-sm) {
+  .logCost,
+  .logWorkOrder,
+  .logWac {
+    display: none;
+  }
+}
+
+.emptyState {
+  @include flex-column-center;
+  padding: $space-xl;
+  color: $text-muted;
+  gap: $space-sm;
+}

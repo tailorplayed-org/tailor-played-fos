@@ -73,3 +73,17 @@ export const scoopInputSchema = z.object({
 });
 
 export type ScoopInput = z.infer<typeof scoopInputSchema>;
+
+// --- Waste Form Input (Story 6.4) ---
+// reason is REQUIRED for waste — unlike scoop where it's null
+// workOrderId defaults to '' (empty string) because react-hook-form Select uses '' for "no selection"
+// Convert empty string to null when writing to Firestore: workOrderRef: data.workOrderId || null
+
+export const wasteInputSchema = z.object({
+  itemId: z.string().min(1, { error: 'Material is required' }),
+  quantity: z.number().positive({ error: 'Quantity must be greater than 0' }),
+  reason: z.string().min(1, { error: 'Reason is required' }),
+  workOrderId: z.string().default(''), // empty string = no WO linked
+});
+
+export type WasteInput = z.infer<typeof wasteInputSchema>;

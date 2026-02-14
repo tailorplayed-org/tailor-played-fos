@@ -5,6 +5,7 @@ import {
   inventoryLogSchema,
   restockInputSchema,
   scoopInputSchema,
+  wasteInputSchema,
 } from './inventory';
 
 describe('inventoryItemSchema', () => {
@@ -372,6 +373,80 @@ describe('scoopInputSchema', () => {
   it('rejects missing quantity', () => {
     const { quantity: _, ...noQty } = validInput;
     const result = scoopInputSchema.safeParse(noQty);
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('wasteInputSchema', () => {
+  const validInput = {
+    itemId: 'item-1',
+    quantity: 5,
+    reason: 'Expired material',
+    workOrderId: 'wo-1',
+  };
+
+  it('validates a complete waste input with work order', () => {
+    const result = wasteInputSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual(validInput);
+    }
+  });
+
+  it('defaults workOrderId to empty string when omitted', () => {
+    const { workOrderId: _, ...noWo } = validInput;
+    const result = wasteInputSchema.safeParse(noWo);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.workOrderId).toBe('');
+    }
+  });
+
+  it('accepts empty workOrderId (no WO linked)', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, workOrderId: '' });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects empty itemId', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, itemId: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty reason', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, reason: '' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects zero quantity', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, quantity: 0 });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects negative quantity', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, quantity: -3 });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts decimal quantity', () => {
+    const result = wasteInputSchema.safeParse({ ...validInput, quantity: 2.5 });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing itemId', () => {
+    const { itemId: _, ...noItemId } = validInput;
+    const result = wasteInputSchema.safeParse(noItemId);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing reason', () => {
+    const { reason: _, ...noReason } = validInput;
+    const result = wasteInputSchema.safeParse(noReason);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects missing quantity', () => {
+    const { quantity: _, ...noQty } = validInput;
+    const result = wasteInputSchema.safeParse(noQty);
     expect(result.success).toBe(false);
   });
 });

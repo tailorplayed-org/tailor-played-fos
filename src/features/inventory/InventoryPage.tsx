@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Package, Plus } from '@phosphor-icons/react';
+import { Package, Plus, Trash, ClockCounterClockwise } from '@phosphor-icons/react';
 import { collection, addDoc, updateDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db, auth } from '@/services';
 import { toMinorUnits } from '@/lib/currency';
@@ -9,9 +9,13 @@ import { toast } from '@/stores/useUIStore';
 import { useInventory } from './hooks/useInventory';
 import { useWorkOrders } from '@/features/work-orders/hooks/useWorkOrders';
 import { useScoopAction } from '@/hooks/useScoopAction';
+import { useWasteAction } from '@/hooks/useWasteAction';
+import { useInventoryLogs } from './hooks/useInventoryLogs';
 import { InventoryTable } from './components/InventoryTable';
 import { InventoryForm } from './components/InventoryForm';
 import { RestockForm } from './components/RestockForm';
+import { WasteForm } from './components/WasteForm';
+import { AuditLogPanel } from './components/AuditLogPanel';
 import { ScoopModal } from '@/features/work-orders/components/ScoopModal';
 import { Button, Card } from '@/components';
 import type { InventoryItem, CreateInventoryItemInput, RestockInput } from '@/types';
@@ -22,13 +26,17 @@ type FormMode =
   | { type: 'create' }
   | { type: 'edit'; item: InventoryItem }
   | { type: 'restock'; item?: InventoryItem }
-  | { type: 'scoop'; item?: InventoryItem };
+  | { type: 'scoop'; item?: InventoryItem }
+  | { type: 'waste'; item?: InventoryItem }
+  | { type: 'audit' };
 
 export function InventoryPage() {
   const { t } = useTranslation();
   const { inventory, loading, error } = useInventory();
   const { workOrders } = useWorkOrders();
   const { executeScoop } = useScoopAction(inventory, workOrders);
+  const { executeWaste } = useWasteAction(inventory, workOrders);
+  const { logs: inventoryLogs, loading: logsLoading } = useInventoryLogs();
   const [formMode, setFormMode] = useState<FormMode>({ type: 'closed' });
 
   const handleCreate = useCallback(async (data: CreateInventoryItemInput) => {
@@ -123,6 +131,14 @@ export function InventoryPage() {
     setFormMode({ type: 'scoop', item });
   }, []);
 
+  const handleWasteClick = useCallback((item: InventoryItem) => {
+    setFormMode({ type: 'waste', item });
+  }, []);
+
+  const handleAuditClick = useCallback(() => {
+    setFormMode({ type: 'audit' });
+  }, []);
+
   const handleRowClick = useCallback((item: InventoryItem) => {
     setFormMode({ type: 'edit', item });
   }, []);
@@ -160,9 +176,19 @@ export function InventoryPage() {
           <h1 className={styles.title}>{t('inventory.title')}</h1>
         </div>
         {inventory.length > 0 && (
-          <Button onClick={() => setFormMode({ type: 'create' })}>
-            <Plus size={16} weight="bold" /> {t('inventory.addMaterial')}
-          </Button>
+          <div className={styles.headerActions}>
+            <Button size="sm" variant="secondary" onClick={handleAuditClick}>
+              <ClockCounterClockwise size={18} weight="bold" />
+              <span>{t('inventory.audit.title')}</span>
+            </Button>
+            <Button size="sm" variant="danger" onClick={() => setFormMode({ type: 'waste' })}>
+              <Trash size={18} weight="bold" />
+              <span>{t('inventory.waste.action')}</span>
+            </Button>
+            <Button onClick={() => setFormMode({ type: 'create' })}>
+              <Plus size={16} weight="bold" /> {t('inventory.addMaterial')}
+            </Button>
+          </div>
         )}
       </header>
 
@@ -208,12 +234,36 @@ export function InventoryPage() {
         />
       )}
 
+      {formMode.type === 'waste' && (
+        <WasteForm
+          item={formMode.item}
+          inventoryItems={inventory}
+          workOrders={workOrders}
+          onSubmit={async (data) => {
+            await executeWaste(data);
+            setFormMode({ type: 'closed' });
+          }}
+          onCancel={handleCancel}
+        />
+      )}
+
+      {formMode.type === 'audit' && (
+        <AuditLogPanel
+          logs={inventoryLogs}
+          inventoryItems={inventory}
+          workOrders={workOrders}
+          loading={logsLoading}
+          onClose={handleCancel}
+        />
+      )}
+
       <InventoryTable
         items={inventory}
         loading={loading}
         onRowClick={handleRowClick}
         onRestock={handleRestockClick}
         onScoop={handleScoopClick}
+        onWaste={handleWasteClick}
         emptyState={emptyState}
       />
     </div>

@@ -36,6 +36,13 @@
   margin: 0;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex-wrap: wrap;
+}
+
 // ─── Empty State ────────────────────────────
 
 .emptyState {
