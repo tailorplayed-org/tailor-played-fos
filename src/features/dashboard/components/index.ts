@@ -8,3 +8,5 @@ export type { ProjectRowProps } from './ProjectRow';
 export { ProjectList } from './ProjectList';
 export type { ProjectListProps } from './ProjectList';
 export { OsPaturBanner } from './OsPaturBanner';
+export { ForwardProjection } from './ForwardProjection';
+export type { ForwardProjectionProps } from './ForwardProjection';

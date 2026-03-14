@@ -1,0 +1,266 @@
+.projectionPanel {
+  @include card-surface;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $space-lg;
+  margin-block-end: $space-lg;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  color: $gold;
+
+  h2 {
+    font-size: $text-lg;
+    font-weight: $font-semibold;
+    margin: 0;
+  }
+}
+
+.closeButton {
+  @include interactive-reset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  color: $text-muted;
+  transition: background-color $transition-fast, color $transition-fast;
+
+  &:hover {
+    background: $bg-elevated;
+    color: $text-primary;
+  }
+}
+
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $space-sm;
+}
+
+.snapshotItem {
+  @include elevated-surface;
+  padding: $space-md;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-xs;
+  text-align: center;
+}
+
+.snapshotLabel {
+  font-size: $text-xs;
+  color: $text-muted;
+  font-weight: $font-medium;
+}
+
+.snapshotValue {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.locked {
+  color: $text-secondary;
+  opacity: 0.65;
+}
+
+.bufferValue {
+  color: $gold;
+  font-size: $text-base;
+}
+
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+}
+
+.inputLabel {
+  font-size: $text-sm;
+  color: $text-secondary;
+  font-weight: $font-medium;
+}
+
+.inputWrap {
+  display: flex;
+  align-items: center;
+  background: $bg-secondary;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: border-color $transition-fast;
+
+  &:focus-within {
+    border-color: $gold;
+  }
+}
+
+.currencyPrefix {
+  padding-inline-start: $space-md;
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+}
+
+.purchaseInput {
+  flex: 1;
+  padding: $space-md;
+  font-size: $text-lg;
+  font-family: $font-family;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: $text-primary;
+  min-height: 44px;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+  font-size: $text-xs;
+  color: $text-secondary;
+  cursor: pointer;
+
+  svg {
+    color: $text-muted;
+  }
+}
+
+.checkbox {
+  accent-color: $gold;
+  width: 16px;
+  height: 16px;
+}
+
+.result {
+  padding: $space-lg;
+  border-radius: $radius-md;
+  display: flex;
+  flex-direction: column;
+  gap: $space-md;
+}
+
+.assessmentHealthy {
+  background: rgba($success, 0.1);
+  border: 1px solid rgba($success, 0.3);
+}
+
+.assessmentTight {
+  background: rgba($warning, 0.1);
+  border: 1px solid rgba($warning, 0.3);
+}
+
+.assessmentNegative {
+  background: rgba($error, 0.1);
+  border: 1px solid rgba($error, 0.3);
+}
+
+.assessmentHeader {
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.assessmentTitle {
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  margin: 0;
+}
+
+.assessmentHealthy .assessmentHeader {
+  color: $success;
+}
+
+.assessmentTight .assessmentHeader {
+  color: $warning;
+}
+
+.assessmentNegative .assessmentHeader {
+  color: $error;
+}
+
+.resultDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $text-sm;
+  color: $text-secondary;
+  padding-block: $space-xs;
+
+  &:not(:last-child) {
+    border-block-end: 1px solid rgba($border-subtle, 0.3);
+  }
+
+  span:last-child {
+    font-weight: $font-semibold;
+    color: $text-primary;
+  }
+}
+
+.shortfall span:last-child {
+  color: $error;
+}
+
+.resultRow span.negativeAmount {
+  color: $error;
+}
+
+.inventoryNote {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-xs;
+  font-size: $text-xs;
+  color: $text-muted;
+  margin: 0;
+  padding-block-start: $space-xs;
+  border-block-start: 1px solid rgba($border-subtle, 0.3);
+
+  svg {
+    flex-shrink: 0;
+    margin-block-start: 2px;
+  }
+}
+
+@media (max-width: $bp-md) {
+  .snapshotGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: $bp-sm) {
+  .projectionPanel {
+    padding: $space-md;
+    gap: $space-md;
+  }
+
+  .snapshotGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .snapshotItem:last-child {
+    grid-column: 1 / -1;
+  }
+}

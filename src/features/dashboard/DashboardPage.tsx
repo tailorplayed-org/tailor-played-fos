@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import {
@@ -5,16 +6,18 @@ import {
   Briefcase,
   Receipt,
   Tray,
+  ChartLineUp,
 } from '@phosphor-icons/react';
 import { auth } from '@/services';
 import { formatCurrency } from '@/lib';
-import { HeroStat, KpiCard, getDelta, ProjectList, OsPaturBanner } from './components';
+import { HeroStat, KpiCard, getDelta, ProjectList, OsPaturBanner, ForwardProjection } from './components';
 import { useDashboardData } from './hooks';
 import styles from './DashboardPage.module.scss';
 
 export function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [showProjection, setShowProjection] = useState(false);
   const {
     netProfitAgora,
     previousMonthNetProfitAgora,
@@ -25,6 +28,7 @@ export function DashboardPage() {
     pendingReviewCount,
     pendingGreenCount,
     pendingCheckCount,
+    pipelineRevenueAgora,
     osPaturWarning,
     osPaturPercent,
     osPaturThresholdAgora,
@@ -105,6 +109,27 @@ export function DashboardPage() {
           />
         </div>
       </div>
+
+      <div className={loaded ? styles.fadeIn : undefined}>
+        <button
+          className={styles.projectionTrigger}
+          onClick={() => setShowProjection((prev) => !prev)}
+          aria-expanded={showProjection}
+        >
+          <ChartLineUp size={20} weight="bold" />
+          <span>{t('dashboard.projection.triggerLabel')}</span>
+        </button>
+      </div>
+
+      {showProjection && (
+        <ForwardProjection
+          netProfitAgora={netProfitAgora}
+          taxJarAgora={taxJarAgora}
+          monthlyOverheadAgora={monthlyOverheadAgora}
+          pipelineRevenueAgora={pipelineRevenueAgora}
+          onClose={() => setShowProjection(false)}
+        />
+      )}
 
       <div className={loaded ? styles.fadeIn : undefined}>
         <ProjectList workOrders={workOrders} loading={loading} />

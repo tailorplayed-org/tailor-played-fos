@@ -283,6 +283,29 @@
       "advice": "Exceeding the threshold changes your tax obligations significantly.",
       "dismiss": "Dismiss warning"
     },
+    "projection": {
+      "triggerLabel": "Can I afford this?",
+      "title": "Forward Projection",
+      "netProfit": "Net Profit",
+      "taxJar": "Tax Jar (locked)",
+      "overhead": "Monthly Overhead",
+      "buffer": "Available Buffer",
+      "pipeline": "Pipeline Revenue",
+      "inputLabel": "Proposed Purchase",
+      "inputPlaceholder": "Enter amount...",
+      "inventoryPurchase": "Inventory / bulk purchase",
+      "assessment": {
+        "healthy": "You have headroom. Overhead and Tax Jar are covered.",
+        "tight": "Tight — next month's overhead is covered, but limited buffer.",
+        "negative": "This purchase would exceed your available buffer."
+      },
+      "bufferAfter": "Buffer After Purchase",
+      "coverageMonths": "Coverage",
+      "months": "{{count}} months",
+      "shortfall": "Shortfall",
+      "recoveryTime": "Recovery Time",
+      "inventoryNote": "Investment consumed across future projects via Scoops — one-time hit, not recurring."
+    },
     "projectHealth": {
       "title": "Project Health",
       "count": "{{count}} projects",

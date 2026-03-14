@@ -483,4 +483,111 @@ describe('useDashboardData', () => {
     expect(callWithRates).toBeDefined();
     expect(callWithRates![2]).toEqual(customRates);
   });
+
+  // --- Pipeline Revenue (Story 7.4) ---
+
+  it('pipelineRevenueAgora sums unrealized revenue from Production/Shipped WOs', () => {
+    const now = new Date();
+    mockWoStore.workOrders = [
+      {
+        id: 'wo-1', status: 'Production', clientName: 'A', projectDescription: '',
+        deadline: null, revenueTotalAgora: 1_000_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'wo-2', status: 'Shipped', clientName: 'B', projectDescription: '',
+        deadline: null, revenueTotalAgora: 500_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+    ];
+    // No revenue transactions → all is unrealized
+    const { result } = renderHook(() => useDashboardData());
+    expect(result.current.pipelineRevenueAgora).toBe(1_500_000);
+  });
+
+  it('pipelineRevenueAgora subtracts approved Revenue transactions linked to WOs', () => {
+    const now = new Date();
+    mockWoStore.workOrders = [
+      {
+        id: 'wo-1', status: 'Production', clientName: 'A', projectDescription: '',
+        deadline: null, revenueTotalAgora: 1_000_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+    ];
+    mockTxnStore.transactions = [
+      createTransaction({
+        id: 'txn-rev-1', amountAgora: 400_000, category: 'Revenue',
+        workOrderId: 'wo-1', status: 'approved',
+      }),
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    // 1_000_000 - 400_000 = 600_000
+    expect(result.current.pipelineRevenueAgora).toBe(600_000);
+  });
+
+  it('pipelineRevenueAgora returns 0 when no Production/Shipped WOs exist', () => {
+    const now = new Date();
+    mockWoStore.workOrders = [
+      {
+        id: 'wo-1', status: 'Design', clientName: 'A', projectDescription: '',
+        deadline: null, revenueTotalAgora: 500_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'wo-2', status: 'Lead', clientName: 'B', projectDescription: '',
+        deadline: null, revenueTotalAgora: 300_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    expect(result.current.pipelineRevenueAgora).toBe(0);
+  });
+
+  it('pipelineRevenueAgora clamps unrealized to 0 (never negative)', () => {
+    const now = new Date();
+    mockWoStore.workOrders = [
+      {
+        id: 'wo-1', status: 'Production', clientName: 'A', projectDescription: '',
+        deadline: null, revenueTotalAgora: 200_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+    ];
+    mockTxnStore.transactions = [
+      createTransaction({
+        id: 'txn-rev-1', amountAgora: 500_000, category: 'Revenue',
+        workOrderId: 'wo-1', status: 'approved',
+      }),
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    // Max(0, 200_000 - 500_000) = 0
+    expect(result.current.pipelineRevenueAgora).toBe(0);
+  });
+
+  it('pipelineRevenueAgora ignores Lead and Design status WOs', () => {
+    const now = new Date();
+    mockWoStore.workOrders = [
+      {
+        id: 'wo-1', status: 'Lead', clientName: 'A', projectDescription: '',
+        deadline: null, revenueTotalAgora: 1_000_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'wo-2', status: 'Design', clientName: 'B', projectDescription: '',
+        deadline: null, revenueTotalAgora: 500_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'wo-3', status: 'Production', clientName: 'C', projectDescription: '',
+        deadline: null, revenueTotalAgora: 300_000, directCostAgora: 0,
+        inventoryCostAgora: 0, overheadAllocationAgora: 0, createdAt: now, updatedAt: now,
+      },
+    ];
+
+    const { result } = renderHook(() => useDashboardData());
+    // Only wo-3 (Production, 300k) counted
+    expect(result.current.pipelineRevenueAgora).toBe(300_000);
+  });
 });

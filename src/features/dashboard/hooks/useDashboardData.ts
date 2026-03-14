@@ -126,6 +126,18 @@ export function useDashboardData() {
     ).length;
     const pendingCheckCount = pendingReview.length - pendingGreenCount;
 
+    // Pipeline Revenue — unrealized revenue from Production + Shipped work orders
+    const pipelineWorkOrders = woStore.workOrders.filter(
+      (wo) => wo.status === 'Production' || wo.status === 'Shipped',
+    );
+    const pipelineRevenueAgora = pipelineWorkOrders.reduce((sum, wo) => {
+      const realizedRevenue = approved
+        .filter((t) => t.category === 'Revenue' && t.workOrderId === wo.id)
+        .reduce((s, t) => s + toIlsAgora(t.amountAgora, t.currency, rates), 0);
+      const unrealized = Math.max(0, wo.revenueTotalAgora - realizedRevenue);
+      return sum + unrealized;
+    }, 0);
+
     // Osek Patur threshold alert — warn at configurable % of annual threshold
     const threshold = configStore.config?.osPaturThresholdAgora ?? 12_000_000;
     const alertPercent = configStore.config?.osPaturAlertPercent ?? 0.80;
@@ -144,6 +156,7 @@ export function useDashboardData() {
       pendingReviewCount: pendingReview.length,
       pendingGreenCount,
       pendingCheckCount,
+      pipelineRevenueAgora,
       osPaturWarning,
       osPaturPercent,
       osPaturThresholdAgora: threshold,

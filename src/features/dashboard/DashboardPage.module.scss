@@ -17,6 +17,38 @@
   gap: $space-md;
 }
 
+.projectionTrigger {
+  @include interactive-reset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-sm;
+  width: 100%;
+  padding: $space-md $space-lg;
+  background: $bg-secondary;
+  border: 1px dashed rgba($gold, 0.3);
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  font-family: $font-family;
+  transition: background-color $transition-fast, color $transition-fast, border-color $transition-fast;
+  min-height: 44px;
+
+  &:hover {
+    background: $bg-tertiary;
+    color: $gold;
+    border-color: rgba($gold, 0.5);
+  }
+
+  &[aria-expanded="true"] {
+    background: $bg-tertiary;
+    color: $gold;
+    border-color: $gold;
+    border-style: solid;
+  }
+}
+
 @media (max-width: $bp-md) {
   .page {
     padding: $space-md;

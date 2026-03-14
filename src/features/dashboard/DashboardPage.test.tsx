@@ -14,6 +14,10 @@ vi.mock('@phosphor-icons/react', () => {
     Briefcase: iconStub('Briefcase'),
     Receipt: iconStub('Receipt'),
     Tray: iconStub('Tray'),
+    ChartLineUp: iconStub('ChartLineUp'),
+    // ForwardProjection
+    Calculator: iconStub('Calculator'),
+    Package: iconStub('Package'),
     // Toast component
     CheckCircle: iconStub('CheckCircle'),
     XCircle: iconStub('XCircle'),
@@ -49,6 +53,7 @@ vi.mock('@/lib', () => ({
   calculateTaxReserve: (net: number, _method: string, rate: number) =>
     Math.round(net * rate),
   toIlsAgora: (amount: number) => amount,
+  toMinorUnits: (amount: number) => Math.round(amount * 100),
   calculateMargin: (revenue: number, cost: number) => {
     if (revenue === 0) return 0;
     return ((revenue - cost) / revenue) * 100;
@@ -58,6 +63,21 @@ vi.mock('@/lib', () => ({
     if (margin >= 20) return 'watch';
     return 'danger';
   },
+  buildFinancialSnapshot: (net: number, tax: number, oh: number, pipe: number) => ({
+    netProfitAgora: net,
+    taxJarAgora: tax,
+    monthlyOverheadAgora: oh,
+    availableBufferAgora: net - (net > 0 ? tax : 0) - oh,
+    pipelineRevenueAgora: pipe,
+  }),
+  calculateProjection: () => ({
+    assessment: 'healthy',
+    bufferAfterPurchaseAgora: 100_000,
+    monthlyCoverageMonths: 3,
+    monthsUntilAbsorbed: 1,
+    shortfallAgora: 0,
+    isInventoryPurchase: false,
+  }),
 }));
 
 // Mock navigate
@@ -78,6 +98,7 @@ const mockDashboardData = {
   pendingReviewCount: 5,
   pendingGreenCount: 3,
   pendingCheckCount: 2,
+  pipelineRevenueAgora: 1_400_000,
   osPaturWarning: false,
   osPaturPercent: 40,
   osPaturThresholdAgora: 12_000_000,
@@ -135,6 +156,7 @@ describe('DashboardPage', () => {
       pendingReviewCount: 5,
       pendingGreenCount: 3,
       pendingCheckCount: 2,
+      pipelineRevenueAgora: 1_400_000,
       osPaturWarning: false,
       osPaturPercent: 40,
       osPaturThresholdAgora: 12_000_000,
@@ -312,8 +334,8 @@ describe('DashboardPage', () => {
     mockDashboardData.loaded = true;
     const { container } = render(<DashboardPage />);
     const fadeInElements = container.querySelectorAll('.fadeIn');
-    // 3 fadeIn wrappers: HeroStat, KPI row, ProjectList
-    expect(fadeInElements.length).toBe(3);
+    // 4 fadeIn wrappers: HeroStat, KPI row, Projection trigger, ProjectList
+    expect(fadeInElements.length).toBe(4);
   });
 
   it('does not apply fadeIn class when loaded is false', () => {
@@ -350,5 +372,45 @@ describe('DashboardPage', () => {
     });
     render(<DashboardPage />);
     expect(screen.getByText(/92/)).toBeInTheDocument();
+  });
+
+  // --- Forward Projection (Story 7.4) ---
+
+  it('renders projection trigger button', () => {
+    render(<DashboardPage />);
+    expect(screen.getByText('dashboard.projection.triggerLabel')).toBeInTheDocument();
+    expect(screen.getByTestId('icon-ChartLineUp')).toBeInTheDocument();
+  });
+
+  it('clicking trigger button shows ForwardProjection panel', () => {
+    render(<DashboardPage />);
+    expect(screen.queryByTestId('forward-projection')).not.toBeInTheDocument();
+    const trigger = screen.getByText('dashboard.projection.triggerLabel').closest('button')!;
+    fireEvent.click(trigger);
+    expect(screen.getByTestId('forward-projection')).toBeInTheDocument();
+  });
+
+  it('clicking close in ForwardProjection hides the panel', () => {
+    render(<DashboardPage />);
+    const trigger = screen.getByText('dashboard.projection.triggerLabel').closest('button')!;
+    fireEvent.click(trigger);
+    expect(screen.getByTestId('forward-projection')).toBeInTheDocument();
+
+    const closeButton = screen.getByLabelText('actions.cancel');
+    fireEvent.click(closeButton);
+    expect(screen.queryByTestId('forward-projection')).not.toBeInTheDocument();
+  });
+
+  it('trigger button has aria-expanded attribute', () => {
+    render(<DashboardPage />);
+    const trigger = screen.getByText('dashboard.projection.triggerLabel').closest('button')!;
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('ForwardProjection is not rendered by default', () => {
+    render(<DashboardPage />);
+    expect(screen.queryByTestId('forward-projection')).not.toBeInTheDocument();
   });
 });
