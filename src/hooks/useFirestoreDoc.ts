@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/services';
 import type { ZodSchema } from 'zod';
@@ -45,7 +45,9 @@ export function useFirestoreDoc<T>(
     onError: (error: string) => void;
     onLoading: (loading: boolean) => void;
   }
-) {
+): { parseErrors: number } {
+  const [parseErrors, setParseErrors] = useState(0);
+
   // Use ref to always access latest callbacks without re-subscribing
   const callbacksRef = useRef(callbacks);
   useEffect(() => {
@@ -67,8 +69,10 @@ export function useFirestoreDoc<T>(
         const converted = convertTimestamps(raw);
         const result = schema.safeParse(converted);
         if (result.success) {
+          setParseErrors(0);
           callbacksRef.current.onData(result.data);
         } else {
+          setParseErrors(1);
           console.warn(`[useFirestoreDoc] Failed to parse ${collectionName}/${docId}:`, result.error);
           callbacksRef.current.onError('Invalid document format');
         }
@@ -80,4 +84,6 @@ export function useFirestoreDoc<T>(
     );
     return () => unsubscribe();
   }, [collectionName, docId, schema]);
+
+  return { parseErrors };
 }

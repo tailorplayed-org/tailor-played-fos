@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '@/services';
 import type { ZodSchema } from 'zod';
@@ -44,7 +44,9 @@ export function useFirestoreCollection<T>(
     onError: (error: string) => void;
     onLoading: (loading: boolean) => void;
   }
-) {
+): { parseErrors: number } {
+  const [parseErrors, setParseErrors] = useState(0);
+
   // Use ref to always access latest callbacks without re-subscribing
   const callbacksRef = useRef(callbacks);
   useEffect(() => {
@@ -58,6 +60,7 @@ export function useFirestoreCollection<T>(
       q,
       (snapshot) => {
         const items: T[] = [];
+        let failed = 0;
         snapshot.forEach((doc) => {
           const raw = doc.data({ serverTimestamps: 'estimate' });
           const converted = {
@@ -68,9 +71,11 @@ export function useFirestoreCollection<T>(
           if (result.success) {
             items.push(result.data);
           } else {
+            failed++;
             console.warn(`[useFirestoreCollection] Failed to parse document ${doc.id}:`, result.error);
           }
         });
+        setParseErrors(failed);
         callbacksRef.current.onData(items);
         callbacksRef.current.onLoading(false);
       },
@@ -83,4 +88,6 @@ export function useFirestoreCollection<T>(
 
     return () => unsubscribe();
   }, [collectionName, schema]);
+
+  return { parseErrors };
 }
