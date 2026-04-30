@@ -28,19 +28,20 @@ export const transactionSchema = z.object({
   aiConfidence: z.number().nullable(),
   originalFileUrl: z.string().nullable(),
   source: z.enum(TRANSACTION_SOURCES),
-  sourceEmailRef: z.string().nullable(),
+  sourceEmailRef: z.string().nullable().default(null),
   notes: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 
   // --- NEW classification + conversion fields (Story 4.4) ---
-  suggestedWorkOrderId: z.string().nullable(), // AI suggestion — user confirms in Ghost Text (Epic 5)
-  suggestedInventoryItemId: z.string().nullable(), // AI suggestion for restock items
-  classificationReasoning: z.string().nullable(), // AI reasoning for category/project match
-  isEstimatedConversion: z.boolean(), // true for non-ILS currencies
-  conversionRate: z.number().nullable(), // Rate used (e.g., 3.5 for USD→ILS)
-  conversionRateDate: z.string().nullable(), // ISO date when rate was recorded
-  conversionRateStale: z.boolean(), // true when using fallback/stale conversion rates (Story 4.5)
+  // Defaults absorb pre-Story-4.4 documents that lack these keys entirely.
+  suggestedWorkOrderId: z.string().nullable().default(null),
+  suggestedInventoryItemId: z.string().nullable().default(null),
+  classificationReasoning: z.string().nullable().default(null),
+  isEstimatedConversion: z.boolean().default(false),
+  conversionRate: z.number().nullable().default(null),
+  conversionRateDate: z.string().nullable().default(null),
+  conversionRateStale: z.boolean().default(false),
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
