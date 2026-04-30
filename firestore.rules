@@ -1,11 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Admin: @tailorplayed.com domain or specific external accounts
     function isAdmin() {
-      return request.auth != null && request.auth.uid in ['MKeVSMwPzAVSUg8VGy9EG2L72ha2', '3lO30cF0OtNBsfTiNWZ35YqdI7l2'];
+      return request.auth != null
+        && (request.auth.token.email.matches('.*@tailorplayed\\.com$')
+            || request.auth.token.email == 'dartaryan@gmail.com');
     }
+
+    // ============================================================
+    // Submission app (existing — preserved verbatim from deployed)
+    // ============================================================
+    match /submissions/{submissionId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+      match /{subDoc=**} {
+        allow read, update, delete: if isAdmin();
+      }
+    }
+    match /counters/{counterId} {
+      allow read, write: if true;
+      // Note: public read/write — production hardening flagged in original rules
+    }
+    match /progress_saves/{saveId} {
+      allow create: if true;
+      allow read: if false;
+      allow update, delete: if false;
+    }
+    match /rate_limits/{limitId} {
+      allow read, write: if false;
+    }
+
+    // ============================================================
+    // FOS app — admin-only on Rocky's 8 allowlisted collections
+    // ============================================================
+    match /transactions/{doc=**}   { allow read, write: if isAdmin(); }
+    match /work_orders/{doc=**}    { allow read, write: if isAdmin(); }
+    match /inventory/{doc=**}      { allow read, write: if isAdmin(); }
+    match /inventory_log/{doc=**}  { allow read, write: if isAdmin(); }
+    match /overhead/{doc=**}       { allow read, write: if isAdmin(); }
+    match /email_log/{doc=**}      { allow read, write: if isAdmin(); }
+    match /audit_log/{doc=**}      { allow read, write: if isAdmin(); }
+    match /system_config/{doc=**}  { allow read, write: if isAdmin(); }
+
+    // Default deny
     match /{document=**} {
-      allow read, write: if isAdmin();
+      allow read, write: if false;
     }
   }
 }

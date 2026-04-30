@@ -81,3 +81,12 @@ functions/          # Firebase Cloud Functions (separate package)
 - **SCSS Modules**: All component styles use `.module.scss` — no CSS-in-JS, no Tailwind
 - **Modular Firebase SDK**: Tree-shakeable imports only — never use compat API
 - **Co-located tests**: Test files live next to source files (`Component.test.tsx`)
+
+## Firestore Rules
+
+The Firebase project `tailor-played` is **shared** between this repo (FOS) and a separate public submission/questionnaire app. Both apps' rules live in a single Firestore ruleset.
+
+- **`firestore.rules` in this repo is the SINGLE SOURCE OF TRUTH for the deployed ruleset.** It contains rules for both FOS collections (`work_orders`, `transactions`, `inventory`, `inventory_log`, `overhead`, `email_log`, `audit_log`, `system_config`) **and** the submission app's collections (`submissions`, `counters`, `progress_saves`, `rate_limits`).
+- **Anyone editing this file must preserve both sections.** Removing the submission-app blocks will break the public questionnaire; removing the FOS blocks will break this dashboard.
+- **Deploy ONLY from this repo:** `firebase deploy --only firestore:rules --project tailor-played`. The submission app's repo must **not** run `firebase deploy --only firestore:rules` — doing so will overwrite the merged ruleset and break whichever app's collections it omits.
+- If the submission app's rules need to change, update them here in this repo and deploy from here.
