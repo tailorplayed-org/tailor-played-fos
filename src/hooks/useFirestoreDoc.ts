@@ -3,9 +3,13 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/services';
 import type { ZodSchema } from 'zod';
 
+// Match ISO 8601 datetimes like "2026-04-30T00:00:00.000Z" so MCP-written
+// docs that store dates as strings convert to Date alongside real Timestamps.
+const ISO_DATETIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/;
+
 /**
  * Convert any Firestore Timestamp-like values to JS Date objects.
- * Detects timestamps by checking for a `.toDate()` method.
+ * Recognizes Firestore Timestamps (via .toDate()) and ISO 8601 datetime strings.
  */
 function convertTimestamps(data: Record<string, unknown>): Record<string, unknown> {
   const converted: Record<string, unknown> = {};
@@ -17,6 +21,9 @@ function convertTimestamps(data: Record<string, unknown>): Record<string, unknow
       typeof (value as { toDate: unknown }).toDate === 'function'
     ) {
       converted[key] = (value as { toDate: () => Date }).toDate();
+    } else if (typeof value === 'string' && ISO_DATETIME_RE.test(value)) {
+      const parsed = new Date(value);
+      converted[key] = Number.isNaN(parsed.getTime()) ? value : parsed;
     } else {
       converted[key] = value;
     }
