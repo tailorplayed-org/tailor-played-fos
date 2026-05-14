@@ -47,6 +47,8 @@ const CATEGORY_KEYS: Record<TransactionCategory, string> = {
   Overhead: 'transactions.category.Overhead',
   Revenue: 'transactions.category.Revenue',
   Personal: 'transactions.category.Personal',
+  OwnerContribution: 'transactions.category.OwnerContribution',
+  OwnerWithdrawal: 'transactions.category.OwnerWithdrawal',
 };
 
 export function GhostTextCard({

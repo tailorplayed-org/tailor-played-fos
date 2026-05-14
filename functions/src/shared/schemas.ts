@@ -42,6 +42,8 @@ export const TRANSACTION_CATEGORIES = [
   'Overhead',
   'Revenue',
   'Personal',
+  'OwnerContribution',
+  'OwnerWithdrawal',
 ] as const;
 
 export const TRANSACTION_STATUSES = ['pending_review', 'approved', 'rejected'] as const;
