@@ -151,7 +151,9 @@
       "InventoryRestock": "חידוש מלאי",
       "Overhead": "תקורה",
       "Revenue": "הכנסה",
-      "Personal": "אישי"
+      "Personal": "אישי",
+      "OwnerContribution": "השקעת בעלים",
+      "OwnerWithdrawal": "משיכת בעלים"
     },
     "toast": {
       "created": "העסקה נשמרה",

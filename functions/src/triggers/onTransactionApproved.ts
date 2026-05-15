@@ -55,7 +55,7 @@ async function updateWorkOrderTotals(
 ): Promise<void> {
   // Check category maps to a WO field BEFORE any Firestore read
   const field = WO_FIELD_MAP[category];
-  if (!field) return; // Overhead, Personal — no WO update
+  if (!field) return; // Overhead, Personal, OwnerContribution, OwnerWithdrawal — no WO update
 
   const woRef = db.collection('work_orders').doc(workOrderId);
 

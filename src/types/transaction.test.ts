@@ -56,6 +56,20 @@ describe('transactionSchema', () => {
     }
   });
 
+  it('accepts the new owner equity categories', () => {
+    const contrib = transactionSchema.parse({
+      ...validTransaction,
+      category: 'OwnerContribution',
+    });
+    expect(contrib.category).toBe('OwnerContribution');
+
+    const withdraw = transactionSchema.parse({
+      ...validTransaction,
+      category: 'OwnerWithdrawal',
+    });
+    expect(withdraw.category).toBe('OwnerWithdrawal');
+  });
+
   it('rejects invalid category', () => {
     const invalid = { ...validTransaction, category: 'InvalidCategory' };
     expect(() => transactionSchema.parse(invalid)).toThrow();

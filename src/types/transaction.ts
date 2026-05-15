@@ -6,6 +6,8 @@ export const TRANSACTION_CATEGORIES = [
   'Overhead',
   'Revenue',
   'Personal',
+  'OwnerContribution',
+  'OwnerWithdrawal',
 ] as const;
 export type TransactionCategory = (typeof TRANSACTION_CATEGORIES)[number];
 

@@ -151,7 +151,9 @@
       "InventoryRestock": "Inventory Restock",
       "Overhead": "Overhead",
       "Revenue": "Revenue",
-      "Personal": "Personal"
+      "Personal": "Personal",
+      "OwnerContribution": "Owner Contribution",
+      "OwnerWithdrawal": "Owner Withdrawal"
     },
     "toast": {
       "created": "Transaction saved",

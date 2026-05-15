@@ -37,7 +37,7 @@ const mockTxnStore = {
     amountAgora: number;
     currency: 'ILS' | 'USD' | 'EUR';
     date: Date;
-    category: 'Revenue' | 'DirectCost' | 'Overhead' | 'InventoryRestock' | 'Personal';
+    category: 'Revenue' | 'DirectCost' | 'Overhead' | 'InventoryRestock' | 'Personal' | 'OwnerContribution' | 'OwnerWithdrawal';
     workOrderId: string | null;
     inventoryItemId: string | null;
     status: 'approved' | 'pending_review' | 'rejected';

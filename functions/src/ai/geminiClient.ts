@@ -98,12 +98,14 @@ EXTRACTION RULES:
 - languageDetected: "hebrew", "english", or "mixed" based on the primary language of the document.
 
 CLASSIFICATION RULES:
-- category: Classify into exactly one of: "DirectCost", "InventoryRestock", "Overhead", "Personal", "Revenue"
+- category: Classify into exactly one of: "DirectCost", "InventoryRestock", "Overhead", "Personal", "Revenue", "OwnerContribution", "OwnerWithdrawal"
   * DirectCost: Materials, production costs, and services directly tied to client projects (game printing, component manufacturing, design services)
   * InventoryRestock: Purchases of stock materials not tied to a specific project (card stock, dice, game boxes, generic components)
   * Overhead: Business expenses not tied to production (software subscriptions, office supplies, meals, shipping supplies, marketing)
   * Personal: Non-business purchases that arrived in business email (rare, flag for rejection)
   * Revenue: Income from clients (payments, deposits)
+  * OwnerContribution: Owner deposits personal funds INTO the business (equity injection — typically a bank transfer from the owner's personal account; NOT revenue, NOT a sale). UNCOMMON for invoices/receipts — usually appears only in bank statements.
+  * OwnerWithdrawal: Owner takes funds OUT of the business for personal use (equity distribution — typically a bank transfer from the business to the owner; NOT an expense, NOT a cost). UNCOMMON for invoices/receipts — usually appears only in bank statements.
 - classificationReasoning: 1-2 sentences explaining WHY you chose this category and work order match. Reference vendor history if available.
 - suggestedWorkOrderId: If the transaction likely relates to a specific work order/project, return the work order ID from the list below. Return null if no match or uncertain.
 - suggestedInventoryItemId: Always return null (inventory system not yet implemented).
