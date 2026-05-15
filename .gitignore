@@ -190,3 +190,6 @@ coverage/
 
 #bmad stuff
 _bmad/
+
+# Local recon / scratch outputs
+user-data/rocky-recon-output.md
