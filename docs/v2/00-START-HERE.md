@@ -23,7 +23,8 @@ deliberately parked for a later phase; order first.
 | 4 | `04-gap-analysis.md` | The 9 gaps in 4 build waves — the seed for the v2 PRD/epics. |
 | 5 | `05-ui-spec.md` | The design language, tokens, per-view spec, charts spec. |
 | 6 | `06-external-contracts.md` | Contracts outside this repo that v2 MUST NOT break. |
-| 7 | `mockup/fos-mockup.html` | The approved visual reference — open it in a browser. It is the UI spec made tangible. |
+| 7 | `07-system-map.md` | The whole ecosystem on one page: every component, its status, the end-to-end flow, and the open cross-system loops. |
+| 8 | `mockup/fos-mockup.html` | The approved visual reference — open it in a browser. It is the UI spec made tangible. |
 
 ## Governing rules (non-negotiable)
 
