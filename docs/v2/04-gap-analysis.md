@@ -55,7 +55,14 @@
   archives; Tier-1 has no archive instruction); (b) domain emission; (c) **content-fingerprint
   dedup** (vendor+amount+date → `triage/duplicate`) — the May-18 incident proves messageId alone is
   insufficient; (d) then create the weekly `dumbbell-deliver` scheduled task (its own gate — "not
-  until the FOS vocabulary migration lands" — is satisfied after Gap 1).
+  until the FOS vocabulary migration lands" — is satisfied after Gap 1); (e) **absorb the frozen
+  Secretary finance rules** into Dumbbell's classification guidance — Secretary (the mail-transport
+  agent) froze 7 vendor rules under its constitution, marked `migrated: pending`, whose logic now
+  belongs to Dumbbell: Shiptanbul → `production`; hebrew-ai (Stripe), TTD (Stripe), Anthropic
+  receipts, ElevenLabs (Stripe) → `developing`. When they are encoded in Dumbbell, notify Secretary
+  to flip them to `migrated: done` (they live in its `state/rules/vendor-rules.json`); (f) resolve
+  the 3 duplicate receipt pairs quarantined under `triage/duplicate` in developing@ (Anthropic
+  #2819, #2948, Google Cloud 01F7E0) — Dumbbell's to decide, per the ratified territory split.
 - **Where:** repo `tailorplayed-dumbbell` — `knowledge/vocabulary-contract.md`, the three SKILL.md
   files, the Cowork scheduled task. Also: investigate why classify's daily summaries never landed
   in the runtime `output/` folder despite ~330 scratch files.

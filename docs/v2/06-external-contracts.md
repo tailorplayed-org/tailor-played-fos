@@ -60,16 +60,24 @@ system_config`; every write requires `actor` + `idempotency_key` and lands atomi
 
 ## 4. Secretary (email transport agent — Ben's mail-triage system)
 
-Constitution ratified 2026-07-02. Division of territory:
+Constitution ratified 2026-07-02 — **and adopted + fully executed by Secretary the same day**
+(its debt schedule ran: accounts registry, register-mode unification, audit wiring, finance-rule
+freeze, rule-offer machinery, transport ledger, DB backfill; taxonomy now v2.1.0). Division of
+territory, now operative law:
 
 - **Secretary owns TRANSPORT**: getting every receipt from every mailbox TO developing@ (filters +
-  manual-forward flags + transport-time fingerprint dedup) and tagging `Money/*` on source boxes.
-- **Dumbbell is the sole classification authority inside developing@.** Secretary never coins or
-  applies the finance vocabulary; its historical finance vendor-rules are frozen pending migration
-  into the finance pipeline's authority.
-- **Register-mode everywhere**: every handled mail archives; `Action/*` labels are the worklist;
-  inbox = true zero (this is the same Ben decision that adds the archive rule to Dumbbell in Gap 4).
+  manual-forward flags) and tagging `Money/*` on source boxes. A **transport ledger** is live
+  (fingerprint priority: rfc Message-ID → vendor+doc_number → vendor+amount+date; insert-or-refuse)
+  — duplicate forwards into developing@ are now structurally blocked on the transport side.
+- **developing@ is READ-ONLY for Secretary.** Dumbbell is the sole classification authority there.
+  Secretary's 7 historical finance vendor-rules are frozen (`migrated: pending`) — their logic must
+  be absorbed into Dumbbell (Gap 4e), after which Secretary flips them to `done`.
+- **Register-mode everywhere**: every handled mail archives at apply, including open `Action/*`
+  items; the `Action/*` labels + open-actions registers are the worklist; inbox = true zero.
 - Secretary never extracts amounts, never writes to FOS, never forwards to the accountant.
+- Interop detail: Dumbbell's guard labels on developing@ are recorded in Secretary's account
+  registry as foreign labels (`dumbbell-processed`=Label_34, `dumbbell-forwarded`=35,
+  `dumbbell-delivered`=36) — Dumbbell may rely on them being left untouched.
 
 ## 5. Rocky (conversational layer — returns in Wave 4)
 
