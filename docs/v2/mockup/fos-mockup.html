@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOS — הדמיית חזון (נתוני דוגמה)</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --border:#ececec; --border-strong:#dfe3e8;
+    --text:#1d1d1f; --text-2:#5f6570; --text-3:#9aa0a8;
+    --accent:#0e9f9a; --accent-soft:#e6f5f4; --accent-border:#bfe6e4;
+    --income:#1e8e5a; --income-soft:#e9f6ef;
+    --expense:#b4552d; --expense-soft:#faf0ea;
+    --owner:#6b5bd2; --owner-soft:#efedfa;
+    --ghost:#8b93a0;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(20,24,32,.05), 0 4px 14px rgba(20,24,32,.04);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Rubik","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:var(--bg); color:var(--text);
+    font-size:13px; line-height:1.45;
+  }
+  .frame{max-width:1180px; margin:0 auto; padding:18px 20px 60px;}
+
+  /* header */
+  .top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;}
+  .brand{display:flex; align-items:baseline; gap:10px;}
+  .brand h1{font-size:17px; font-weight:600; letter-spacing:.2px;}
+  .brand .tag{font-size:11px; color:var(--text-3); border:1px solid var(--border-strong); border-radius:999px; padding:2px 9px; background:var(--surface);}
+  .month-picker{display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border-strong); border-radius:8px; padding:4px 6px;}
+  .month-picker button{border:0; background:transparent; cursor:pointer; font:inherit; color:var(--text-2); padding:2px 7px; border-radius:6px;}
+  .month-picker button:hover{background:var(--accent-soft); color:var(--accent);}
+  .month-picker .cur{font-weight:600; min-width:86px; text-align:center;}
+
+  /* tabs */
+  nav.tabs{display:flex; gap:4px; border-bottom:1px solid var(--border-strong); margin-bottom:16px; flex-wrap:wrap;}
+  nav.tabs a{
+    text-decoration:none; color:var(--text-2); font-size:13px; padding:8px 14px;
+    border-radius:8px 8px 0 0; border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  nav.tabs a.active{color:var(--accent); border-bottom-color:var(--accent); font-weight:600; background:linear-gradient(180deg,transparent,rgba(14,159,154,.05));}
+  nav.tabs a:hover{color:var(--accent);}
+
+  section.view{display:none;}
+  section.view.active{display:block;}
+
+  /* cards & layout */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-bottom:14px;}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:11px 14px;}
+  .card .k{font-size:11px; color:var(--text-2); margin-bottom:3px;}
+  .card .v{font-size:19px; font-weight:600; letter-spacing:.2px;}
+  .card .s{font-size:11px; color:var(--text-3); margin-top:2px;}
+  .v.pos{color:var(--income);} .v.neg{color:var(--expense);} .v.ghosty{color:var(--ghost);}
+
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:16px;}
+  .panel > h2{font-size:13px; font-weight:600; padding:10px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; justify-content:space-between;}
+  .panel .note{font-size:11px; color:var(--text-3); font-weight:400;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th{font-size:11px; font-weight:500; color:var(--text-2); text-align:right; padding:7px 12px; border-bottom:1px solid var(--border-strong); background:#fbfbfc; white-space:nowrap;}
+  td{padding:6px 12px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  tr:last-child td{border-bottom:0;}
+  td.num, th.num{font-variant-numeric:tabular-nums; direction:ltr; text-align:left; white-space:nowrap;}
+  .in{color:var(--income); font-weight:500;}
+  .out{color:var(--expense);}
+  .muted{color:var(--text-3);}
+  tr.ghost td{color:var(--ghost); background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(139,147,160,.05) 6px,rgba(139,147,160,.05) 12px);}
+  tr.ghost td .chip{opacity:.75;}
+  tr.total td{font-weight:600; background:#fbfbfc; border-top:1px solid var(--border-strong);}
+
+  .chip{display:inline-block; font-size:10.5px; border-radius:999px; padding:1px 8px; border:1px solid transparent; white-space:nowrap;}
+  .chip.tp{background:#f3ecfd; color:#5b2ea6; border-color:#e2d3f7;}
+  .chip.bn{background:#fff6e0; color:#8a6400; border-color:#f1e3b3;}
+  .chip.sh{background:var(--accent-soft); color:var(--accent); border-color:var(--accent-border);}
+  .chip.ow{background:var(--owner-soft); color:var(--owner); border-color:#dcd6f5;}
+  .chip.bank{background:#eef2f6; color:#44505e; border-color:#dbe2ea;}
+  .chip.credit{background:#fdeef3; color:#a53963; border-color:#f5d3e0;}
+  .chip.exp{background:#f1f2f4; color:var(--ghost); border-color:#e0e3e8; border-style:dashed;}
+  .chip.landed{background:var(--income-soft); color:var(--income); border-color:#cdebdb;}
+  .chip.cat{background:#f6f6f8; color:var(--text-2); border-color:var(--border-strong); font-family:ui-monospace,Consolas,monospace; font-size:10px;}
+  .chip.conf-hi{background:var(--income-soft); color:var(--income);}
+  .chip.conf-md{background:#fff6e0; color:#8a6400;}
+
+  .filters{display:flex; gap:6px; padding:9px 12px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+  .filters button{font:inherit; font-size:12px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-2); border-radius:999px; padding:3px 12px; cursor:pointer;}
+  .filters button.on{background:var(--accent-soft); color:var(--accent); border-color:var(--accent-border); font-weight:600;}
+
+  /* review cards */
+  .review-list{display:flex; flex-direction:column;}
+  .rev{display:grid; grid-template-columns:1fr auto; gap:6px 14px; padding:10px 14px; border-bottom:1px solid var(--border);}
+  .rev:last-child{border-bottom:0;}
+  .rev .line1{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .rev .vendor{font-weight:600;}
+  .rev .reason{font-size:11.5px; color:var(--text-3); max-width:640px;}
+  .rev .amount{font-size:15px; font-weight:600; text-align:left; direction:ltr;}
+  .rev .actions{display:flex; gap:6px; align-items:center; justify-content:flex-end;}
+  .rev select{font:inherit; font-size:11.5px; border:1px dashed var(--border-strong); border-radius:6px; padding:2px 6px; color:var(--text-2); background:#fcfcfd;}
+  .btn{font:inherit; font-size:12px; border-radius:7px; padding:4px 12px; cursor:pointer; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-2);}
+  .btn.ok{background:var(--income-soft); color:var(--income); border-color:#cdebdb;}
+  .btn.no{background:var(--expense-soft); color:var(--expense); border-color:#f0d8cb;}
+  .rev.done{opacity:.45;}
+  .rev .verdict{font-size:11px; font-weight:600;}
+
+  /* domains */
+  .dom-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin-bottom:16px;}
+  .dom{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:12px 14px;}
+  .dom h3{font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
+  .dom .row{display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0;}
+  .dom .row .num{font-variant-numeric:tabular-nums; direction:ltr;}
+  .dom .net{border-top:1px solid var(--border); margin-top:6px; padding-top:6px; font-weight:600;}
+  .bar{height:5px; border-radius:3px; background:#f0f1f3; margin-top:9px; overflow:hidden; display:flex;}
+  .bar i{display:block; height:100%;}
+
+  .legend{font-size:11px; color:var(--text-3); padding:8px 14px; border-top:1px dashed var(--border-strong); background:#fcfcfd;}
+  .footer-note{margin-top:22px; font-size:11px; color:var(--text-3); text-align:center;}
+  .usd{font-size:10.5px; color:var(--text-3); direction:ltr; display:inline-block; margin-inline-start:4px;}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="top">
+    <div class="brand">
+      <h1>FOS</h1>
+      <span class="tag">הדמיית חזון · נתוני דוגמה בלבד</span>
+    </div>
+    <div class="month-picker" id="monthPicker">
+      <button id="mPrev" aria-label="חודש קודם">‹</button>
+      <span class="cur" id="mCur">יולי 2026</span>
+      <button id="mNext" aria-label="חודש הבא">›</button>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <a href="#v-cash" data-v="v-cash">תזרים</a>
+    <a href="#v-pnl" data-v="v-pnl">חודש מול חודש</a>
+    <a href="#v-review" data-v="v-review">Review</a>
+    <a href="#v-expected" data-v="v-expected">צפויים</a>
+    <a href="#v-domains" data-v="v-domains">דומיינים</a>
+  </nav>
+
+  <!-- ======================= תזרים ======================= -->
+  <section class="view" id="v-cash">
+    <div class="cards" id="cashCards"></div>
+    <div class="panel">
+      <h2>רישום יומי — יתרה רצה <span class="note">הכנסה נספרת כשנחתה בחשבון · הוצאה בחודש שבוצעה · שורות מקווקוות = צפוי (לא נספר ביתרה)</span></h2>
+      <table id="cashTable">
+        <thead><tr>
+          <th>תאריך</th><th>פרטים</th><th>דומיין</th><th>ערוץ</th>
+          <th class="num">תקבול</th><th class="num">תשלום</th><th class="num">יתרה</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="legend">יתרת פתיחה 1.7: ‏₪18,420 · תנועות אשראי מסומנות בנפרד — הן נספרות בחודש הביצוע גם אם החיוב בבנק ירד בחודש הבא.</div>
+    </div>
+  </section>
+
+  <!-- ======================= חודש מול חודש ======================= -->
+  <section class="view" id="v-pnl">
+    <div class="panel">
+      <div class="filters" id="pnlFilters">
+        <button data-d="all" class="on">הכל</button>
+        <button data-d="tp">TailorPlayed</button>
+        <button data-d="bn">Benefits</button>
+        <button data-d="sh">משותף</button>
+        <button data-d="ow">בעלים</button>
+      </div>
+      <table id="pnlTable">
+        <thead><tr>
+          <th>שורה</th><th class="num">מאי 2026</th><th class="num">יוני 2026</th><th class="num">יולי 2026</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="legend">מבנה לפי חוברת הקורס: הכנסה ← עלות המכר ← רווח גולמי ← הוצאות תפעול ← נשאר. גרסת עוסק פטור (ללא שורות מע"מ).</div>
+    </div>
+  </section>
+
+  <!-- ======================= Review ======================= -->
+  <section class="view" id="v-review">
+    <div class="panel">
+      <h2>ממתין לאישור <span class="note">קטגוריה ודומיין ניתנים לעריכה לפני אישור · ביטחון ≥85 זמין לאישור מרוכז</span></h2>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+  </section>
+
+  <!-- ======================= צפויים ======================= -->
+  <section class="view" id="v-expected">
+    <div class="panel">
+      <h2>הכנסות והוצאות צפויות <span class="note">צפוי הופך ל"נחת" כשהתנועה מזוהה בבנק/SUMIT · צפוי לעולם לא נספר כיתרה</span></h2>
+      <table id="expTable">
+        <thead><tr>
+          <th>תיאור</th><th>דומיין</th><th>סוג</th><th>תאריך צפוי</th><th class="num">סכום</th><th>מצב</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="legend">הזנה: ידנית במסך הזה, או בשיחה עם רוקי ("תרשום שצפויה הכנסה של 9,500 מהקבוצה ב-15.7").</div>
+    </div>
+  </section>
+
+  <!-- ======================= דומיינים ======================= -->
+  <section class="view" id="v-domains">
+    <div class="dom-grid" id="domGrid"></div>
+    <div class="panel">
+      <h2>שירותים משותפים <span class="note">משרתים את שני העסקים — העלות שקופה, בלי לזהם את ה-P&L של אף עסק</span></h2>
+      <table id="sharedTable">
+        <thead><tr><th>שירות</th><th>קטגוריה</th><th class="num">עלות חודשית</th><th>משרת</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer-note">FOS · הדמיה סטטית לאישור חזון · כל הנתונים בדויים · נבנה על ידי 💿 Silver · 2026-07-02</div>
+</div>
+
+<script>
+"use strict";
+/* ---------- sample data (FAKE) ---------- */
+const FMT = new Intl.NumberFormat('he-IL');
+const sh = v => '₪' + FMT.format(Math.abs(v));
+
+const MONTHS = ['מאי 2026','יוני 2026','יולי 2026'];
+let monthIdx = 2; // default: יולי
+
+const OPENING = { 0: 15260, 1: 16980, 2: 18420 };
+
+// channel: bank | credit ; kind: in | out ; ghost: expected (not counted)
+const LEDGER = {
+  2: [ // יולי 2026
+    {d:'01.7', txt:'Anthropic — מנוי Max', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:740, usd:'$200'},
+    {d:'03.7', txt:'SUMIT — סדנת AI לארגון לוגיסטי', dom:'bn', cat:'revenue', ch:'bank', kind:'in', amt:6000},
+    {d:'04.7', txt:'דפוס אלגרו — הדפסת לוחות TP-1042', dom:'tp', cat:'production', ch:'credit', kind:'out', amt:620},
+    {d:'07.7', txt:'Google Workspace', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:58},
+    {d:'08.7', txt:'פאקלנד — קופסאות ואריזות (מלאי)', dom:'tp', cat:'materials', ch:'credit', kind:'out', amt:340},
+    {d:'10.7', txt:'SUMIT — משחק מותאם TP-1042 (יתרה)', dom:'tp', cat:'revenue', ch:'bank', kind:'in', amt:4800},
+    {d:'12.7', txt:'Canva Pro', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:45},
+    {d:'14.7', txt:'UPS — שילוח TP-1042 ללקוח', dom:'tp', cat:'production', ch:'credit', kind:'out', amt:180},
+    {d:'15.7', txt:'קורס Benefits — קבוצה של 4 (צפוי)', dom:'bn', cat:'revenue', ch:'bank', kind:'in', amt:9500, ghost:true},
+    {d:'18.7', txt:'Midjourney — חידוש (צפוי)', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:95, ghost:true},
+    {d:'20.7', txt:'קניון האומנים — ציוד סדנה', dom:'bn', cat:'expenses', ch:'credit', kind:'out', amt:210},
+    {d:'24.7', txt:'SUMIT — מקדמה משחק TP-1043 (צפוי)', dom:'tp', cat:'revenue', ch:'bank', kind:'in', amt:2500, ghost:true},
+    {d:'28.7', txt:'העברה לעצמי — מחיה (צפוי, טרם הופעל)', dom:'ow', cat:'owner-withdrawal', ch:'bank', kind:'out', amt:6000, ghost:true},
+  ],
+  1: [ // יוני 2026 (מצומצם)
+    {d:'02.6', txt:'Anthropic — מנוי Max', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:740, usd:'$200'},
+    {d:'05.6', txt:'SUMIT — שיעור פרטי AI', dom:'bn', cat:'revenue', ch:'bank', kind:'in', amt:900},
+    {d:'09.6', txt:'דפוס אלגרו — אבטיפוס TP-1042', dom:'tp', cat:'production', ch:'credit', kind:'out', amt:410},
+    {d:'11.6', txt:'Google Workspace', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:58},
+    {d:'16.6', txt:'SUMIT — מקדמה משחק TP-1042', dom:'tp', cat:'revenue', ch:'bank', kind:'in', amt:2400},
+    {d:'23.6', txt:'Canva Pro', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:45},
+    {d:'26.6', txt:'BGG Store — משחקי השראה', dom:'tp', cat:'materials', ch:'credit', kind:'out', amt:385},
+  ],
+  0: [ // מאי 2026 (מצומצם)
+    {d:'04.5', txt:'Anthropic — מנוי Max', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:740, usd:'$200'},
+    {d:'08.5', txt:'SUMIT — הרצאת AI לעסק קטן', dom:'bn', cat:'revenue', ch:'bank', kind:'in', amt:1500},
+    {d:'13.5', txt:'Google Workspace', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:58},
+    {d:'19.5', txt:'שיפטנבול — רכיבי עץ', dom:'tp', cat:'materials', ch:'credit', kind:'out', amt:290},
+    {d:'27.5', txt:'Canva Pro', dom:'sh', cat:'developing', ch:'credit', kind:'out', amt:45},
+  ],
+};
+
+const REVIEW = [
+  {vendor:'ElevenLabs', amt:82, usd:'$22', date:'29.6', cat:'developing', dom:'sh', conf:91,
+   why:'מנוי חודשי לכלי AI קולי — שירות אונליין המשרת את שני העסקים.'},
+  {vendor:'דפוס אלגרו', amt:620, date:'04.7', cat:'production', dom:'tp', conf:88,
+   why:'הדפסת לוחות עבור הזמנה TP-1042 — עלות ייצור ישירה הקשורה להזמנה.'},
+  {vendor:'BGG Store', amt:385, date:'26.6', cat:'materials', dom:'tp', conf:76,
+   why:'רכישת משחקים — כנראה מלאי/השראה ולא עבור הזמנה ספציפית. ביטחון בינוני — לבדיקה.'},
+  {vendor:'SUMIT — עמלת פלטפורמה', amt:29, date:'30.6', cat:'expenses', dom:'sh', conf:95,
+   why:'עמלת מערכת הסליקה — הוצאה תפעולית כללית.'},
+];
+
+const EXPECTED = [
+  {txt:'קורס Benefits — קבוצה של 4', dom:'bn', type:'הכנסה', date:'15.7.26', amt:9500, st:'exp'},
+  {txt:'מקדמה משחק TP-1043', dom:'tp', type:'הכנסה', date:'24.7.26', amt:2500, st:'exp'},
+  {txt:'Midjourney — חידוש שנתי', dom:'sh', type:'הוצאה', date:'18.7.26', amt:-95, st:'exp'},
+  {txt:'העברה לעצמי — מחיה (טרם הופעל)', dom:'ow', type:'הוצאה', date:'28.7.26', amt:-6000, st:'exp'},
+  {txt:'משחק מותאם TP-1042 (יתרה)', dom:'tp', type:'הכנסה', date:'10.7.26', amt:4800, st:'landed'},
+  {txt:'סדנת AI לארגון לוגיסטי', dom:'bn', type:'הכנסה', date:'03.7.26', amt:6000, st:'landed'},
+];
+
+const SHARED = [
+  {s:'Anthropic (Claude Max)', cat:'developing', amt:740},
+  {s:'Google Workspace', cat:'developing', amt:58},
+  {s:'Canva Pro', cat:'developing', amt:45},
+  {s:'SUMIT — עמלות פלטפורמה', cat:'expenses', amt:29},
+];
+
+const DOMS = {tp:{n:'TailorPlayed',c:'tp'}, bn:{n:'Benefits',c:'bn'}, sh:{n:'משותף',c:'sh'}, ow:{n:'בעלים',c:'ow'}};
+const chip = (cls,txt) => `<span class="chip ${cls}">${txt}</span>`;
+const domChip = d => chip(DOMS[d].c, DOMS[d].n);
+
+/* ---------- תזרים ---------- */
+function renderCash(){
+  const rows = LEDGER[monthIdx] || [];
+  let bal = OPENING[monthIdx], projBal = OPENING[monthIdx];
+  let tin=0, tout=0, ein=0, eout=0;
+  const tb = document.querySelector('#cashTable tbody');
+  tb.innerHTML = '';
+  rows.forEach(r=>{
+    const signed = r.kind==='in' ? r.amt : -r.amt;
+    let balCell;
+    if(r.ghost){
+      projBal += signed;
+      if(r.kind==='in') ein+=r.amt; else eout+=r.amt;
+      balCell = `<span class="muted">~ ${sh(projBal)}</span>`;
+    } else {
+      bal += signed; projBal += signed;
+      if(r.kind==='in') tin+=r.amt; else tout+=r.amt;
+      balCell = sh(bal);
+    }
+    tb.insertAdjacentHTML('beforeend', `
+      <tr class="${r.ghost?'ghost':''}">
+        <td>${r.d}</td>
+        <td>${r.txt}${r.usd?`<span class="usd">${r.usd}</span>`:''}</td>
+        <td>${domChip(r.dom)} ${chip('cat',r.cat)}</td>
+        <td>${chip(r.ch, r.ch==='bank'?'בנק':'אשראי')}</td>
+        <td class="num">${r.kind==='in' ? `<span class="in">+${sh(r.amt)}</span>` : ''}</td>
+        <td class="num">${r.kind==='out' ? `<span class="out">−${sh(r.amt)}</span>` : ''}</td>
+        <td class="num">${balCell}</td>
+      </tr>`);
+  });
+  const net = tin - tout;
+  document.getElementById('cashCards').innerHTML = `
+    <div class="card"><div class="k">נכנס החודש (נחת בפועל)</div><div class="v pos">+${sh(tin)}</div><div class="s">+ צפוי: ${sh(ein)}</div></div>
+    <div class="card"><div class="k">יצא החודש (בוצע)</div><div class="v neg">−${sh(tout)}</div><div class="s">+ צפוי: ${sh(eout)}</div></div>
+    <div class="card"><div class="k">נשאר החודש</div><div class="v ${net>=0?'pos':'neg'}">${net>=0?'+':'−'}${sh(net)}</div><div class="s">הכנסות שנחתו פחות הוצאות שבוצעו</div></div>
+    <div class="card"><div class="k">יתרה נוכחית</div><div class="v">${sh(bal)}</div><div class="s">יתרת פתיחה ${sh(OPENING[monthIdx])}</div></div>
+    <div class="card"><div class="k">צפי סוף חודש</div><div class="v ghosty">~ ${sh(projBal)}</div><div class="s">כולל צפויים — תחזית, לא יתרה</div></div>`;
+}
+
+/* ---------- חודש מול חודש ---------- */
+let pnlDom = 'all';
+function pnlAgg(mi){
+  const rows = (LEDGER[mi]||[]).filter(r=>!r.ghost).filter(r=> pnlDom==='all' ? true : r.dom===pnlDom);
+  const sum = f => rows.filter(f).reduce((a,r)=>a+r.amt,0);
+  const income = sum(r=>r.kind==='in');
+  const cogs   = sum(r=>r.kind==='out' && (r.cat==='production'||r.cat==='materials'));
+  const opex   = sum(r=>r.kind==='out' && (r.cat==='developing'||r.cat==='expenses'));
+  const owner  = sum(r=>r.kind==='out' && r.cat.startsWith('owner'));
+  return {income, cogs, gross:income-cogs, opex, owner, net:income-cogs-opex-owner};
+}
+function renderPnl(){
+  const a = [0,1,2].map(pnlAgg);
+  const cell = (v,neg) => `<td class="num">${v===0?'<span class="muted">0</span>':(neg?`<span class="out">−${sh(v)}</span>`:`<span class="${v>0?'in':''}">${v>0?'+':''}${sh(v)}</span>`)}</td>`;
+  const netCell = v => `<td class="num"><b class="${v>=0?'in':'out'}">${v>=0?'+':'−'}${sh(v)}</b></td>`;
+  document.querySelector('#pnlTable tbody').innerHTML = `
+    <tr><td>הכנסה (נחתה בחשבון)</td>${a.map(x=>cell(x.income)).join('')}</tr>
+    <tr><td>עלות המכר <span class="muted">production + materials</span></td>${a.map(x=>cell(x.cogs,true)).join('')}</tr>
+    <tr class="total"><td>רווח גולמי</td>${a.map(x=>netCell(x.gross)).join('')}</tr>
+    <tr><td>הוצאות תפעול <span class="muted">developing + expenses</span></td>${a.map(x=>cell(x.opex,true)).join('')}</tr>
+    <tr><td>העברות בעלים <span class="muted">owner-*</span></td>${a.map(x=>cell(x.owner,true)).join('')}</tr>
+    <tr class="total"><td>נשאר החודש</td>${a.map(x=>netCell(x.net)).join('')}</tr>`;
+}
+
+/* ---------- Review ---------- */
+const CATS = ['revenue','production','materials','developing','expenses'];
+function renderReview(){
+  const el = document.getElementById('reviewList');
+  el.innerHTML = '';
+  REVIEW.forEach((r,i)=>{
+    const catSel = `<select aria-label="קטגוריה">${CATS.map(c=>`<option ${c===r.cat?'selected':''}>${c}</option>`).join('')}</select>`;
+    const domSel = `<select aria-label="דומיין">${Object.keys(DOMS).map(d=>`<option value="${d}" ${d===r.dom?'selected':''}>${DOMS[d].n}</option>`).join('')}</select>`;
+    el.insertAdjacentHTML('beforeend', `
+      <div class="rev" id="rev-${i}">
+        <div>
+          <div class="line1">
+            <span class="vendor">${r.vendor}</span>
+            <span class="muted">${r.date}</span>
+            ${catSel} ${domSel}
+            ${chip(r.conf>=85?'conf-hi':'conf-md', 'ביטחון ' + r.conf + '%')}
+          </div>
+          <div class="reason">${r.why}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+          <div class="amount out">−${sh(r.amt)}${r.usd?`<span class="usd">${r.usd}</span>`:''}</div>
+          <div class="actions">
+            <button class="btn ok" onclick="verdict(${i},'אושר')">אשר</button>
+            <button class="btn no" onclick="verdict(${i},'נדחה')">דחה</button>
+          </div>
+        </div>
+      </div>`);
+  });
+}
+function verdict(i,txt){
+  const el = document.getElementById('rev-'+i);
+  el.classList.add('done');
+  el.querySelector('.actions').innerHTML = `<span class="verdict ${txt==='אושר'?'in':'out'}">${txt}</span>`;
+}
+
+/* ---------- צפויים ---------- */
+function renderExpected(){
+  document.querySelector('#expTable tbody').innerHTML = EXPECTED.map(e=>`
+    <tr class="${e.st==='exp'?'ghost':''}">
+      <td>${e.txt}</td>
+      <td>${domChip(e.dom)}</td>
+      <td>${e.type}</td>
+      <td>${e.date}</td>
+      <td class="num">${e.amt>0?`<span class="in">+${sh(e.amt)}</span>`:`<span class="out">−${sh(e.amt)}</span>`}</td>
+      <td>${e.st==='exp'?chip('exp','צפוי'):chip('landed','נחת ✓')}</td>
+    </tr>`).join('');
+}
+
+/* ---------- דומיינים ---------- */
+function renderDomains(){
+  const rows = (LEDGER[2]||[]).filter(r=>!r.ghost);
+  const g = document.getElementById('domGrid');
+  g.innerHTML = '';
+  Object.keys(DOMS).forEach(d=>{
+    const rs = rows.filter(r=>r.dom===d);
+    const inc = rs.filter(r=>r.kind==='in').reduce((a,r)=>a+r.amt,0);
+    const out = rs.filter(r=>r.kind==='out').reduce((a,r)=>a+r.amt,0);
+    const net = inc-out;
+    const tot = Math.max(inc+out,1);
+    g.insertAdjacentHTML('beforeend', `
+      <div class="dom">
+        <h3>${DOMS[d].n} ${domChip(d)}</h3>
+        <div class="row"><span>הכנסות (יולי)</span><span class="num in">+${sh(inc)}</span></div>
+        <div class="row"><span>הוצאות (יולי)</span><span class="num out">−${sh(out)}</span></div>
+        <div class="row net"><span>נטו</span><span class="num ${net>=0?'in':'out'}">${net>=0?'+':'−'}${sh(net)}</span></div>
+        <div class="bar"><i style="width:${inc/tot*100}%; background:var(--income)"></i><i style="width:${out/tot*100}%; background:var(--expense)"></i></div>
+      </div>`);
+  });
+  document.querySelector('#sharedTable tbody').innerHTML =
+    SHARED.map(s=>`<tr><td>${s.s}</td><td>${chip('cat',s.cat)}</td><td class="num out">−${sh(s.amt)}</td><td>${domChip('tp')} ${domChip('bn')}</td></tr>`).join('')
+    + `<tr class="total"><td>סה"כ משותף / חודש</td><td></td><td class="num out">−${sh(SHARED.reduce((a,s)=>a+s.amt,0))}</td><td></td></tr>`;
+}
+
+/* ---------- nav & month ---------- */
+function setView(){
+  const h = (location.hash||'#v-cash').slice(1);
+  document.querySelectorAll('section.view').forEach(s=>s.classList.toggle('active', s.id===h));
+  document.querySelectorAll('nav.tabs a').forEach(a=>a.classList.toggle('active', a.dataset.v===h));
+}
+window.addEventListener('hashchange', setView);
+
+document.getElementById('mPrev').onclick = ()=>{ if(monthIdx>0){monthIdx--; refreshMonth();} };
+document.getElementById('mNext').onclick = ()=>{ if(monthIdx<2){monthIdx++; refreshMonth();} };
+function refreshMonth(){
+  document.getElementById('mCur').textContent = MONTHS[monthIdx];
+  renderCash();
+}
+document.getElementById('pnlFilters').addEventListener('click', e=>{
+  if(e.target.tagName!=='BUTTON') return;
+  pnlDom = e.target.dataset.d;
+  document.querySelectorAll('#pnlFilters button').forEach(b=>b.classList.toggle('on', b===e.target));
+  renderPnl();
+});
+
+renderCash(); renderPnl(); renderReview(); renderExpected(); renderDomains(); setView();
+</script>
+</body>
+</html>
