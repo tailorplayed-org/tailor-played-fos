@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ספר־הרצה — BMAD v6.10 ← FOS v2</title>
+<style>
+/* ═══════════════ tokens ═══════════════ */
+:root{
+  --bg:#f7f8fa; --surface:#ffffff; --surface-2:#fbfcfd; --surface-3:#f2f4f7;
+  --border:rgba(20,24,32,.09); --border-strong:rgba(20,24,32,.14);
+  --text:#16181b; --text-2:#565d66; --text-3:#8b929b;
+  --accent:#0e9f9a; --accent-soft:#e6f5f4; --accent-border:#bfe6e4;
+  --ok:#1e8e5a; --ok-soft:#e9f6ef; --ok-border:#c3e5d3;
+  --warn:#b4552d; --warn-soft:#faf0ea; --warn-border:#ecd2c2;
+  --owner:#6b5bd2; --owner-soft:#efedfa; --owner-border:#d6d0f4;
+  --code-bg:#f3f5f7; --code-text:#2a3138; --code-border:rgba(20,24,32,.07);
+  --pre-bg:#fbfcfd;
+  --shadow-1:0 1px 2px rgba(20,24,32,.05);
+  --shadow-2:0 1px 2px rgba(20,24,32,.05), 0 4px 14px rgba(20,24,32,.045);
+  --shadow-nav:0 1px 0 rgba(20,24,32,.06), 0 6px 20px rgba(20,24,32,.04);
+  --inset:none;
+  --radius:10px; --radius-sm:7px; --radius-lg:14px;
+}
+:root[data-theme="dark"]{
+  --bg:#0e1113; --surface:#16191d; --surface-2:#1b1f24; --surface-3:#20252b;
+  --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.14);
+  --text:#e8ebee; --text-2:#a3abb4; --text-3:#6e767f;
+  --accent:#2dd4bd; --accent-soft:rgba(45,212,189,.10); --accent-border:rgba(45,212,189,.26);
+  --ok:#43cd8b; --ok-soft:rgba(67,205,139,.10); --ok-border:rgba(67,205,139,.24);
+  --warn:#e0925f; --warn-soft:rgba(224,146,95,.10); --warn-border:rgba(224,146,95,.24);
+  --owner:#9d8ef7; --owner-soft:rgba(157,142,247,.10); --owner-border:rgba(157,142,247,.24);
+  --code-bg:rgba(255,255,255,.055); --code-text:#cfd6dd; --code-border:rgba(255,255,255,.07);
+  --pre-bg:rgba(255,255,255,.032);
+  --shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.28);
+  --shadow-nav:0 1px 0 rgba(255,255,255,.05), 0 8px 24px rgba(0,0,0,.4);
+  --inset:inset 0 1px 0 rgba(255,255,255,.045);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1113; --surface:#16191d; --surface-2:#1b1f24; --surface-3:#20252b;
+    --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.14);
+    --text:#e8ebee; --text-2:#a3abb4; --text-3:#6e767f;
+    --accent:#2dd4bd; --accent-soft:rgba(45,212,189,.10); --accent-border:rgba(45,212,189,.26);
+    --ok:#43cd8b; --ok-soft:rgba(67,205,139,.10); --ok-border:rgba(67,205,139,.24);
+    --warn:#e0925f; --warn-soft:rgba(224,146,95,.10); --warn-border:rgba(224,146,95,.24);
+    --owner:#9d8ef7; --owner-soft:rgba(157,142,247,.10); --owner-border:rgba(157,142,247,.24);
+    --code-bg:rgba(255,255,255,.055); --code-text:#cfd6dd; --code-border:rgba(255,255,255,.07);
+    --pre-bg:rgba(255,255,255,.032);
+    --shadow-1:0 1px 2px rgba(0,0,0,.4);
+    --shadow-2:0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.28);
+    --shadow-nav:0 1px 0 rgba(255,255,255,.05), 0 8px 24px rgba(0,0,0,.4);
+    --inset:inset 0 1px 0 rgba(255,255,255,.045);
+  }
+}
+
+/* ═══════════════ base ═══════════════ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Segoe UI","Rubik",system-ui,-apple-system,"Noto Sans Hebrew","Arial Hebrew",sans-serif;
+  font-size:16px; line-height:1.7; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+p{margin:0 0 1em; max-width:70ch}
+ul,ol{max-width:70ch; padding-inline-start:1.3em; margin:0 0 1em}
+li{margin:.32em 0}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline; text-underline-offset:3px}
+strong{font-weight:600}
+hr{border:0; border-top:1px solid var(--border); margin:0}
+
+code{
+  font-family:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,"SF Mono",monospace;
+  font-size:.855em; unicode-bidi:isolate; direction:ltr;
+  background:var(--code-bg); color:var(--code-text);
+  border:1px solid var(--code-border); border-radius:5px;
+  padding:.1em .38em; white-space:nowrap;
+}
+td code,th code{font-size:.9em; white-space:normal}
+code.wrapcode{white-space:normal; overflow-wrap:anywhere; word-break:break-word}
+pre{
+  direction:ltr; text-align:left; margin:1.1em 0; padding:14px 16px;
+  background:var(--pre-bg); border:1px solid var(--border); border-radius:var(--radius);
+  overflow-x:auto; box-shadow:var(--inset);
+}
+pre code{
+  background:none; border:0; padding:0; font-size:13px; line-height:1.65;
+  white-space:pre; color:var(--text-2); display:block;
+}
+pre code b{color:var(--text); font-weight:600}
+
+/* ═══════════════ nav ═══════════════ */
+.topnav{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--border); box-shadow:var(--shadow-nav);
+}
+.topnav .wrap{display:flex; align-items:center; gap:14px; padding-top:0; padding-bottom:0}
+.navmark{
+  font-size:12px; font-weight:650; letter-spacing:.02em; color:var(--accent);
+  white-space:nowrap; padding:11px 0; flex:0 0 auto;
+}
+.navlinks{
+  display:flex; gap:2px; overflow-x:auto; scrollbar-width:thin;
+  flex:1 1 auto; padding:6px 0; -webkit-overflow-scrolling:touch;
+}
+.navlinks::-webkit-scrollbar{height:3px}
+.navlinks::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:3px}
+.navlinks a{
+  white-space:nowrap; font-size:13px; color:var(--text-2); padding:5px 10px;
+  border-radius:6px; border:1px solid transparent; transition:background .12s, color .12s;
+}
+.navlinks a:hover{background:var(--surface-3); color:var(--text); text-decoration:none}
+.tgl{
+  flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+  font-size:12px; font-family:inherit; color:var(--text-2); cursor:pointer;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:99px;
+  padding:5px 11px; box-shadow:var(--shadow-1);
+}
+.tgl:hover{border-color:var(--border-strong); color:var(--text)}
+.tgl svg{width:15px; height:15px}
+
+/* ═══════════════ header ═══════════════ */
+header.hd{padding:56px 0 30px}
+h1{
+  font-size:30px; line-height:1.28; font-weight:650; margin:0 0 14px;
+  letter-spacing:-.01em;
+}
+.thesis{font-size:17px; color:var(--text-2); max-width:74ch; margin:0 0 6px}
+.meta{font-size:13px; color:var(--text-3); margin:14px 0 0}
+
+/* state strip */
+.strip{display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 0}
+.schip{
+  display:flex; flex-direction:column; gap:1px;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:9px 13px; box-shadow:var(--shadow-1), var(--inset); min-width:0;
+}
+.schip .k{font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-3)}
+.schip .v{font-size:13.5px; font-weight:600; color:var(--text); font-variant-numeric:tabular-nums}
+.schip.warn .v{color:var(--warn)}
+.schip.ok .v{color:var(--ok)}
+.schip.acc .v{color:var(--accent)}
+
+/* ═══════════════ sections ═══════════════ */
+section{padding:68px 0 0}
+section:last-of-type{padding-bottom:80px}
+h2{
+  font-size:22px; font-weight:650; margin:0 0 8px; letter-spacing:-.005em;
+  display:flex; align-items:center; gap:10px; line-height:1.35;
+}
+h2 .num{
+  font-size:11px; font-weight:600; color:var(--accent); background:var(--accent-soft);
+  border:1px solid var(--accent-border); border-radius:6px; padding:2px 7px;
+  font-family:ui-monospace,"Cascadia Mono",Consolas,monospace; flex:0 0 auto;
+}
+h2 svg{width:18px; height:18px; color:var(--text-3); flex:0 0 auto}
+h3{font-size:17px; font-weight:640; margin:32px 0 8px; letter-spacing:-.003em}
+.lede{color:var(--text-2); max-width:72ch; margin:0 0 22px; font-size:15.5px}
+
+/* ═══════════════ tables ═══════════════ */
+.scroll-x{
+  overflow-x:auto; -webkit-overflow-scrolling:touch; margin:18px 0 22px;
+  border:1px solid var(--border); border-radius:var(--radius);
+  background:var(--surface); box-shadow:var(--shadow-1), var(--inset);
+}
+.scroll-x::-webkit-scrollbar{height:8px}
+.scroll-x::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:8px}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px}
+thead th{
+  background:var(--surface-2); text-align:right; font-weight:600; font-size:11.5px;
+  letter-spacing:.03em; color:var(--text-3); text-transform:uppercase;
+  padding:9px 13px; border-bottom:1px solid var(--border-strong); white-space:nowrap;
+  position:sticky; top:0;
+}
+tbody td{padding:11px 13px; border-bottom:1px solid var(--border); vertical-align:top; line-height:1.55}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+tbody th{
+  padding:11px 13px; border-bottom:1px solid var(--border); text-align:right;
+  font-weight:600; vertical-align:top; white-space:nowrap; line-height:1.55;
+}
+tr.wave td{
+  background:var(--surface-3); font-weight:640; font-size:13px; color:var(--text);
+  border-bottom:1px solid var(--border-strong); padding:8px 13px;
+}
+.nowrap{white-space:nowrap}
+.num-cell{font-variant-numeric:tabular-nums}
+td small,th small{display:block; color:var(--text-3); font-size:12px; line-height:1.5; margin-top:3px}
+
+/* ═══════════════ marks & chips ═══════════════ */
+.m{font-size:15px; line-height:1; font-weight:400}
+.m-core{color:var(--accent)}
+.m-part{color:var(--warn)}
+.m-no{color:var(--text-3)}
+.tag{
+  display:inline-block; font-size:11px; font-weight:600; line-height:1.5;
+  padding:1px 7px; border-radius:99px; border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text-2); white-space:nowrap;
+}
+.tag.acc{background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent)}
+.tag.ok{background:var(--ok-soft); border-color:var(--ok-border); color:var(--ok)}
+.tag.warn{background:var(--warn-soft); border-color:var(--warn-border); color:var(--warn)}
+.tag.own{background:var(--owner-soft); border-color:var(--owner-border); color:var(--owner)}
+.tag.dead{text-decoration:line-through; opacity:.72}
+
+/* ═══════════════ pipeline ═══════════════ */
+.pipe{margin:24px 0 8px}
+.lane{
+  border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--surface);
+  padding:16px 16px 18px; margin-bottom:14px; box-shadow:var(--shadow-1), var(--inset);
+}
+.lane-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px}
+.lane-badge{
+  font-size:11.5px; font-weight:650; padding:3px 10px; border-radius:99px;
+  background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent-border);
+}
+.lane-b .lane-badge{background:var(--warn-soft); color:var(--warn); border-color:var(--warn-border)}
+.lane-note{font-size:12.5px; color:var(--text-3)}
+.flow{display:flex; flex-wrap:wrap; align-items:stretch; gap:5px}
+.node{
+  flex:0 1 auto; min-width:0; background:var(--surface-2);
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:7px 11px; font-size:12.5px; font-weight:600; line-height:1.35;
+  box-shadow:var(--inset);
+}
+.node small{display:block; font-weight:400; font-size:11px; color:var(--text-3); margin-top:2px; line-height:1.4}
+.node code{font-size:11.5px; padding:0 3px; background:transparent; border:0; color:inherit}
+.node.src{background:var(--accent-soft); border-color:var(--accent-border); color:var(--accent)}
+.node.src small{color:var(--accent)}
+.node.zero{background:var(--warn-soft); border-color:var(--warn-border); color:var(--warn)}
+.node.zero small{color:var(--warn)}
+.node.out{background:var(--ok-soft); border-color:var(--ok-border); color:var(--ok)}
+.node.out small{color:var(--ok)}
+.node.off{background:transparent; border-style:dashed; color:var(--text-2)}
+.arr{
+  align-self:center; color:var(--text-3); font-size:14px; user-select:none;
+  padding:0 1px; flex:0 0 auto;
+}
+.loop-row{
+  margin-top:12px; padding-top:12px; border-top:1px dashed var(--border-strong);
+}
+.loop-label{font-size:11.5px; color:var(--text-3); margin-bottom:7px; font-weight:600}
+
+/* ═══════════════ trap cards ═══════════════ */
+.traps{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); margin:22px 0 0}
+.trap{
+  background:var(--surface); border:1px solid var(--border);
+  border-inline-start:3px solid var(--warn); border-radius:var(--radius);
+  padding:16px 18px; box-shadow:var(--shadow-1), var(--inset);
+}
+.trap h4{
+  margin:0 0 7px; font-size:15px; font-weight:640; line-height:1.45;
+  display:flex; gap:8px; align-items:baseline;
+}
+.trap h4 .no{
+  font-size:10.5px; font-weight:700; color:var(--warn); background:var(--warn-soft);
+  border:1px solid var(--warn-border); border-radius:5px; padding:1px 6px;
+  font-family:ui-monospace,Consolas,monospace; flex:0 0 auto;
+}
+.trap p{font-size:14px; color:var(--text-2); margin:0 0 9px; max-width:none}
+.ev{
+  font-size:12.5px; color:var(--text-2); background:var(--surface-2);
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:9px 11px; margin:0 0 10px; line-height:1.6;
+}
+.ev b{color:var(--text-3); font-weight:600; font-size:10.5px; letter-spacing:.05em;
+  text-transform:uppercase; display:block; margin-bottom:3px}
+.fix{font-size:13.5px; color:var(--text); margin:0}
+.fix b{color:var(--ok); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase;
+  display:block; margin-bottom:3px; font-weight:700}
+.trap pre{margin:8px 0 0; font-size:12px}
+.trap pre code{font-size:11.8px}
+
+/* ═══════════════ verdict cards ═══════════════ */
+.verdicts{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); margin:22px 0 0}
+.vc{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px 20px; box-shadow:var(--shadow-1), var(--inset);
+}
+.vc-hd{display:flex; align-items:flex-start; gap:12px; margin-bottom:10px}
+.vc-mark{font-size:26px; line-height:1; flex:0 0 auto; margin-top:1px}
+.vc-mark.core{color:var(--accent)}
+.vc-mark.part{color:var(--warn)}
+.vc-mark.no{color:var(--text-3)}
+.vc-hd h4{margin:0; font-size:16px; font-weight:650; line-height:1.35}
+.vc-hd .ver{display:block; font-size:11.5px; color:var(--text-3); font-weight:400; margin-top:2px}
+.vc-call{
+  font-size:13px; font-weight:650; margin:0 0 10px; padding:5px 10px;
+  border-radius:var(--radius-sm); display:inline-block;
+}
+.vc-call.core{background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent-border)}
+.vc-call.part{background:var(--warn-soft); color:var(--warn); border:1px solid var(--warn-border)}
+.vc-call.no{background:var(--surface-3); color:var(--text-2); border:1px solid var(--border)}
+.vc p{font-size:14px; color:var(--text-2); max-width:none; margin:0 0 10px}
+.vc p:last-child{margin-bottom:0}
+.vc .yes{color:var(--ok); font-weight:650}
+.vc .nope{color:var(--warn); font-weight:650}
+.vc ul{font-size:13.5px; color:var(--text-2); max-width:none; margin:0 0 10px}
+
+/* ═══════════════ steps ═══════════════ */
+.steps{list-style:none; padding:0; margin:22px 0 0; max-width:none; counter-reset:st}
+.step{
+  position:relative; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:16px 20px 16px 20px; margin:0 0 10px;
+  box-shadow:var(--shadow-1), var(--inset);
+}
+.step-hd{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px}
+.step-n{
+  width:24px; height:24px; border-radius:99px; flex:0 0 auto;
+  background:var(--accent); color:#fff; font-size:12.5px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums;
+}
+:root[data-theme="dark"] .step-n{color:#0e1113}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .step-n{color:#0e1113}}
+.step-t{font-size:15px; font-weight:640; flex:1 1 auto; min-width:0}
+.dur{
+  font-size:11px; font-weight:650; color:var(--text-2); background:var(--surface-3);
+  border:1px solid var(--border); border-radius:99px; padding:2px 9px; white-space:nowrap;
+  font-variant-numeric:tabular-nums; flex:0 0 auto;
+}
+.step p{font-size:14px; color:var(--text-2); max-width:none; margin:0 0 9px}
+.step ul{font-size:13.5px; color:var(--text-2); max-width:none; margin:0 0 9px}
+.done{
+  font-size:13px; color:var(--ok); background:var(--ok-soft);
+  border:1px solid var(--ok-border); border-radius:var(--radius-sm);
+  padding:7px 11px; margin:0; line-height:1.55;
+}
+.done b{font-weight:700}
+.dont{
+  margin:26px 0 0; background:var(--warn-soft); border:1px solid var(--warn-border);
+  border-radius:var(--radius); padding:16px 20px;
+}
+.dont h3{margin:0 0 10px; font-size:15.5px; color:var(--warn)}
+.dont ul{margin:0; font-size:14px; color:var(--text-2); max-width:none}
+.dont li::marker{color:var(--warn)}
+
+/* ═══════════════ callout ═══════════════ */
+.callout{
+  border:1px solid var(--accent-border); background:var(--accent-soft);
+  border-radius:var(--radius); padding:14px 18px; margin:18px 0;
+}
+.callout p{margin:0; font-size:14.5px; color:var(--text); max-width:none}
+.callout p + p{margin-top:8px}
+.callout .lbl{
+  font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--accent); display:block; margin-bottom:4px;
+}
+.note{
+  border:1px solid var(--border); background:var(--surface-2);
+  border-radius:var(--radius); padding:14px 18px; margin:18px 0;
+}
+.note p{margin:0; font-size:14px; color:var(--text-2); max-width:none}
+.note p + p{margin-top:8px}
+
+/* ═══════════════ details ═══════════════ */
+details{
+  border:1px solid var(--border); border-radius:var(--radius); background:var(--surface);
+  margin:20px 0; box-shadow:var(--shadow-1), var(--inset);
+}
+summary{
+  cursor:pointer; padding:14px 18px; font-size:15px; font-weight:640; list-style:none;
+  display:flex; align-items:center; gap:9px;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"▾"; color:var(--text-3); font-size:12px; margin-inline-start:auto}
+details[open] summary::after{content:"▴"}
+details[open] summary{border-bottom:1px solid var(--border)}
+.det-body{padding:4px 18px 18px}
+.det-body .scroll-x{border:0; box-shadow:none; background:transparent; margin:10px 0 0}
+.det-body table{min-width:520px}
+.det-body thead th{background:transparent}
+.modhd{
+  font-size:12.5px; font-weight:650; color:var(--text-2); margin:20px 0 0;
+  padding:7px 0 5px; border-bottom:1px solid var(--border-strong);
+  display:flex; align-items:baseline; gap:8px;
+}
+.modhd:first-child{margin-top:6px}
+.modhd .cnt{font-size:11px; color:var(--text-3); font-weight:400; font-variant-numeric:tabular-nums}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--text-2); margin:8px 0 0}
+.legend span{display:inline-flex; align-items:center; gap:6px}
+
+/* ═══════════════ footer ═══════════════ */
+footer{
+  border-top:1px solid var(--border); padding:26px 0 44px; margin-top:20px;
+  font-size:12.5px; color:var(--text-3);
+}
+footer p{max-width:none; margin:0 0 5px}
+
+/* ═══════════════ responsive ═══════════════ */
+@media (max-width:720px){
+  .wrap{padding:0 16px}
+  header.hd{padding:36px 0 22px}
+  h1{font-size:24px}
+  .thesis{font-size:15.5px}
+  section{padding:52px 0 0}
+  h2{font-size:19px}
+  .navmark{display:none}
+  .trap,.vc,.step,.lane{padding-inline:14px}
+  .schip{flex:1 1 138px}
+}
+@media (max-width:420px){
+  body{font-size:15.5px}
+  .flow{gap:4px}
+  .node{font-size:12px; padding:6px 9px}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav" aria-label="ניווט ראשי">
+  <div class="wrap">
+    <span class="navmark">BMAD × FOS v2</span>
+    <div class="navlinks">
+      <a href="#s1">התזה</a>
+      <a href="#s2">מלכודות</a>
+      <a href="#s3">המסלול</a>
+      <a href="#s4">גלים ופערים</a>
+      <a href="#s5">טריגרים</a>
+      <a href="#s6">מודולים</a>
+      <a href="#s7">המצב הקיים</a>
+      <a href="#s8">מחר בבוקר</a>
+      <a href="#s9">נספח</a>
+    </div>
+    <button class="tgl" id="themeBtn" type="button" aria-label="החלף ערכת נושא">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <span id="themeLbl">בהיר</span>
+    </button>
+  </div>
+</nav>
+
+<header class="hd">
+  <div class="wrap">
+    <h1>ספר־הרצה — BMAD v6.10 ← FOS v2</h1>
+    <p class="thesis">התכנון כבר נגמר. הוא מאושר, נעול ויושב ב-<code dir="ltr">docs/v2/</code>. לכן לא מריצים את BMAD מלמעלה — מנחיתים את <code dir="ltr">docs/v2</code> לתוך חריצי הארטיפקטים שלו בלי לתת לארטיפקטי V1 להתחזות לאמת, מריצים <code dir="ltr">story → dev → review</code> חזק על ~60% מהעבודה שבאמת יושבת בריפו הזה, ואומרים בפה מלא ש-40% הנותרים חיים בארבעה מקומות ש-BMAD לא מגיע אליהם.</p>
+    <div class="strip">
+      <div class="schip acc"><span class="k">התקנה</span><span class="v">84 סקילים · 6 מודולים</span></div>
+      <div class="schip"><span class="k">sprint-status</span><span class="v">32 stories · 0 actionable</span></div>
+      <div class="schip"><span class="k">ארטיפקטי V1</span><span class="v">tracked in git</span></div>
+      <div class="schip warn"><span class="k">bmad-loop</span><span class="v">mux FAIL — psmux + pwsh חסרים</span></div>
+      <div class="schip"><span class="k">policy</span><span class="v">gates=per-epic · adapter=claude</span></div>
+      <div class="schip warn"><span class="k">[verify] commands</span><span class="v">ריק</span></div>
+    </div>
+    <p class="meta">BMAD v6.10.0 הותקן 2026-07-25 · <code dir="ltr">communication_language = Hebrew</code>, <code dir="ltr">document_output_language = English</code> — מדבר עברית, כותב מסמכים באנגלית. תואם ל-<code dir="ltr">docs/v2</code>, אין מה לשנות.</p>
+  </div>
+</header>
+
+<!-- ═══════════════ §1 ═══════════════ -->
+<section id="s1">
+  <div class="wrap">
+    <h2><span class="num">01</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>
+      התזה, והמפה בעמוד אחד</h2>
+    <p class="lede">מסלול ברירת המחדל של BMAD מניח שהתכנון עוד לא קרה. ב-FOS v2 הוא קרה, אושר ונעול. זה משנה את כל סדר העבודה.</p>
+
+    <p>שלושת התפקידים היחידים של BMAD כאן: <strong>(1)</strong> להנחית את שמונת קבצי <code dir="ltr">docs/v2</code> לתוך חריצי הארטיפקטים שלו — בלי שארטיפקטי V1 שכבר יושבים ב-<code dir="ltr">_bmad-output/</code> יתחזו לאמת. <strong>(2)</strong> להריץ <code dir="ltr">create-story → dev-story → code-review</code> בצורה הדוקה על החלק של העבודה שבאמת חי בריפו הזה — פערים 1, 3, 7 ופריטים 3–4 של פער 9. <strong>(3)</strong> לומר ביושר שכל השאר חי בחמישה מקומות שונים, ושכלי חד־ריפו לא מגיע לשם.</p>
+
+    <div class="pipe">
+      <div class="lane">
+        <div class="lane-head">
+          <span class="lane-badge">מסלול א · בהישג ידו של BMAD</span>
+          <span class="lane-note">הכל בתוך <code dir="ltr">tailor-played-fos</code> — הגלים 1, 2 (חלקית) ו-4</span>
+        </div>
+        <div class="flow">
+          <div class="node src">docs/v2<small>8 קבצים · מאושר · נעול</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node zero">S0 · פינוי<small>git mv של ארטיפקטי V1</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node">project-context.md<small>bmad-generate-project-context</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node">prd.md<small>bmad-prd · תמלול</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node">ARCHITECTURE-SPINE.md<small>bmad-architecture</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node off">DESIGN.md<small>bmad-ux · ממוקד בלבד</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node">epics.md<small>bmad-create-epics-and-stories</small></div>
+          <span class="arr" aria-hidden="true">←</span>
+          <div class="node out">sprint-status.yaml<small>bmad-sprint-planning</small></div>
+        </div>
+        <div class="loop-row">
+          <div class="loop-label">ואז, בלולאה:</div>
+          <div class="flow">
+            <div class="node">לכל סטורי<small>bmad-create-story</small></div>
+            <span class="arr" aria-hidden="true">←</span>
+            <div class="node">bmad-dev-story<small>מימוש + עדכון קובץ הסטורי</small></div>
+            <span class="arr" aria-hidden="true">←</span>
+            <div class="node">bmad-code-review<small>מודל אחר, חלון חדש</small></div>
+            <span class="arr" aria-hidden="true">←</span>
+            <div class="node out">לכל אפוס<small>bmad-retrospective · שער</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lane lane-b">
+        <div class="lane-head">
+          <span class="lane-badge">מסלול ב · מחוץ להישג יד</span>
+          <span class="lane-note">BMAD יכול לתכנן (<code dir="ltr">bmad-spec</code> נייד) — הוא לא יכול לפתח דרך זה מכאן</span>
+        </div>
+        <div class="flow">
+          <div class="node off">tailorplayed-dumbbell<small>פער 4 — ריפו נפרד, תוסף Cowork</small></div>
+          <div class="node off">tailor-played-agents<small>פער 2 — + Apps Script + Cloud Scheduler</small></div>
+          <div class="node off">SUMIT feed<small>פער 5 — רכיב שעדיין לא קיים</small></div>
+          <div class="node off">bank/card feed<small>פער 6 — רכיב שעדיין לא קיים</small></div>
+          <div class="node off">Rocky<small>פער 8 — פרויקט claude.ai, קבצי ידע</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><code dir="ltr">_bmad-output/</code>, <code dir="ltr">sprint-status.yaml</code> ו-<code dir="ltr">bmad-dev-story</code> כולם פועלים בתוך ריפו אחד. זו לא מגבלת תצורה — זו צורתו של הכלי. תשע הפערים של <code dir="ltr">04-gap-analysis.md</code> פרושים על חמישה מקומות. אל תנסה לכופף את BMAD סביב זה; תן לו את מה שהוא טוב בו, ונהל את השאר באפוס מעקב (E9) שאין בו סטוריז שהוא מריץ.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §2 ═══════════════ -->
+<section id="s2">
+  <div class="wrap">
+    <h2><span class="num">02</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      שלב 0 — ארבע המלכודות</h2>
+    <p class="lede">כל אחת מהן מופעלת אוטומטית אם מתחילים להריץ סקילים לפני שמפנים. שלוש הראשונות נפתרות בקומיט אחד.</p>
+
+    <div class="traps">
+      <div class="trap">
+        <h4><span class="no">מלכודת 1</span> <code dir="ltr">bmad-create-epics-and-stories</code> יקרא את ה-PRD של V1 כאמת</h4>
+        <p>שלב הגילוי שלו (step-01) מחפש <code dir="ltr">{planning_artifacts}/*prd*.md</code> (או <code dir="ltr">*prd*/index.md</code> אם שורדד) ו-<code dir="ltr">{planning_artifacts}/*architecture*.md</code>. הוא ימצא בדיוק את הקבצים הלא נכונים.</p>
+        <div class="ev"><b>הראיה</b>
+          <code dir="ltr">_bmad-output/planning-artifacts/prd.md</code> — 470 שורות, 2026-02-05, 50 דרישות פונקציונליות על פני 8 מודולים, האנום הישן, סקופ של TailorPlayed בלבד, ובפרונטמטר מחבר בשם <code dir="ltr">Galelbaz</code>. לצידו <code dir="ltr">architecture.md</code> — 886 שורות.
+        </div>
+        <p class="fix"><b>התיקון</b> חוק ברזל 3 ב-<code dir="ltr">00-START-HERE.md</code> כבר קובע ש-<code dir="ltr">docs/v2</code> גובר. אבל הכלי לא יודע את זה — הוא יודע רק גלוב. להוציא את V1 מנתיב הגילוי לפני שמריצים משהו.</p>
+      </div>
+
+      <div class="trap">
+        <h4><span class="no">מלכודת 2</span> <code dir="ltr">sprint-status.yaml</code> ירעיל את מפתחות האפוסים של V2</h4>
+        <p>הקובץ הנוכחי: 32 סטוריז, כולן <code dir="ltr">done</code>; 7 אפוסים כולם <code dir="ltr">in-progress</code>; 7 רטרוספקטיבות <code dir="ltr">optional</code>. מפתחות האפוסים של V2 — <code dir="ltr">epic-1</code> עד <code dir="ltr">epic-7</code> — מתנגשים חזיתית בשל V1.</p>
+        <div class="ev"><b>כלל השימור, מילה במילה מ-<code dir="ltr">bmad-sprint-planning/SKILL.md</code> שלב 3</b>
+          <span dir="ltr" style="display:block;direction:ltr;text-align:left;font-family:ui-monospace,Consolas,monospace;font-size:12px;margin-top:5px">Preservation rule:<br>- If existing {status_file} exists and has more advanced status, preserve it<br>- Never downgrade status (e.g., don't change `done` to `ready-for-dev`)<br>- If existing {status_file} has an `action_items` section, carry it over unchanged</span>
+        </div>
+        <p class="fix"><b>התיקון</b> מפתחות הסטוריז הם <code dir="ltr">{epic}-{story}-{title-slug}</code>, כך ששינוי כותרת חומק מהתנגשות — אבל מפתחות האפוסים לא. לארכב ולייצר מחדש נקי.</p>
+      </div>
+
+      <div class="trap">
+        <h4><span class="no">מלכודת 3</span> <code dir="ltr">bmad-document-project</code> כותב לתוך <code dir="ltr">docs/</code>, ליד <code dir="ltr">docs/v2/</code></h4>
+        <p>ב-<code dir="ltr">_bmad/bmm/config.yaml</code> מוגדר <code dir="ltr">project_knowledge = {project-root}/docs</code>. הסקיל היה יוצר שם <code dir="ltr">index.md</code>, <code dir="ltr">project-overview.md</code>, <code dir="ltr">architecture.md</code>, <code dir="ltr">source-tree-analysis.md</code>, <code dir="ltr">component-inventory.md</code>, <code dir="ltr">development-guide.md</code> ו-<code dir="ltr">project-scan-report.json</code> — ישר לצד החבילה המאושרת.</p>
+        <div class="ev"><b>ולמה זה גם מיותר</b>
+          <code dir="ltr">02-current-state.md</code> כבר מתעד את המערכת טוב יותר — עם עוגני <code dir="ltr">file:line</code> ועם ממצאי Firestore חיים (14 הכפילויות, שורת TEST מאושרת בפרודקשן, <code dir="ltr">createdAt</code> מעורב) שסריקה אוטומטית לא מייצרת.
+        </div>
+        <p class="fix"><b>ההכרעה</b> לא להריץ אותו. אם בכל זאת תרצה אותו יום אחד — קודם להסיט את <code dir="ltr">project_knowledge</code> עם <code dir="ltr">bmad-customize</code>, ורק אז.</p>
+      </div>
+
+      <div class="trap">
+        <h4><span class="no">מלכודת 4</span> ה-PRD נוחת איפה שהסקיל הבא לא מוצא אותו</h4>
+        <p>ב-<code dir="ltr">bmad-prd/customize.toml</code>: <code dir="ltr" class="wrapcode">prd_output_path = "{planning_artifacts}/prds"</code> ו-<code dir="ltr" class="wrapcode">run_folder_pattern = "prd-{project_name}-{date}"</code>. כלומר תיקיית ריצה מקוננת ומתוארכת. אבל <code dir="ltr">bmad-create-epics-and-stories</code> מגלה עם גלוב <strong>שטוח</strong>. אותו סיפור ל-<code dir="ltr">ARCHITECTURE-SPINE.md</code>.</p>
+        <div class="ev"><b>הפער</b>
+          <span dir="ltr" style="display:block;direction:ltr;text-align:left;font-family:ui-monospace,Consolas,monospace;font-size:11.5px;margin-top:5px">נכתב אל: _bmad-output/planning-artifacts/prds/prd-tailor-played-fos-&lt;date&gt;/prd.md<br>מחופש  ב: _bmad-output/planning-artifacts/*prd*.md</span>
+        </div>
+        <p class="fix"><b>התיקון הפשוט</b> אחרי שכל מסמך נסגר עם <code dir="ltr">status: final</code>, להעתיק אותו מעלה:</p>
+<pre dir="ltr"><code>cp _bmad-output/planning-artifacts/prds/prd-tailor-played-fos-&lt;date&gt;/prd.md \
+   _bmad-output/planning-artifacts/prd.md
+cp _bmad-output/planning-artifacts/architecture/architecture-tailor-played-fos-&lt;date&gt;/ARCHITECTURE-SPINE.md \
+   _bmad-output/planning-artifacts/architecture.md</code></pre>
+        <p class="fix" style="margin-top:9px"><b>אלטרנטיבה מבנית</b> להשטיח את נתיב הפלט עם <code dir="ltr">bmad-customize</code>. מסוכן יותר — משנה התנהגות סקיל לכל הריצות העתידיות. ההעתקה עדיפה כל עוד מדובר בשני מסמכים.</p>
+      </div>
+    </div>
+
+    <h3>הפינוי עצמו — שלוש פקודות</h3>
+<pre dir="ltr"><code>git mv _bmad-output/planning-artifacts       _bmad-output/v1-archive-planning-artifacts
+git mv _bmad-output/implementation-artifacts _bmad-output/v1-archive-implementation-artifacts
+git commit -m "chore(bmad): archive v1 artifacts — docs/v2 supersedes (iron rule 3)"</code></pre>
+    <div class="callout">
+      <p><span class="lbl">שים לב</span>זה לא מוחק כלום. V1 נשאר בהיסטוריית ה-git, נשאר קריא בעץ העבודה, ופשוט יוצא מנתיב הגילוי של BMAD. שלוש מתוך ארבע המלכודות נסגרות כאן, בקומיט אחד, בלי להריץ אף סקיל.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §3 ═══════════════ -->
+<section id="s3">
+  <div class="wrap">
+    <h2><span class="num">03</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      המסלול מקצה לקצה</h2>
+    <p class="lede">עשרה שלבים. הנתיבים בעמודת הפלט הם הנתיבים האמיתיים אחרי פתרון הקונפיגורציה של הפרויקט הזה — לא ברירות מחדל של התיעוד.</p>
+
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>שלב</th><th>מה מריצים</th><th>קלט</th><th>פלט (נתיב מדויק)</th><th>לאן זה נכנס</th><th>הערת FOS</th></tr></thead>
+        <tbody>
+          <tr>
+            <th>S0<small>פינוי</small></th>
+            <td>ללא סקיל — <code dir="ltr">git mv</code> ×2 + commit</td>
+            <td><code dir="ltr">_bmad-output/</code> הקיים</td>
+            <td><code dir="ltr">_bmad-output/v1-archive-planning-artifacts/</code><br><code dir="ltr">_bmad-output/v1-archive-implementation-artifacts/</code></td>
+            <td>מנקה את נתיב הגילוי לכל מה שבא אחרי</td>
+            <td>בלי זה, מלכודות 1 ו-2 מופעלות ב-S5 וב-S7 בלי אזהרה</td>
+          </tr>
+          <tr>
+            <th>S1<small>קונטקסט</small></th>
+            <td><code dir="ltr">bmad-generate-project-context</code><br><small>"generate project context"</small></td>
+            <td><code dir="ltr">docs/v2/*</code> + <code dir="ltr">tp-fos-comprehensive-knowledge-base.md</code> כקלט brownfield</td>
+            <td><code dir="ltr">_bmad-output/project-context.md</code><small>שטוח · נדרס בכל ריצה</small></td>
+            <td>נטען כ-<code dir="ltr">persistent_facts</code> בהתאמה <code dir="ltr">file:{project-root}/**/project-context.md</code> — גם ב-<code dir="ltr">bmad-prd</code> וגם ב-<code dir="ltr">bmad-architecture</code></td>
+            <td><strong>הסקיל הראשון שמריצים.</strong> קובץ אחד שהופך כל ריצה הבאה למודעת־brownfield בלי לאלוסט מחדש</td>
+          </tr>
+          <tr>
+            <th>S2<small>PRD</small></th>
+            <td><code dir="ltr">bmad-prd</code><br><small>stakes = internal</small></td>
+            <td><code dir="ltr">01-locked-decisions</code> + <code dir="ltr">03-target-vision</code> + <code dir="ltr">04-gap-analysis</code> + <code dir="ltr">06-external-contracts</code></td>
+            <td><code dir="ltr">…/planning-artifacts/prds/prd-tailor-played-fos-{date}/prd.md</code><small>מקונן</small></td>
+            <td>להעתיק ל-<code dir="ltr">…/planning-artifacts/prd.md</code> (מלכודת 4)</td>
+            <td>סשן <strong>תמלול</strong>, לא אלוסיטציה. אין ב-v6.10 מושג של "רמה 0–4" — יש כיול סיכון בשלוש דרגות: hobby / internal / launch</td>
+          </tr>
+          <tr>
+            <th>S3<small>ארכיטקטורה</small></th>
+            <td><code dir="ltr">bmad-architecture</code><br><small>"create the architecture"</small></td>
+            <td><code dir="ltr">02-current-state</code> + הקוד החי + <code dir="ltr">prd.md</code></td>
+            <td><code dir="ltr">…/planning-artifacts/architecture/architecture-tailor-played-fos-{date}/ARCHITECTURE-SPINE.md</code><small>מקונן</small></td>
+            <td>להעתיק ל-<code dir="ltr">…/planning-artifacts/architecture.md</code></td>
+            <td><strong>השלב היחיד שבאמת פתוח.</strong> חמש שאלות אמיתיות — ראה למטה</td>
+          </tr>
+          <tr>
+            <th>S4<small>UX ממוקד</small></th>
+            <td><code dir="ltr">bmad-ux</code><br><small>"create UX specifications"</small></td>
+            <td><code dir="ltr">05-ui-spec.md</code> §2 (חוקי צפיפות) + §5 (טבלת הגורל של הרכיבים הקיימים)</td>
+            <td><code dir="ltr">…/planning-artifacts/ux-designs/ux-tailor-played-fos-{date}/DESIGN.md</code> + <code dir="ltr">EXPERIENCE.md</code></td>
+            <td>קלט לסטוריז של E3</td>
+            <td>סקופ מצומצם בכוונה: המוקאפ מכסה את חמשת המסכים החדשים. הוא <strong>לא</strong> מכסה את הריסטייל של הזמנות, מלאי, דיאלוגים/טפסים והשל — שם יש חוקי צפיפות בלי ויזואל. זו עבודת UX אמיתית</td>
+          </tr>
+          <tr>
+            <th>S5<small>אפוסים</small></th>
+            <td><code dir="ltr">bmad-create-epics-and-stories</code><br><small>"create the epics and stories list"</small></td>
+            <td><code dir="ltr">prd.md</code> + <code dir="ltr">architecture.md</code> — <strong>השטוחים</strong></td>
+            <td><code dir="ltr">…/planning-artifacts/epics.md</code><small>שטוח</small></td>
+            <td>קלט ל-S6 ול-S7</td>
+            <td>להאכיל אותו בפיצול E1–E9 של §04. הוא לא ינחש אותו לבד — הוא לא יודע ש-Gap 7 הוא L</td>
+          </tr>
+          <tr>
+            <th>S6<small>מוכנות</small></th>
+            <td><code dir="ltr">bmad-check-implementation-readiness</code></td>
+            <td>PRD + UX + ארכיטקטורה + epics</td>
+            <td><code dir="ltr">…/planning-artifacts/implementation-readiness-report-{date}.md</code></td>
+            <td>שער לפני תכנון ספרינט</td>
+            <td>להוסיף בדיקה ידנית אחת שהכלי לא יודע לעשות: האם כל אפוס מכבד את חוק הסדר מ-<code dir="ltr">00-START-HERE</code> כלל 2 — "שום דבר לא כותב את אוצר המילים החדש ל-Firestore לפני שפער 1 הושלם"</td>
+          </tr>
+          <tr>
+            <th>S7<small>ספרינט</small></th>
+            <td><code dir="ltr">bmad-sprint-planning</code><br><small>"run sprint planning"</small></td>
+            <td><code dir="ltr">epics.md</code></td>
+            <td><code dir="ltr" class="wrapcode">…/implementation-artifacts/sprint-status.yaml</code><small>שטוח · מיוצר מחדש</small></td>
+            <td>מקור הסטוריז — גם ל-<code dir="ltr">bmad-loop</code> בהמשך (<code dir="ltr">[stories] source = "sprint-status"</code>)</td>
+            <td>יוצא נקי רק בזכות S0. אחרת כלל השימור משמר את 32 הסטוריז של V1</td>
+          </tr>
+          <tr>
+            <th>S8<small>לכל סטורי</small></th>
+            <td><code dir="ltr">bmad-create-story</code> ← <code dir="ltr">bmad-dev-story</code> ← <code dir="ltr">bmad-code-review</code></td>
+            <td><code dir="ltr">sprint-status.yaml</code> + הקונטקסט של הסטורי</td>
+            <td><code dir="ltr">…/implementation-artifacts/{story_key}.md</code> (למשל <code dir="ltr">1-2-slug.md</code>) + הקוד עצמו</td>
+            <td>הסקירה מוסיפה <code dir="ltr">### Review Findings</code> לתוך קובץ הסטורי; ממצאים נדחים נצברים ב-<code dir="ltr">…/implementation-artifacts/deferred-work.md</code></td>
+            <td>שלב 10 של <code dir="ltr">bmad-dev-story</code> ממליץ להריץ סקירה עם "a different LLM than the one that implemented this story". וההנחיה של <code dir="ltr">bmad-help</code> עצמו: כל סקיל בחלון קונטקסט טרי</td>
+          </tr>
+          <tr>
+            <th>S9<small>לכל אפוס</small></th>
+            <td><code dir="ltr">bmad-retrospective</code><br><small>"lets retro the epic [epic]"</small></td>
+            <td>הסטוריז של האפוס שנסגר</td>
+            <td><code dir="ltr">…/implementation-artifacts/epic-{n}-retro-{date}.md</code></td>
+            <td>סוגר את השער ומאפשר להתקדם לאפוס הבא</td>
+            <td><code dir="ltr">gates = "per-epic"</code> עוצר אותך שם ממילא. ב-V1 זה מעולם לא הורץ — שבעת האפוסים נשארו <code dir="ltr">in-progress</code> עד היום</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>מה להכניס ל-<code dir="ltr">project-context.md</code> (S1)</h3>
+    <p>זה הקובץ שקובע את איכות כל מה שבא אחריו. הכוון אותו אל:</p>
+    <ul>
+      <li>חמשת חוקי הברזל מ-<code dir="ltr">00-START-HERE.md</code> — במיוחד "Build it right, no build-then-fix" ו-"Never fabricate financial data".</li>
+      <li>מלודת הכישלון השקט: <code dir="ltr">WO_FIELD_MAP</code> ב-<code dir="ltr" class="wrapcode">functions/src/triggers/onTransactionApproved.ts:9-13</code> — "A row with an unknown category (e.g. <code dir="ltr">production</code>) is silently ignored — the cost↔order link dies without an error."</li>
+      <li>ש-<code dir="ltr">docs/v2</code> גובר על <code dir="ltr">_bmad-output</code> בכל התנגשות (חוק ברזל 3).</li>
+      <li>שפרויקט ה-Firebase <code dir="ltr">tailor-played</code> משותף עם אפליקציית ההגשות הציבורית, ו-<code dir="ltr">firestore.rules</code> בריפו הזה הוא מקור האמת היחיד לשתיהן.</li>
+      <li>אוצר המילים הנעול: <code dir="ltr" class="wrapcode">revenue · production · materials · developing · expenses · owner-contribution · owner-withdrawal · owner-personal</code>, ושהחוזה שלו חי ב-Dumbbell, לא כאן.</li>
+      <li>שהאנום שבקוד היום הוא הישן, ושהמיפוי הוא <code dir="ltr">DirectCost→production</code>, <code dir="ltr">InventoryRestock→materials</code>, <code dir="ltr">Personal→owner-personal</code>, ו-<code dir="ltr">Overhead</code> מתפצל לפי שורה.</li>
+    </ul>
+
+    <h3>חמש השאלות הפתוחות ל-S3 (<code dir="ltr">bmad-architecture</code>)</h3>
+    <p><code dir="ltr">docs/v2</code> השאיר החלטות טכניות פתוחות במכוון. מילה במילה: <code dir="ltr">03-target-vision.md</code> §5 — "Proposed navigation (desktop-first sidebar or top-tabs; <strong>BMAD decides the shell</strong>)". ו-<code dir="ltr">05-ui-spec.md</code> §4 — "Options: hand-rolled SVG … or a small library (e.g. Recharts) — <strong>implementer decides</strong>; avoid heavy charting suites."</p>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>#</th><th>השאלה</th><th>למה זו ארכיטקטורה ולא טעם</th></tr></thead>
+        <tbody>
+          <tr><td class="num-cell">1</td><td>מנגנון המיגרציה של פער 1: סקריפט חד־פעמי, Cloud Function, או ידנית דרך <code dir="ltr">fos-mcp</code></td><td>הפרודקשן כמעט ריק (2 הזמנות עבודה, כמה עשרות שורות) — זה משנה את התשובה. חוק ברזל 2 קובע שהסדר כאן קריטי</td></tr>
+          <tr><td class="num-cell">2</td><td>גורלו של אוסף <code dir="ltr">overhead</code> ב-Firestore</td><td><code dir="ltr">03-target-vision.md</code> מגדיר את זה במפורש כ"a migration-wave decision" — הוא סירב להכריע</td></tr>
+          <tr><td class="num-cell">3</td><td>שכתוב <code dir="ltr">useDashboardData.ts</code> מדליי־חודש על תאריך יחיד לאגרגציה לפי כלל־החודש עם שני תאריכים</td><td>זה לא ריפקטור — זה שינוי במודל הזמן של כל תצוגה בדשבורד</td></tr>
+          <tr><td class="num-cell">4</td><td>אלגוריתם ההתאמה צפוי↔בפועל (סכום + קרבת תאריך), והכלל שמסמן חיובי־סליקה בבנק כהעברות</td><td>בלי הכלל הזה יש ספירה כפולה. זה בדיוק הסיכון שמנוסח בפער 3</td></tr>
+          <tr><td class="num-cell">5</td><td>האם <code dir="ltr">fos-mcp</code> מקבל ולידציה של אוצר־מילים בצד השרת</td><td>שינוי בריפו אחר, מתואם, ורק אחרי פער 1. <code dir="ltr">06-external-contracts</code> מציין שהוא "enforces NO schema and NO vocabulary" — כל הנכונות היא משמעת הכותבים</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §4 ═══════════════ -->
+<section id="s4">
+  <div class="wrap">
+    <h2><span class="num">04</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      ארבעה גלים × תשעה פערים</h2>
+    <p class="lede">זה הגשר שהופך את המסלול לספר־הרצה של V2 ולא למדריך גנרי. סדר הגלים הוא בדיוק סדר הבנייה של <code dir="ltr">04-gap-analysis.md</code>.</p>
+
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>פער</th><th>מאמץ</th><th>איפה זה חי</th><th>BMAD?</th><th>אפוס</th><th>הסקילים</th><th>הסיכון (כניסוחו ב-04) ← המענה של BMAD</th></tr></thead>
+        <tbody>
+          <tr class="wave"><td colspan="7">גל 1 · יסודות — פער 1 ← פער 2 (מקביל) ← פער 9 (מקביל, מתי שרוצים)</td></tr>
+          <tr>
+            <th>1<small>מיגרציית אוצר־מילים + ניקוי פרודקשן</small></th>
+            <td class="nowrap"><span class="tag warn">M</span></td>
+            <td><code dir="ltr">tailor-played-fos</code> (רובו) + <code dir="ltr">tailor-played-agents</code> (עותק מסונכרן + פרומפטי AI)</td>
+            <td><span class="tag ok">כן</span></td>
+            <td><span class="tag acc">E1</span></td>
+            <td><code dir="ltr">bmad-testarch-atdd</code>, <code dir="ltr">bmad-testarch-trace</code>, <code dir="ltr">bmad-review-edge-case-hunter</code>, <code dir="ltr">bmad-create-story</code>, <code dir="ltr">bmad-dev-story</code>, <code dir="ltr">bmad-code-review</code></td>
+            <td>"missing one consumer of the old strings — mitigate with a repo-wide grep checklist per string (both repos)". <strong>המענה:</strong> <code dir="ltr">bmad-testarch-trace</code> בונה בדיוק את הצ'קליסט הזה כמטריצת עקיבות עם שער <code dir="ltr">PASS/CONCERNS/FAIL</code>; <code dir="ltr">bmad-review-edge-case-hunter</code> מחזיר לכל אתר JSON קריא־מכונה <code dir="ltr">{location, trigger_condition, guard_snippet, potential_consequence}</code>; ו-<code dir="ltr">bmad-testarch-atdd</code> כותב את הטסט האדום סביב <code dir="ltr">WO_FIELD_MAP</code> <em>לפני</em> שהמיגרציה נוגעת בו</td>
+          </tr>
+          <tr>
+            <th>2<small>פירוק הצינור הישן</small></th>
+            <td class="nowrap"><span class="tag ok">S</span></td>
+            <td><code dir="ltr">tailor-played-agents</code> + Google Apps Script + Cloud Scheduler + הריפו הזה (<code dir="ltr">functions/src/email/*</code>)</td>
+            <td><span class="tag warn">חלקית</span></td>
+            <td><span class="tag">E9</span> + סטורי אחת ב-<span class="tag acc">E1</span></td>
+            <td><code dir="ltr">bmad-spec</code>, <code dir="ltr">bmad-quick-dev</code></td>
+            <td>"something undocumented still posts to the legacy intake URL — verify by <code dir="ltr">email_log</code> silence after disable". <strong>המענה:</strong> חלקי. BMAD יכול לנהל את הריטייר של <code dir="ltr">functions/src/email/*</code> כסטורי רגילה, אבל טריגרים של Apps Script ו-Cloud Scheduler מכובים ידנית בשני חשבונות Workspace — הוא לא רואה אותם ולא יזכיר לך</td>
+          </tr>
+          <tr>
+            <th>9<small>אבטחה והיגיינה</small></th>
+            <td class="nowrap"><span class="tag ok">S</span> לכל פריט</td>
+            <td>פריטים 1–2: ops חוצה מכונות וריפואים · פריטים 3–4: הריפו הזה</td>
+            <td><span class="tag warn">חלקית</span></td>
+            <td><span class="tag acc">E8</span> (3–4) · <span class="tag">E9</span> (1–2)</td>
+            <td><code dir="ltr">bmad-create-story</code>, <code dir="ltr">bmad-dev-story</code>, <code dir="ltr">bmad-code-review</code></td>
+            <td>"These are the keys to the money data." <strong>המענה:</strong> BMAD מסוגל לסגור את פריט 3 (טוקנים לכל סוכן מול <code dir="ltr">fos-mcp</code>) ואת פריט 4 (יישור <code dir="ltr">src/services/auth.ts:16-18</code> מול <code dir="ltr">firestore.rules:6-10</code>). הוא <strong>לא</strong> מסובב סודות בשבילך — פריטים 1–2 הם עבודת ידיים</td>
+          </tr>
+
+          <tr class="wave"><td colspan="7">גל 2 · סכימה — פער 3 ← פער 4 · בסופו <code dir="ltr">deliver</code> עולה לאוויר ולולאת המייל נסגרת</td></tr>
+          <tr>
+            <th>3<small>domain + שני תאריכים + expected</small></th>
+            <td class="nowrap"><span class="tag warn">M</span></td>
+            <td><code dir="ltr">tailor-played-fos</code> + חוזה Dumbbell (פליטת domain) + <code dir="ltr">fos-mcp</code> <code dir="ltr">normalize.ts</code></td>
+            <td><span class="tag ok">כן</span> (הליבה)</td>
+            <td><span class="tag acc">E2</span></td>
+            <td><code dir="ltr">bmad-architecture</code>, <code dir="ltr">bmad-testarch-test-design</code>, <code dir="ltr">bmad-create-story</code>, <code dir="ltr">bmad-dev-story</code>, <code dir="ltr">bmad-code-review</code></td>
+            <td>"month-rule double-count at credit-settlement rows — the bank feed must mark card-settlement debits as transfers". <strong>המענה:</strong> זו בעיית גבולות טהורה ← <code dir="ltr">bmad-testarch-test-design</code>. שים לב שהתלות היא בפער 6, שאינו בהישג יד — אז הכלל נכתב עכשיו ונאכף עליו בבוא היום</td>
+          </tr>
+          <tr>
+            <th>4<small>תיקוני Dumbbell + הפעלת deliver</small></th>
+            <td class="nowrap"><span class="tag ok">S–M</span></td>
+            <td><code dir="ltr">tailorplayed-dumbbell</code> — ריפו נפרד, תוסף Cowork</td>
+            <td><span class="tag warn">לא מכאן</span></td>
+            <td><span class="tag">E9</span></td>
+            <td><code dir="ltr">bmad-spec</code> — נייד. להריץ אותו <strong>שם</strong>, לא כאן</td>
+            <td>"first weekly run meets the historical backlog — supervise it". <strong>ולולאה חוצת־מערכות שאסור לאבד:</strong> אחרי ש-Dumbbell בולע את שבעת כללי הספקים הקפואים של Secretary, צריך לומר ל-Secretary להפוך אותם ל-<code dir="ltr">migrated: done</code> ב-<code dir="ltr">state/rules/vendor-rules.json</code>. BMAD לא יזכיר לך את זה. הספר הזה כן</td>
+          </tr>
+
+          <tr class="wave"><td colspan="7">גל 3 · נתוני אמת — פער 5 ← פער 6</td></tr>
+          <tr>
+            <th>5<small>פיד הכנסות SUMIT</small></th>
+            <td class="nowrap"><span class="tag warn">M</span></td>
+            <td>רכיב חדש שעדיין לא קיים (webhook ← Cloud Function ← <code dir="ltr">fos-mcp</code>, או סוכן מתוזמן)</td>
+            <td><span class="tag warn">לא</span></td>
+            <td><span class="tag">E9</span></td>
+            <td><code dir="ltr">bmad-spec</code>, <code dir="ltr">bmad-architecture</code> (להכרעת הצורה)</td>
+            <td><span dir="ltr">"SUMIT-document → domain mapping (TP vs Benefits) needs a rule — start with a manual-confirm queue"</span>. <strong>המענה:</strong> תכנון בלבד. אין קוד בריפו הזה לפתח דרכו. הערת רקע: FOS מעולם לא החזיק שורת הכנסה אחת — הזמנת העבודה האמיתית היחידה מציגה <code dir="ltr">revenueTotal 0</code></td>
+          </tr>
+          <tr>
+            <th>6<small>פיד בנק/אשראי חי</small></th>
+            <td class="nowrap"><span class="tag warn">M</span> + תחזוקה שוטפת</td>
+            <td>רכיב חדש, מסוג moneyman (One Zero + ישראכרט 9576 בלבד)</td>
+            <td><span class="tag warn">לא</span></td>
+            <td><span class="tag">E9</span></td>
+            <td><code dir="ltr">bmad-cis-problem-solving</code> — היחיד ב-CIS שמוצדק בפרויקט הזה</td>
+            <td><strong>כאן יש בעיה טכנית שהמסמכים מסמנים בלי לפתור:</strong> חסימת בוטים של Cloudflare פעילה על ישראכרט ב-2026, משמורת ה-OTP של One Zero (טוקן ארוך־טווח מול פרומפט בטלגרם), One Zero מסומן <code dir="ltr">experimental</code> בספרייה, ושבירת סקרייפרים כל כמה שבועות בכל האקוסיסטם. זו בעיה לא מוכרעת אמיתית — ולכן זה החריג היחיד לפסילת CIS</td>
+          </tr>
+
+          <tr class="wave"><td colspan="7">גל 4 · חוויה — פער 7 ← פער 8</td></tr>
+          <tr>
+            <th>7<small>חמישה מסכים + ריסטייל כלל־אפליקטיבי + גרפים</small></th>
+            <td class="nowrap"><span class="tag warn">L</span> הבלוק הגדול</td>
+            <td><code dir="ltr">tailor-played-fos</code> — כולו</td>
+            <td><span class="tag ok">כן, במלואו</span></td>
+            <td><span class="tag acc">E3</span> <span class="tag acc">E4</span> <span class="tag acc">E5</span> <span class="tag acc">E6</span> <span class="tag acc">E7</span></td>
+            <td><code dir="ltr">bmad-ux</code> (ממוקד), <code dir="ltr">bmad-create-story</code>, <code dir="ltr">bmad-dev-story</code>, <code dir="ltr">bmad-code-review</code>, <code dir="ltr">bmad-testarch-automate</code>; מ-E3 והלאה גם <code dir="ltr">bmad-loop</code></td>
+            <td>"scope creep — <strong>the mockup is the spec</strong>". <strong>המענה הוא תהליך, לא סקיל:</strong> שערים per-epic + חמשת קריטריוני הקבלה המילוליים של <code dir="ltr">05-ui-spec.md</code> §6 הופכים לקריטריוני הקבלה של הסטוריז — טקסט בסיס 13px, מסך 1440px מציג ~25 שורות בלי גלילה פנימית, RTL עם סכומים ב-LTR, שורות צפי בלתי־ניתנות לבלבול ומחוץ לסכומים בפועל, וירוק/חימר סמנטיים בלבד. <code dir="ltr">bmad-testarch-automate</code> יכול לאמת חלק מהם</td>
+          </tr>
+          <tr>
+            <th>8<small>הפעלה מחדש של Rocky</small></th>
+            <td class="nowrap"><span class="tag ok">S</span></td>
+            <td>פרויקט claude.ai — קבצי ידע, לא קוד</td>
+            <td><span class="tag warn">לא</span></td>
+            <td><span class="tag">E9</span></td>
+            <td>—</td>
+            <td>"patching stale knowledge instead of rewriting — rewrite". <strong>המענה:</strong> אין כאן סטורי של BMAD בכלל. זה שכתוב קבצי ידע בפרויקט claude.ai, כולל תיקון שגיאות הכינוי הידועות לגבי גל</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>פיצול האפוסים — לפי בלוק עבודה</h3>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>אפוס</th><th>תוכן</th><th>גל</th><th>מאמץ</th></tr></thead>
+        <tbody>
+          <tr><th>E1</th><td>פער 1 — מיגרציית אוצר־מילים + ניקוי פרודקשן</td><td>1</td><td class="nowrap"><span class="tag warn">M</span></td></tr>
+          <tr><th>E2</th><td>פער 3 — <code dir="ltr">domain</code> + שני תאריכים + <code dir="ltr">expected</code></td><td>2</td><td class="nowrap"><span class="tag warn">M</span></td></tr>
+          <tr><th>E3</th><td>פער 7a — שֶׁל + ניווט + ריסטייל כלל־אפליקטיבי</td><td>4</td><td class="nowrap"><span class="tag warn">L</span></td></tr>
+          <tr><th>E4</th><td>פער 7b — תזרים: מרשם יומי + יתרה רצה + overlay של צפויים</td><td>4</td><td>—</td></tr>
+          <tr><th>E5</th><td>פער 7c — חודש־מול־חודש + אזור הגרפים</td><td>4</td><td>—</td></tr>
+          <tr><th>E6</th><td>פער 7d — Review (+ צ'יפ דומיין) + צפויים + דומיינים</td><td>4</td><td>—</td></tr>
+          <tr><th>E7</th><td>פער 7e — חיפוש חופשי + מסנן טווח תאריכים</td><td>4</td><td class="nowrap"><span class="tag ok">S</span></td></tr>
+          <tr><th>E8</th><td>פער 9 — אבטחה: שני הפריטים שבריפו. טוקנים לכל סוכן מול <code dir="ltr">fos-mcp</code>; יישור מדיניות ה-auth בין <code dir="ltr">src/services/auth.ts:16-18</code> ל-<code dir="ltr">firestore.rules:6-10</code></td><td>מקביל</td><td class="nowrap"><span class="tag ok">S</span></td></tr>
+          <tr><th>E9</th><td>תיאום חוץ־ריפו — פערים 2, 4, 5, 6, 8. אפוס מעקב, בלי סטוריז ש-BMAD מריץ</td><td>חוצה</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <p><span class="lbl">למה לפצל ככה</span><code dir="ltr">gates = "per-epic"</code> אומר שגרנולריות האפוס <strong>היא</strong> גרנולריות האישור. פער 7 הוא L. אם הוא נשאר אפוס אחד, הוא הופך לשלושים סטוריז עם שער אחד בסוף — וזה מתנגש חזיתית בחוק ברזל 1: "Build it right, no build-then-fix." חמישה אפוסים = חמש נקודות עצירה שבהן אתה רואה מסך אמיתי לפני שממשיכים.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §5 ═══════════════ -->
+<section id="s5">
+  <div class="wrap">
+    <h2><span class="num">05</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      טריגרים — כשקורה X, מריצים Y</h2>
+    <p class="lede">הטבלה שתחזור אליה. הביטויים בעמודה האמצעית הם ביטויי ההפעלה המילוליים מתיאור הסקיל.</p>
+
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>כשקורה</th><th>מריצים</th><th>למה</th></tr></thead>
+        <tbody>
+          <tr><td>חוזרים לעבודה אחרי הפסקה ולא זוכרים איפה עצרנו</td><td><code dir="ltr">bmad-sprint-status</code><small>"check sprint status"</small></td><td>קורא את <code dir="ltr">sprint-status.yaml</code> ומחזיר את המצב בלי לנחש. הכי זול שיש</td></tr>
+          <tr><td>לא ברור מה השלב הבא בכלל</td><td><code dir="ltr">bmad-help</code><small>"what to do next"</small></td><td>מנתח את מצב הפרויקט וממליץ על הסקיל הבא. גם ההנחיה שלו על חלון קונטקסט טרי לכל סקיל מגיעה משם</td></tr>
+          <tr><td>סטורי נגמרה</td><td><code dir="ltr">bmad-code-review</code><small>"run code review"</small></td><td>בחלון חדש ובמודל אחר מזה שכתב אותה — כפי ש-<code dir="ltr">bmad-dev-story</code> ממליץ בשלב 10 שלו</td></tr>
+          <tr><td><code dir="ltr">epics.md</code> גדל מדי — של V1 היה 1894 שורות</td><td><code dir="ltr">bmad-shard-doc</code><small>"perform shard document"</small></td><td>שוברת מסמך ענק לחלקים. הגילוי של <code dir="ltr">bmad-create-epics-and-stories</code> יודע לקרוא גם <code dir="ltr">*prd*/index.md</code> משורדד</td></tr>
+          <tr><td>שינוי קטן שלא מצדיק סטורי</td><td><code dir="ltr">bmad-quick-dev</code><small>"build, fix, tweak, refactor, add or modify any code, component or feature"</small></td><td>כותב <code dir="ltr">…/implementation-artifacts/spec-{slug}.md</code> + הקוד, בלי מעגל הסטורי המלא</td></tr>
+          <tr><td>החלטה נעולה מתבררת כלא ישימה</td><td><code dir="ltr">bmad-correct-course</code><small>"propose sprint change"</small> ← ואז לעדכן את <code dir="ltr">docs/v2</code> עצמה</td><td><code dir="ltr">00-START-HERE</code>: "This folder is the single source of truth and the single management surface for v2 — every update, problem, decision, or improvement gets recorded HERE, in these files, and nowhere else." ה-<code dir="ltr">sprint-change-proposal</code> הוא הארטיפקט של BMAD; <code dir="ltr">docs/v2</code> הוא רשומת האמת. להחזיר את השינוי לשם</td></tr>
+          <tr><td>אפוס נסגר</td><td><code dir="ltr">bmad-retrospective</code></td><td><code dir="ltr">gates=per-epic</code> עוצר שם ממילא. ב-V1 זה מעולם לא הורץ, ולכן שבעת האפוסים תקועים <code dir="ltr">in-progress</code></td></tr>
+          <tr><td>ממצא נדחה בסקירה</td><td>נכנס אוטומטית ל-<code dir="ltr">deferred-work.md</code> ← בהמשך <code dir="ltr">bmad-loop sweep</code></td><td>רק אחרי שהמולטיפלקסר מתוקן. עד אז הקובץ הוא פשוט רשימת חוב קריאה</td></tr>
+          <tr><td>לולאת <code dir="ltr">bmad-loop</code> נעצרה על escalation</td><td><code dir="ltr">/bmad-loop-resolve &lt;story-key&gt;</code></td><td>הסקיל היחיד בכל ההתקנה שמתעד צורת סלאש מפורשת בטקסט שלו עצמו</td></tr>
+          <tr><td>חשד שפספסנו consumer של האנום הישן</td><td><code dir="ltr">bmad-testarch-trace</code> + <code dir="ltr">bmad-review-edge-case-hunter</code></td><td>מטריצת עקיבות עם שער, ולצידה JSON קריא־מכונה לכל אתר. בדיוק הצ'קליסט שפער 1 מבקש</td></tr>
+          <tr><td>צריך להכריע בין שתי ארכיטקטורות</td><td><code dir="ltr">bmad-architecture</code> בכוונת update, או <code dir="ltr">bmad-review-adversarial-general</code></td><td>הראשון מעדכן את עמוד השדרה; השני מחזיר לפחות 10 ממצאים לא־מדורגים ומכריח אותך להגן על הבחירה</td></tr>
+          <tr><td>סקיל כותב לנתיב הלא נכון או מתנהג לא נכון</td><td><code dir="ltr">bmad-customize</code><small>"override a skill", "customize a workflow"</small></td><td>כותב <code dir="ltr">_bmad/custom/{skill-name}.toml</code> (צוותי) או <code dir="ltr">.user.toml</code> (אישי, מוחרג מ-git)</td></tr>
+          <tr><td>צריך לעבוד בריפו אחר — Dumbbell</td><td><code dir="ltr">bmad-spec</code> — <strong>שם</strong>, לא מכאן<small>"create a spec", "distill this into a spec"</small></td><td>מפרטים לפי slug שמתעדכנים במקום עם מזהים יציבים. זה הסקיל הנייד היחיד שבאמת שווה להריץ מחוץ לריפו הזה</td></tr>
+          <tr><td>ניסוח עברית ב-UI צריך ליטוש</td><td>זה לא BMAD. הסקילים שלך: <code dir="ltr">story</code> / <code dir="ltr">ben-tone</code></td><td>ל-BMAD יש סקילי עריכה, אבל הם עורכים פרוזה טכנית באנגלית. קופי בעברית למסך של גל ובן הוא לא התחום שלהם</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §6 ═══════════════ -->
+<section id="s6">
+  <div class="wrap">
+    <h2><span class="num">06</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      הכרעה על ששת המודולים</h2>
+    <p class="lede">שניים ליבה, שניים חלקיים, שניים לא. ה"לא" הם התוכן היקר כאן — הם מחזירים לך שעות.</p>
+    <div class="legend">
+      <span><span class="m m-core">●</span> ליבה</span>
+      <span><span class="m m-part">◐</span> חלקית, בתנאים</span>
+      <span><span class="m m-no">○</span> לא בפרויקט הזה</span>
+    </div>
+
+    <div class="verdicts">
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark core">●</span><h4>BMad Method <code dir="ltr">bmm</code><span class="ver">v6.10.0 · 33 סקילים · built-in</span></h4></div>
+        <div class="vc-call core">עמוד השדרה</div>
+        <p>אבל בשני מצבים שונים. בראש המשפך (S2/S3/S4) הוא רץ במצב <strong>תמלול</strong> — ההחלטות כבר נעולות ב-<code dir="ltr">01-locked-decisions.md</code>, והתפקיד שלו הוא להמיר אותן לצורת PRD, לא לפתוח אותן מחדש. מהאפוסים ומטה הוא רץ במלואו, כמו שנועד.</p>
+        <p><span class="yes">בשימוש:</span> <code dir="ltr">bmad-generate-project-context</code>, <code dir="ltr">bmad-prd</code>, <code dir="ltr">bmad-architecture</code>, <code dir="ltr">bmad-ux</code>, <code dir="ltr">bmad-create-epics-and-stories</code>, <code dir="ltr">bmad-check-implementation-readiness</code>, <code dir="ltr">bmad-sprint-planning</code>, <code dir="ltr">bmad-sprint-status</code>, <code dir="ltr">bmad-create-story</code>, <code dir="ltr">bmad-dev-story</code>, <code dir="ltr">bmad-code-review</code>, <code dir="ltr">bmad-retrospective</code>, <code dir="ltr">bmad-correct-course</code>, <code dir="ltr">bmad-quick-dev</code>.</p>
+        <p><span class="nope">לא, ולמה:</span> <code dir="ltr">bmad-product-brief</code> — הבריף כבר קיים ברמת <code dir="ltr">docs/v2</code> כולה. <code dir="ltr">bmad-domain-research</code>, <code dir="ltr">bmad-market-research</code>, <code dir="ltr">bmad-technical-research</code> — אין כאן שוק לחקור, והמחקר הטכני שכן היה חשוב (moneyman, israeli-bank-scrapers, Cloudflare על ישראכרט) כבר יושב בתוך <code dir="ltr">04-gap-analysis.md</code>. <code dir="ltr">bmad-document-project</code> — מלכודת 3.</p>
+        <p><span class="nope">והשימים הנטושים:</span> <code dir="ltr">bmad-create-prd</code>, <code dir="ltr">bmad-edit-prd</code> ו-<code dir="ltr">bmad-validate-prd</code> מפנים כולם ל-<code dir="ltr">bmad-prd</code>; <code dir="ltr">bmad-create-architecture</code> מפנה ל-<code dir="ltr">bmad-architecture</code>. כולם אומרים בעצמם ב-SKILL.md שלהם "will be removed in v7". אל תיגע בהם. <code dir="ltr">bmad-dev-auto</code> הוא פרימיטיב שהאורקסטרטור של <code dir="ltr">bmad-loop</code> קורא לו — לא אתה.</p>
+      </div>
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark core">●</span><h4>BMad Core <code dir="ltr">core</code><span class="ver">v6.10.0 · 13 סקילים · built-in</span></h4></div>
+        <div class="vc-call core">התשתית</div>
+        <p>לא מודול שמריצים "בשלב", אלא ארגז הכלים שנשלף בנקודות. שים לב ש-<code dir="ltr">bmad-spec</code> יושב כאן — וזה בדיוק מה שהופך אותו לנייד לריפואים אחרים.</p>
+        <p><span class="yes">בשימוש:</span> <code dir="ltr">bmad-help</code> (מה השלב הבא), <code dir="ltr">bmad-customize</code> (הסטת נתיבי פלט והתנהגות סקילים), <code dir="ltr">bmad-shard-doc</code> (כש-<code dir="ltr">epics.md</code> מתנפח), <code dir="ltr">bmad-index-docs</code> (אינדקס ל-<code dir="ltr">docs/v2</code>), <code dir="ltr">bmad-spec</code> (בריפו Dumbbell), <code dir="ltr">bmad-review-edge-case-hunter</code> ו-<code dir="ltr">bmad-review-adversarial-general</code> (שתי שכבות סקירה אורתוגונליות — האחת מונעת־שיטה, השנייה מונעת־גישה), <code dir="ltr">bmad-advanced-elicitation</code> (כשצריך להעמיק בהחלטה שבאמת פתוחה).</p>
+        <p><span class="nope">לא, ולמה:</span> <code dir="ltr">bmad-forge-idea</code>, <code dir="ltr">bmad-brainstorming</code>, <code dir="ltr">bmad-party-mode</code> — כולם קיימים כדי לפתוח מרחב החלטה ש-<code dir="ltr">01-locked-decisions.md</code> סגר במפורש. <code dir="ltr">bmad-editorial-review-prose</code> ו-<code dir="ltr">bmad-editorial-review-structure</code> — עריכת פרוזה טכנית באנגלית, וזה לא צוואר הבקבוק שלך.</p>
+        <p><em>הערה על מיפוי:</em> <code dir="ltr">bmad-checkpoint-preview</code> ו-<code dir="ltr">bmad-prfaq</code> נמצאים בפועל תחת <code dir="ltr">bmm</code> ולא תחת <code dir="ltr">core</code> — לפי <code dir="ltr">_bmad/_config/skill-manifest.csv</code>. <code dir="ltr">bmad-checkpoint-preview</code> שימושי נקודתית; <code dir="ltr">bmad-prfaq</code> הוא עוד פותח־מרחב, ולכן לא.</p>
+      </div>
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark part">◐</span><h4>BMad Loop <code dir="ltr">bmad-loop</code><span class="ver">v0.9.0 · 3 סקילים · external</span></h4></div>
+        <div class="vc-call part">חסום היום — וגם לא נכון לגל 1</div>
+        <p>שתי טענות נפרדות. אל תערבב ביניהן.</p>
+        <p><strong>(א) חסום מכנית.</strong> <code dir="ltr">bmad-loop validate</code> יוצא בקוד 0 עם שורת FAIL אחת: המולטיפלקסר <code dir="ltr">PsmuxMultiplexer</code> לא זמין. אימות ב-<code dir="ltr">psmux_backend.py:262</code> מראה את התנאי המדויק: <code dir="ltr" class="wrapcode">if not all(shutil.which(exe) for exe in (self._BINARY, "pwsh")):</code> — כלומר צריך גם את הבינארי <code dir="ltr">psmux</code> וגם את <code dir="ltr">pwsh</code>. <strong>שניהם חסרים, לא רק pwsh.</strong> זה שתי התקנות, לא אחת.</p>
+        <p><strong>(ב) גם אחרי שיפתח — לא לגל 1.</strong> פער 1 הוא מיגרציה של נתוני כספים בפרודקשן שמצב הכישלון שלה <em>שקט</em>: <code dir="ltr">WO_FIELD_MAP</code> בולע קטגוריה לא מוכרת בלי שגיאה. חוק ברזל 1 הוא "Build it right, no build-then-fix". פיתוח לא־מפוקח הוא בדיוק היציבה ההפוכה. ובנוסף <code dir="ltr">[scm] isolation = "none"</code> — הלולאה עורכת את הענף שצ'קאאוט עליו, בלי worktree מבודד.</p>
+        <p><span class="yes">מתי כן:</span> גל 4, אפוסים E3–E7. סטוריז ריסטייל מכניות מול מפרט חד־משמעי (המוקאפ + חוקי הצפיפות של <code dir="ltr">05-ui-spec</code>), רדיוס פגיעה של CSS/TSX, וקריטריוני קבלה שממש מנויים אחד־אחד ב-§6 של אותו מסמך. זו בדיוק צורת העבודה שלולאה לא־מפוקחת טובה בה.</p>
+        <p><span class="nope">תנאי סף לפני <code dir="ltr">bmad-loop run</code> הראשון:</span> למלא את <code dir="ltr">[verify] commands</code> (ריק היום), לשקול מחדש את <code dir="ltr">[scm] isolation</code>, ולוודא שאפוס אחד לפחות עבר סטוריז שנסקרו ידנית — כדי שתסמוך על איכות הסטוריז לפני שאתה מוריד את היד מההגה.</p>
+      </div>
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark part">◐</span><h4>Test Architect <code dir="ltr">tea</code><span class="ver">v1.19.1 · 10 סקילים · external</span></h4></div>
+        <div class="vc-call part">צר, אבל אמיתי</div>
+        <p>לא "להוסיף טסטים" באופן כללי — ארבעה סקילים, כל אחד קשור לסיכון ספציפי שכבר מנוסח ב-<code dir="ltr">04-gap-analysis.md</code>.</p>
+        <ul>
+          <li><code dir="ltr">bmad-testarch-atdd</code> — טסט אדום סביב <code dir="ltr">WO_FIELD_MAP</code> לפני שפער 1 נוגע באנום.</li>
+          <li><code dir="ltr">bmad-testarch-trace</code> — מטריצת העקיבות שהיא הצ'קליסט שפער 1 מבקש, עם שער <code dir="ltr">PASS/CONCERNS/FAIL</code>.</li>
+          <li><code dir="ltr">bmad-testarch-test-design</code> — גבולות כלל־החודש והספירה הכפולה בשורות סליקה (פער 3).</li>
+          <li><code dir="ltr">bmad-testarch-automate</code> — הרחבת כיסוי מול קריטריוני הקבלה של <code dir="ltr">05-ui-spec</code> §6 (פער 7).</li>
+        </ul>
+        <p><span class="nope">לא, ולמה:</span> <code dir="ltr">bmad-testarch-framework</code> — Vitest + React Testing Library + jsdom כבר מוגדרים, <code dir="ltr">npm test</code> הוא <code dir="ltr">vitest run</code>. <code dir="ltr">bmad-testarch-ci</code> — <code dir="ltr">.github/workflows/ci.yml</code> כבר מריץ <code dir="ltr">npm ci → lint → test → tsc -b → build</code> על כל PR ל-main, על Node 20. <code dir="ltr">bmad-testarch-nfr</code> — שני משתמשים, טננט אחד, אין לחץ NFR ששווה ביקורת. <code dir="ltr">bmad-qa-generate-e2e-tests</code> — אין Playwright בריפו; הקמת סטאק E2E היא פרויקט בפני עצמו. אם בכלל — לשקול מחדש ב-E6 עבור מסך ה-Review בלבד.</p>
+        <p>קיימים גם <code dir="ltr">bmad-testarch-test-review</code> (ביקורת איכות הטסטים עצמם — שימושי נקודתית) ו-<code dir="ltr">bmad-teach-me-testing</code>, שהוא מסלול למידה ולא עבודת פרויקט.</p>
+      </div>
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark no">○</span><h4>Creative Intelligence Suite <code dir="ltr">cis</code><span class="ver">v0.2.1 · 10 סקילים · external</span></h4></div>
+        <div class="vc-call no">כמעט לגמרי לא</div>
+        <p>כל תפקידו של CIS הוא לייצר ולעצב רעיונות. <code dir="ltr">docs/v2</code> <strong>הוא</strong> התוצר הגמור והמאושר של בדיוק התהליך הזה, ו-<code dir="ltr">01-locked-decisions.md</code> מכריז בכותרת שלו שתכולתו היא אילוצים ולא הצעות. להריץ כאן <code dir="ltr">bmad-cis-design-thinking</code> או <code dir="ltr">bmad-cis-innovation-strategy</code> לא מוסיף — הוא פותח מחדש.</p>
+        <p><span class="yes">חריג אחד ישר:</span> <code dir="ltr">bmad-cis-problem-solving</code> על פער 6. שם המסמכים מסמנים בעיה טכנית בלי לתת לה תשובה — Cloudflare חוסם בוטים על ישראכרט (פעיל 2026), משמורת ה-OTP של One Zero (טוקן ארוך־טווח מול פרומפט בטלגרם), One Zero מסומן <code dir="ltr">experimental</code> בספרייה, ושבירת סקרייפרים כל כמה שבועות בכל האקוסיסטם. זו בעיה לא מוכרעת אמיתית, וזה המקום היחיד שבו CIS מרוויח את מקומו.</p>
+        <p>שאר המודול — <code dir="ltr">bmad-cis-storytelling</code>, שש פרסונות הסוכן — לא רלוונטי לכלי פיננסי פנימי לשני אנשים.</p>
+      </div>
+
+      <div class="vc">
+        <div class="vc-hd"><span class="vc-mark no">○</span><h4>Whiteport Design Studio <code dir="ltr">wds</code><span class="ver">v0.4.3 · 15 סקילים · external</span></h4></div>
+        <div class="vc-call no">לא. נקי.</div>
+        <p>שלוש סיבות מאומתות:</p>
+        <p><strong>(1) הצנרת שלו היא מכונת גילוי.</strong> project brief ← trigger mapping ← פרסונות ← תרחישים ← מערכת עיצוב — כל זה קיים כדי להבין מוצר שאתה עוד לא מבין למי הוא. ל-FOS יש שני משתמשים, שניהם נקובים בשם במסמכים, שניהם בחדר, והחלטה נעולה מס' 17 כבר סגרה את שאלת התפקידים היחידה שהייתה: "Review is Ben AND Gal equally — address 'the reviewer'".</p>
+        <p><strong>(2) מערכת העיצוב כבר הוכרעה</strong> עד רמת ערכי ההקס ב-<code dir="ltr">05-ui-spec.md</code>, שהכותרת שלו עצמו היא "the mockup is the spec". <code dir="ltr">wds-7-design-system</code> יכריע מחדש מה שנעול.</p>
+        <p><strong>(3) הוא בכלל מוגדר לא נכון לפרויקט הזה:</strong> <code dir="ltr">design_system_mode: none</code>, <code dir="ltr">product_languages: ["en"]</code> על אפליקציה עברית־ראשונה ב-RTL, <code dir="ltr">design-artifacts/</code> קיימת וריקה לגמרי, וה-<code dir="ltr">_bmad/wds/module-help.csv</code> שלו עדיין מפרט שמות סקילים ישנים בתבנית <code dir="ltr">bmad-wds-*</code> שלא תואמים לתיקיות המותקנות (<code dir="ltr">wds-1-project-brief</code> וכן הלאה). אל תשרוף סשן על גילוי זה.</p>
+        <p>ולסיום, בהגינות: אם FOS יגדל אי־פעם לבסיס משתמשים חיצוני אמיתי, WDS הוא הכלי הנכון. הוא פשוט לא הכלי הנכון למערכת פיננסית פנימית לשני אנשים ששפת העיצוב שלה כבר נעולה. <code dir="ltr">memory</code> ו-<code dir="ltr">sync</code> הם צנרת פנימית של WDS — לא סקילים שמשתמש קורא להם.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §7 ═══════════════ -->
+<section id="s7">
+  <div class="wrap">
+    <h2><span class="num">07</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      המצב הקיים — שלושת הפריטים</h2>
+    <p class="lede">שלושת הדברים שקיימים בריפו כרגע ונראים מדאיגים. אף אחד מהם לא באמת מדאיג, אבל שניים מהם דורשים פעולה.</p>
+
+    <h3>1 · «32 stories, 0 actionable» — מה זה באמת</h3>
+    <p>V1 נשלח במלואו. כל 32 הסטוריז מסומנות <code dir="ltr">done</code>. אבל שבעת האפוסים נשארו <code dir="ltr">in-progress</code> כי רטרוספקטיבה מעולם לא הורצה — שבע רשומות <code dir="ltr">retrospective: optional</code> יושבות שם עד היום. "0 actionable" פירושו פשוט "לא נשאר שום דבר שאינו done". זה לא באג ולא חוסר.</p>
+    <p>האפוסים של V1, לשם ההקשר: E1 Project Foundation &amp; App Shell · E2 Work Orders &amp; Manual Financial Tracking · E3 Dashboard &amp; Project Health · E4 Email Ingestion &amp; AI Document Processing · E5 Ghost Text Review &amp; Transaction Approval · E6 Inventory Management &amp; WAC Engine · E7 Overhead, Tax Intelligence &amp; Forward Projections.</p>
+    <div class="callout">
+      <p><span class="lbl">הטעות המפתה</span>אל תמחזר את מספור האפוסים של V1 עבור V2. מפתחות הסטוריז הם <code dir="ltr">{epic}-{story}-{title-slug}</code> ולכן שינוי כותרת חומק מהתנגשות — אבל <code dir="ltr">epic-1</code> עד <code dir="ltr">epic-7</code> מתנגשים ישירות, וכלל השימור של <code dir="ltr">bmad-sprint-planning</code> יעדיף את הסטטוס "המתקדם יותר" של V1. הפתרון הוא S0.</p>
+    </div>
+
+    <h3>2 · ארטיפקטי V1 ב-<code dir="ltr">_bmad-output/</code></h3>
+    <p>הם <strong>עקובים ב-git</strong> — <code dir="ltr">git ls-files _bmad-output</code> מחזיר את כל 39 הקבצים. (לשם השוואה: <code dir="ltr">_bmad/</code> מוחרג ב-<code dir="ltr">.gitignore:192</code>, ו-<code dir="ltr">.bmad-loop/policy.toml</code> מוחרג ב-<code dir="ltr">:198</code> בעוד <code dir="ltr">.bmad-loop/bmad_loop_hook.py</code> דווקא עקוב.)</p>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>קובץ</th><th>גודל</th><th>מה זה</th></tr></thead>
+        <tbody>
+          <tr><td><code dir="ltr">planning-artifacts/prd.md</code></td><td class="num-cell nowrap">470 שורות</td><td>2026-02-05 · 50 דרישות פונקציונליות · 8 מודולים · אנום ישן · TailorPlayed בלבד · מחבר <code dir="ltr">Galelbaz</code></td></tr>
+          <tr><td><code dir="ltr">planning-artifacts/architecture.md</code></td><td class="num-cell nowrap">886 שורות</td><td>הארכיטקטורה של V1</td></tr>
+          <tr><td><code dir="ltr">planning-artifacts/epics.md</code></td><td class="num-cell nowrap">1894 שורות</td><td>שבעת האפוסים ו-32 הסטוריז</td></tr>
+          <tr><td><code dir="ltr">planning-artifacts/ux-design-specification.md</code></td><td class="num-cell nowrap">1182 שורות</td><td>+ <code dir="ltr">ux-design-directions.html</code></td></tr>
+          <tr><td><code dir="ltr">planning-artifacts/prd-validation-report.md</code></td><td class="num-cell nowrap">541 שורות</td><td>+ <code dir="ltr">implementation-readiness-report.md</code> (276) + <code dir="ltr">product-brief-TP-FOS-2026-02-05.md</code> (229)</td></tr>
+          <tr><td><code dir="ltr">implementation-artifacts/</code></td><td class="num-cell nowrap">33 קבצים</td><td><code dir="ltr">sprint-status.yaml</code> + 32 קבצי סטורי, מ-<code dir="ltr">1-1</code> עד <code dir="ltr">7-4</code></td></tr>
+          <tr><td><code dir="ltr">tp-fos-comprehensive-knowledge-base.md</code></td><td class="num-cell nowrap">1572 שורות</td><td>נוצר 2026-02-06 — <strong>הפריט היחיד ששווה להציל</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>לפי חוק ברזל 3 הם היסטוריה ורקע, לא דרישות: "v1 docs describe the OLD category enum and a TailorPlayed-only scope as truth — for v2 they are history and background, not requirements." שים לב גם לפרט הקטן שמסגיר את גילם — הפרונטמטר אומר מחבר <code dir="ltr">Galelbaz</code>, בעוד <code dir="ltr">_bmad</code> היום מוגדר <code dir="ltr">user_name = Ben</code>.</p>
+    <p><strong>מה כן להציל:</strong> <code dir="ltr">tp-fos-comprehensive-knowledge-base.md</code> הוא קלט brownfield סביר ל-<code dir="ltr">bmad-generate-project-context</code> — כל עוד אוצר המילים שבו מנוכה כאנום הישן. ארכוב מוציא את V1 מנתיב הגילוי; הוא לא מוחק היסטוריה.</p>
+
+    <h3>3 · חסימת <code dir="ltr">pwsh</code> / <code dir="ltr">psmux</code></h3>
+    <p><code dir="ltr">bmad-loop validate</code> — יציאה בקוד 0, שורת FAIL אחת:</p>
+<pre dir="ltr"><code><b>FAIL</b>: multiplexer PsmuxMultiplexer unavailable — its transport binary is missing, the version is
+      unsupported, or a required helper is absent (psmux needs `pwsh` on PATH); see `bmad-loop diagnose`
+  ok: BMAD config OK: artifacts at ...\_bmad-output\implementation-artifacts
+  ok: policy OK: gates=per-epic, adapter dev=claude, review=claude, triage=claude
+  ok: sprint-status OK: 32 stories, 0 actionable
+  ok: git worktree clean
+  ok: mux backends: tmux (unavailable), psmux* (unavailable)
+  ok: process host: WindowsProcessHost
+  ok: claude found
+  ok: bmad-loop hooks registered for claude
+  ok: upstream skills present (bmad-dev-auto + review layers)</code></pre>
+<pre dir="ltr"><code>$ bmad-loop mux
+NAME   PLATFORM  AVAILABLE  VERSION  SELECTED
+tmux   no        no         -
+psmux  yes       no         -        * fallback (no registered backend is available)</code></pre>
+    <div class="callout">
+      <p><span class="lbl">תיקון להבנה הקודמת</span>ההנחה הייתה "אין <code dir="ltr">pwsh</code>, ולכן אין מולטיפלקסר". האימות ב-<code dir="ltr">psmux_backend.py:262</code> מראה תנאי כפול — <code dir="ltr" class="wrapcode">if not all(shutil.which(exe) for exe in (self._BINARY, "pwsh")):</code> כאשר <code dir="ltr">_BINARY = "psmux"</code>. <strong>שניהם חסרים.</strong> זה שתי התקנות, לא אחת.</p>
+    </div>
+<pre dir="ltr"><code>winget install Microsoft.PowerShell     # pwsh 7
+winget install marlocarlo.psmux         # psmux 3.3.7 — מאומת קיים ב-winget
+bmad-loop mux                           # לוודא AVAILABLE=yes
+bmad-loop validate                      # להריץ preflight מחדש</code></pre>
+    <p>(<code dir="ltr">choco</code> ו-<code dir="ltr">scoop</code> לא מותקנים על המכונה הזו. <code dir="ltr">winget</code> כן.)</p>
+    <p><strong>וביושר: זה לא דחוף.</strong> הלולאה לא אמורה לרוץ לפני גל 4 בכל מקרה. תקן את זה כשתגיע ל-E3, לא לפני.</p>
+
+    <h3>שני תיקוני קונפיגורציה שכן שווה לעשות</h3>
+    <p><code dir="ltr">.bmad-loop/policy.toml</code> נמצא כרגע במצב: <code dir="ltr">[gates] mode = "per-epic"</code>, <code dir="ltr">retrospective = "notify"</code> · <code dir="ltr">[adapter] name = "claude"</code>, <code dir="ltr">model = ""</code> (ברירת מחדל של ה-CLI), בלי דריסות לפי שלב · <code dir="ltr">[scm] isolation = "none"</code>, <code dir="ltr">max_parallel = 1</code> · <code dir="ltr">[stories] source = "sprint-status"</code> · <code dir="ltr">[sweep] auto = "never"</code> · <code dir="ltr">max_review_cycles = 3</code>, <code dir="ltr">max_dev_attempts = 2</code>, <code dir="ltr">session_timeout_min = 90</code>. ו-<code dir="ltr">[verify] commands = []</code> — <strong>ריק. אין שער דטרמיניסטי בכלל.</strong> התיקון, בהתאמה למה ש-<code dir="ltr">.github/workflows/ci.yml</code> כבר מריץ:</p>
+<pre dir="ltr"><code>[verify]
+commands = ["npm run lint", "npm run test", "npx tsc -b"]</code></pre>
+    <div class="note">
+      <p><strong>ועל ההוקים — אין מה לדאוג.</strong> <code dir="ltr">.claude/settings.json</code> רושם <code dir="ltr">SessionStart</code> / <code dir="ltr">Stop</code> / <code dir="ltr">SessionEnd</code> / <code dir="ltr">PreCompact</code> אל <code dir="ltr" class="wrapcode">uv run --no-project python "$CLAUDE_PROJECT_DIR"/.bmad-loop/bmad_loop_hook.py &lt;Event&gt;</code>. ההוק הוא ממסר stdlib טהור שמסיים ב-exit 0 בלי לעשות כלום, אלא אם הסשן הוזנק על ידי <code dir="ltr">bmad-loop</code> — הוא מזהה זאת דרך <code dir="ltr">BMAD_LOOP_RUN_DIR</code> / <code dir="ltr">BMAD_LOOP_TASK_ID</code>. סשנים אינטראקטיביים רגילים לא מושפעים.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §8 ═══════════════ -->
+<section id="s8">
+  <div class="wrap">
+    <h2><span class="num">08</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      מה מריצים מחר בבוקר</h2>
+    <p class="lede">רצף אחד, ניתן לביצוע. סך הכל בערך יום עבודה עד ל-<code dir="ltr">sprint-status.yaml</code> נקי ולסטורי הראשונה.</p>
+
+    <ol class="steps">
+      <li class="step">
+        <div class="step-hd"><span class="step-n">1</span><span class="step-t">S0 — הפינוי. בלי סקיל.</span><span class="dur">10 דק'</span></div>
+        <p>שלוש הפקודות מ-§02. <code dir="ltr">git mv</code> על שתי תיקיות הארטיפקטים, ואז קומיט.</p>
+        <p class="done"><b>סיימת כש…</b> <code dir="ltr">ls _bmad-output/</code> מראה רק <code dir="ltr">v1-archive-*</code> ו-<code dir="ltr">tp-fos-comprehensive-knowledge-base.md</code>, ו-<code dir="ltr">git status</code> נקי.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">2</span><span class="step-t"><code dir="ltr">bmad-generate-project-context</code> — בחלון טרי</span><span class="dur">25 דק'</span></div>
+        <p>זה הסקיל הראשון שאתה מריץ. כוון אותו אל: חמשת חוקי הברזל, מלכודת הכישלון השקט של <code dir="ltr">WO_FIELD_MAP</code>, ש-<code dir="ltr">docs/v2</code> גובר על <code dir="ltr">_bmad-output</code>, פרויקט ה-Firebase המשותף (<code dir="ltr">firestore.rules</code> = מקור אמת יחיד לשתי אפליקציות), "never fabricate financial data", ואוצר המילים הנעול. תן לו את <code dir="ltr">tp-fos-comprehensive-knowledge-base.md</code> כרקע — עם הערה מפורשת שאוצר המילים שבו הוא הישן.</p>
+        <p class="done"><b>סיימת כש…</b> <code dir="ltr">_bmad-output/project-context.md</code> קיים ומכיל את חוק הסדר של פער 1 במילים מפורשות.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">3</span><span class="step-t"><code dir="ltr">bmad-prd</code> — סשן תמלול</span><span class="dur">60–90 דק'</span></div>
+        <p>הזן <code dir="ltr">01</code> + <code dir="ltr">03</code> + <code dir="ltr">04</code> + <code dir="ltr">06</code>. כיול סיכון: <strong>internal</strong> — "Length scales with stakes. Hobby / solo PRDs aim for about two pages. Internal tools land around five to eight."</p>
+        <p>פתח בהוראה מפורשת: ההחלטות האלה נעולות על ידך מ-2026-07-02; לתמלל אותן לצורת PRD, לא לפתוח אותן מחדש, ולא להמציא דרישות פונקציונליות שהמסמכים לא תומכים בהן.</p>
+        <p class="done"><b>סיימת כש…</b> ה-PRD סגור עם <code dir="ltr">status: final</code>, והעתקת אותו אל <code dir="ltr">_bmad-output/planning-artifacts/prd.md</code>.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">4</span><span class="step-t"><code dir="ltr">bmad-architecture</code> — השלב היחיד שבאמת פתוח</span><span class="dur">60–90 דק'</span></div>
+        <p>חמש השאלות מ-§03: מנגנון המיגרציה, גורל אוסף <code dir="ltr">overhead</code>, השכתוב של <code dir="ltr">useDashboardData.ts</code>, אלגוריתם ההתאמה צפוי↔בפועל וכלל ההעברות, וולידציית אוצר־מילים ב-<code dir="ltr">fos-mcp</code>. בנוסף — הכרעת השל (סיידבר מול טאבים) והכרעת ספריית הגרפים, ששני המסמכים השאירו לו במפורש.</p>
+        <p>מצב brownfield: הוא קורא את הקוד האמיתי ומאשרר את הקונבנציות הקיימות במקום להמציא חדשות.</p>
+        <p class="done"><b>סיימת כש…</b> <code dir="ltr">ARCHITECTURE-SPINE.md</code> סגור, הועתק ל-<code dir="ltr">…/planning-artifacts/architecture.md</code>, וכל אחת מחמש השאלות קיבלה תשובה מנומקת.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">5</span><span class="step-t"><code dir="ltr">bmad-create-epics-and-stories</code></span><span class="dur">30 דק'</span></div>
+        <p>עם פיצול E1–E9 מ-§04. הוא לא ינחש אותו לבד — הוא לא יודע שפער 7 הוא L ולא יודע ש-E9 הוא אפוס מעקב ללא סטוריז.</p>
+        <p class="done"><b>סיימת כש…</b> <code dir="ltr">…/planning-artifacts/epics.md</code> מכיל תשעה אפוסים, ו-E9 מסומן במפורש כתיאום חוץ־ריפו.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">6</span><span class="step-t"><code dir="ltr">bmad-check-implementation-readiness</code> ← <code dir="ltr">bmad-sprint-planning</code></span><span class="dur">15 דק'</span></div>
+        <p>ואז בדיקה ידנית אחת שהכלי לא יודע לעשות: האם כל אפוס מכבד את חוק הסדר — שום דבר לא כותב את אוצר המילים החדש ל-Firestore לפני שפער 1 הושלם.</p>
+        <p class="done"><b>סיימת כש…</b> <code dir="ltr" class="wrapcode">…/implementation-artifacts/sprint-status.yaml</code> חדש, בלי אף מפתח אפוס של V1.</p>
+      </li>
+
+      <li class="step">
+        <div class="step-hd"><span class="step-n">7</span><span class="step-t">הסטורי הראשונה של E1 — ומהלך הפתיחה שלה</span><span class="dur">—</span></div>
+        <p>המהלך הראשון ב-E1 הוא <code dir="ltr">bmad-testarch-atdd</code>: טסטים אדומים סביב <code dir="ltr">WO_FIELD_MAP</code> לפני שמשהו נוגע באנום. רק אחרי שהם אדומים ועובדים — <code dir="ltr">bmad-create-story</code> ← <code dir="ltr">bmad-dev-story</code> ← <code dir="ltr">bmad-code-review</code>.</p>
+        <p class="done"><b>סיימת כש…</b> יש טסט שנופל היום ויעבור אחרי המיגרציה, ושמוכיח שקטגוריה לא מוכרת <em>לא</em> נבלעת בשקט.</p>
+      </li>
+    </ol>
+
+    <div class="dont">
+      <h3>ומה <em>לא</em> לעשות מחר בבוקר</h3>
+      <ul>
+        <li><strong>אל תתחיל ב-<code dir="ltr">bmad-prd</code>.</strong> זו האינטואיציה, וזו בדיוק מלכודת 1 — ה-PRD של V1 יושב בנתיב הגילוי ויתפוס פיקוד.</li>
+        <li><strong>אל תריץ <code dir="ltr">bmad-document-project</code>.</strong> הוא כותב לתוך <code dir="ltr">docs/</code> ליד החבילה המאושרת, ו-<code dir="ltr">02-current-state.md</code> כבר עדיף ממנו — עם עוגני <code dir="ltr">file:line</code> וממצאי Firestore חיים.</li>
+        <li><strong>אל תריץ <code dir="ltr">bmad-loop run</code>.</strong> חסום (חסרים <code dir="ltr">psmux</code> וגם <code dir="ltr">pwsh</code>), ובכל מקרה לא מתאים לגל 1 — פיתוח לא־מפוקח מול מיגרציה עם כישלון שקט הוא היציבה ההפוכה לחוק ברזל 1.</li>
+        <li><strong>אל תפתח שום מודול CIS או WDS.</strong> ההחלטות נעולות. החריג היחיד הוא <code dir="ltr">bmad-cis-problem-solving</code> — ורק כשתגיע לפער 6.</li>
+        <li><strong>אל תריץ את השימים הנטושים</strong> <code dir="ltr">bmad-create-prd</code> · <code dir="ltr">bmad-edit-prd</code> · <code dir="ltr">bmad-validate-prd</code> · <code dir="ltr">bmad-create-architecture</code>. כולם מפנים הלאה ומסומנים להסרה ב-v7.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ §9 ═══════════════ -->
+<section id="s9">
+  <div class="wrap">
+    <h2><span class="num">09</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      נספח — מלאי הסקילים המאומת</h2>
+    <p class="lede">כל 84 התיקיות ב-<code dir="ltr">.claude/skills/</code>, מקובצות לפי מודול לפי <code dir="ltr">_bmad/_config/skill-manifest.csv</code>. אף שם בעמוד הזה לא נלקח משום מקום אחר.</p>
+    <div class="legend">
+      <span><span class="m m-core">●</span> בשימוש במסלול</span>
+      <span><span class="m m-part">◐</span> בתנאי / נקודתי</span>
+      <span><span class="m m-no">○</span> לא בפרויקט הזה</span>
+    </div>
+
+    <details>
+      <summary>פתח את המלאי המלא — 84 סקילים</summary>
+      <div class="det-body">
+
+        <div class="modhd">bmm <span class="cnt">· 33 · v6.10.0</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-generate-project-context</code></td><td>הסקיל הראשון שמריצים</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-prd</code></td><td>PRD — במצב תמלול של docs/v2</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-architecture</code></td><td>עמוד שדרה; חמש שאלות פתוחות</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-ux</code></td><td>רק מה שהמוקאפ לא מכסה</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-create-epics-and-stories</code></td><td>E1–E9 מתוך תשעת הפערים</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-check-implementation-readiness</code></td><td>שער לפני תכנון הספרינט</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-sprint-planning</code></td><td>מייצר sprint-status.yaml נקי</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-sprint-status</code></td><td>איפה עצרנו, בלי לנחש</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-create-story</code></td><td>סטורי הבאה עם קונטקסט מלא</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-dev-story</code></td><td>מימוש; עורך את קובץ הסטורי במקום</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-code-review</code></td><td>סקירה יריבה אחרי כל סטורי</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-retrospective</code></td><td>בסוף כל אפוס — השער</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-correct-course</code></td><td>כשהחלטה נעולה נשברת</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-quick-dev</code></td><td>שינוי קטן בלי מעגל סטורי</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-checkpoint-preview</code></td><td>תצוגה מקדימה נקודתית</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-agent-architect</code></td><td>פרסונת Winston — לדיון ארכיטקטורה</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-document-project</code></td><td>כותב לתוך docs/; מלכודת 3</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-product-brief</code></td><td>הבריף כבר קיים ב-docs/v2</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-domain-research</code></td><td>הדומיין ידוע ומתועד</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-market-research</code></td><td>אין שוק — שני משתמשים</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-technical-research</code></td><td>המחקר כבר בתוך 04-gap-analysis</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-prfaq</code></td><td>פותח מרחב החלטה שנסגר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-qa-generate-e2e-tests</code></td><td>אין Playwright בריפו</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-dev-auto</code></td><td>פרימיטיב אוטומציה — לא ידני</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-create-prd</code> <span class="tag dead">deprecated</span></td><td>שים נטוש ← bmad-prd</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-edit-prd</code> <span class="tag dead">deprecated</span></td><td>שים נטוש ← bmad-prd</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-validate-prd</code> <span class="tag dead">deprecated</span></td><td>שים נטוש ← bmad-prd</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-create-architecture</code> <span class="tag dead">deprecated</span></td><td>שים נטוש ← bmad-architecture</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-agent-analyst</code></td><td>פרסונה — הניתוח כבר נעשה</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-agent-dev</code></td><td>פרסונה — הסקילים הישירים עדיפים</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-agent-pm</code></td><td>פרסונה — ההחלטות נעולות</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-agent-tech-writer</code></td><td>פרסונה — docs/v2 כבר כתוב</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-agent-ux-designer</code></td><td>פרסונה — המוקאפ הוא המפרט</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="modhd">core <span class="cnt">· 13 · v6.10.0</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-help</code></td><td>מה השלב הבא, כשלא ברור</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-review-edge-case-hunter</code></td><td>JSON קריא־מכונה של מקרי קצה</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-customize</code></td><td>הסטת נתיבי פלט והתנהגות</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-shard-doc</code></td><td>כש-epics.md מתנפח</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-index-docs</code></td><td>אינדקס לתיקיית docs/v2</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-spec</code></td><td>נייד — להריץ בריפו Dumbbell</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-review-adversarial-general</code></td><td>ביקורת ציניקן, ≥10 ממצאים</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-advanced-elicitation</code></td><td>העמקה בהחלטה שבאמת פתוחה</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-brainstorming</code></td><td>פותח מרחב שכבר נסגר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-forge-idea</code></td><td>אין רעיון לחשל</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-party-mode</code></td><td>מולטי־פרסונה; לא נחוץ</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-editorial-review-prose</code></td><td>פרוזה טכנית באנגלית</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-editorial-review-structure</code></td><td>מבנה טקסט; לא צוואר הבקבוק</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="modhd">tea <span class="cnt">· 10 · v1.19.1</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-testarch-atdd</code></td><td>טסט אדום סביב WO_FIELD_MAP</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-testarch-trace</code></td><td>מטריצת עקיבות למיגרציה</td></tr>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-testarch-test-design</code></td><td>גבולות כלל־החודש</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-testarch-automate</code></td><td>כיסוי לקריטריוני 05-ui-spec §6</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-testarch-test-review</code></td><td>ביקורת איכות הטסטים עצמם</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-testarch-framework</code></td><td>Vitest + RTL + jsdom כבר מוגדרים</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-testarch-ci</code></td><td>ci.yml כבר רץ על כל PR</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-testarch-nfr</code></td><td>שני משתמשים; אין לחץ NFR</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-tea</code></td><td>פרסונת ארכיטקט הבדיקות</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-teach-me-testing</code></td><td>מסלול למידה, לא עבודת פרויקט</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="modhd">bmad-loop <span class="cnt">· 3 · v0.9.0</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-core">●</td><td><code dir="ltr">bmad-loop-setup</code></td><td>כבר הורץ — ההתקנה קיימת</td></tr>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-loop-resolve</code></td><td><code dir="ltr">/bmad-loop-resolve &lt;story-key&gt;</code> על escalation</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-loop-sweep</code></td><td>פרימיטיב — האורקסטרטור קורא לו</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="modhd">cis <span class="cnt">· 10 · v0.2.1</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-part">◐</td><td><code dir="ltr">bmad-cis-problem-solving</code></td><td>החריג היחיד — פער 6 בלבד</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-design-thinking</code></td><td>פותח מחדש החלטות נעולות</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-innovation-strategy</code></td><td>אין אסטרטגיה לגלות</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-storytelling</code></td><td>אין קהל לספר לו</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-brainstorming-coach</code></td><td>פרסונת סיעור מוחות</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-creative-problem-solver</code></td><td>פרסונה; הסקיל הישיר מספיק</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-design-thinking-coach</code></td><td>פרסונה; העיצוב נעול</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-innovation-strategist</code></td><td>פרסונה; אין מרחב חדשנות פתוח</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-presentation-master</code></td><td>פרסונה; אין מצגת</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">bmad-cis-agent-storyteller</code></td><td>פרסונה; לא רלוונטי</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="modhd">wds <span class="cnt">· 15 · v0.4.3</span></div>
+        <div class="scroll-x"><table>
+          <thead><tr><th></th><th>סקיל</th><th>הערה</th></tr></thead>
+          <tbody>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-0-project-setup</code></td><td>הפרויקט כבר מוגדר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-0-alignment-signoff</code></td><td>יישור מול מי? שני אנשים בחדר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-1-project-brief</code></td><td>הבריף קיים ומאושר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-2-trigger-mapping</code></td><td>מיפוי טריגרים למשתמשים ידועים</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-3-scenarios</code></td><td>תרחישים כבר ב-03-target-vision</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-4-ux-design</code></td><td>המוקאפ הוא המפרט</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-5-agentic-development</code></td><td>מסלול פיתוח מקביל ל-bmm</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-6-asset-generation</code></td><td>אין נכסים חזותיים לייצר</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-7-design-system</code></td><td>יכריע מחדש מה שנעול ב-05-ui-spec</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-8-product-evolution</code></td><td>שלב אחרי שיש משתמשים</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-agent-freya-ux</code></td><td>פרסונת UX של WDS</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-agent-mimir-builder</code></td><td>פרסונת בנאי של WDS</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">wds-agent-saga-analyst</code></td><td>פרסונת אנליסט של WDS</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">memory</code></td><td>צנרת פנימית — לא נקרא ידנית</td></tr>
+            <tr><td class="m m-no">○</td><td><code dir="ltr">sync</code></td><td>צנרת פנימית — לא נקרא ידנית</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="note" style="margin-top:24px">
+          <p><strong>הערות שוליים.</strong> ארבעה שימים נטושים שמפנים הלאה ומצהירים בעצמם "will be removed in v7": <code dir="ltr">bmad-create-prd</code>, <code dir="ltr">bmad-edit-prd</code>, <code dir="ltr">bmad-validate-prd</code> ← כולם ל-<code dir="ltr">bmad-prd</code>; <code dir="ltr">bmad-create-architecture</code> ← ל-<code dir="ltr">bmad-architecture</code>.</p>
+          <p><code dir="ltr">memory</code> ו-<code dir="ltr">sync</code> הם צנרת פנימית של WDS ולא ניתנים להפעלה על ידי משתמש. <code dir="ltr">bmad-dev-auto</code> ו-<code dir="ltr">bmad-loop-sweep</code> הם פרימיטיבים שהאורקסטרטור של <code dir="ltr">bmad-loop</code> קורא להם — אדם לא קורא להם ישירות.</p>
+          <p>סקילים מופעלים בביטוי ההפעלה שלהם בצ'אט או כ-<code dir="ltr">/skill-name</code>. סקיל אחד בלבד בכל ההתקנה מתעד צורת סלאש מפורשת בטקסט שלו עצמו: <code dir="ltr">bmad-loop-resolve</code> — "Invoked as <code dir="ltr">/bmad-loop-resolve &lt;story-key&gt;</code>".</p>
+        </div>
+
+      </div>
+    </details>
+
+    <h3>פעלי ה-CLI של <code dir="ltr">bmad-loop</code></h3>
+    <p>מאומת מ-<code dir="ltr">--help</code>: <code dir="ltr">init</code>, <code dir="ltr">validate</code>, <code dir="ltr">mux</code>, <code dir="ltr">probe-adapter</code>, <code dir="ltr">run</code>, <code dir="ltr">sweep</code>, <code dir="ltr">resume</code>, <code dir="ltr">resolve</code>, <code dir="ltr">decisions</code>, <code dir="ltr">list</code>/<code dir="ltr">ls</code>, <code dir="ltr">status</code>, <code dir="ltr">diagnose</code>/<code dir="ltr">diag</code>, <code dir="ltr">attach</code>, <code dir="ltr">stop</code>, <code dir="ltr">delete</code>, <code dir="ltr">archive</code>, <code dir="ltr">cleanup</code>, <code dir="ltr">clean</code>, <code dir="ltr">tui</code>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>כל שם סקיל בעמוד הזה מגיע מ-<code dir="ltr">.claude/skills/</code> — 84 תיקיות, מאומת מול <code dir="ltr">_bmad/_config/skill-manifest.csv</code> ו-<code dir="ltr">_bmad/_config/manifest.yaml</code>.</p>
+    <p>כל נתיב פלט הוא נתיב שנפתר מול <code dir="ltr">_bmad/config.toml</code> ו-<code dir="ltr">_bmad/bmm/config.yaml</code> של הפרויקט הזה — לא ברירות מחדל של התיעוד. הציטוטים מ-<code dir="ltr">docs/v2</code> מילוליים.</p>
+    <p style="margin-top:12px">FOS v2 · <code dir="ltr">tailor-played-fos</code> · BMAD v6.10.0</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themeBtn'), lbl=document.getElementById('themeLbl');
+  var KEY='fos-v2-playbook-theme';
+  function sysDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;}
+  function effective(){var s=root.getAttribute('data-theme');return s?s:(sysDark()?'dark':'light');}
+  function paint(){lbl.textContent=(effective()==='dark')?'כהה':'בהיר';}
+  try{var saved=localStorage.getItem(KEY); if(saved==='dark'||saved==='light'){root.setAttribute('data-theme',saved);} }catch(e){}
+  paint();
+  btn.addEventListener('click',function(){
+    var next=(effective()==='dark')?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem(KEY,next);}catch(e){}
+    paint();
+  });
+  if(window.matchMedia){
+    var mq=window.matchMedia('(prefers-color-scheme: dark)');
+    var onCh=function(){if(!root.getAttribute('data-theme'))paint();};
+    if(mq.addEventListener)mq.addEventListener('change',onCh);else if(mq.addListener)mq.addListener(onCh);
+  }
+})();
+</script>
+
+</body>
+</html>

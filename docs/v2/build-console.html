@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>FOS V2 — קונסולת הבנייה</title>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --border:#ececec; --border-strong:#dfe3e8;
+  --text:#1d1d1f; --text-2:#5f6570; --text-3:#9aa0a8;
+  --accent:#0e9f9a; --accent-soft:#e6f5f4; --accent-border:#bfe6e4;
+  --income:#1e8e5a; --income-soft:#e9f6ef;
+  --expense:#b4552d; --expense-soft:#faf0ea;
+  --owner:#6b5bd2; --owner-soft:#efedfa;
+  --ghost:#8b93a0; --radius:10px;
+  --shadow:0 1px 2px rgba(20,24,32,.05), 0 4px 14px rgba(20,24,32,.04);
+  --mono:ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101214; --surface:#191c1f; --border:#26292d; --border-strong:#31353a;
+    --text:#e8eaed; --text-2:#a6adb5; --text-3:#6f767e;
+    --accent:#17b3ad; --accent-soft:rgba(23,179,173,.13); --accent-border:rgba(23,179,173,.35);
+    --income:#3fae7a; --income-soft:rgba(63,174,122,.14);
+    --expense:#c86a42; --expense-soft:rgba(200,106,66,.14);
+    --owner:#8b7de0; --owner-soft:rgba(139,125,224,.14);
+    --ghost:#7a828c;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101214; --surface:#191c1f; --border:#26292d; --border-strong:#31353a;
+  --text:#e8eaed; --text-2:#a6adb5; --text-3:#6f767e;
+  --accent:#17b3ad; --accent-soft:rgba(23,179,173,.13); --accent-border:rgba(23,179,173,.35);
+  --income:#3fae7a; --income-soft:rgba(63,174,122,.14);
+  --expense:#c86a42; --expense-soft:rgba(200,106,66,.14);
+  --owner:#8b7de0; --owner-soft:rgba(139,125,224,.14);
+  --ghost:#7a828c;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Rubik","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:13px; line-height:1.45; overflow-x:clip;
+}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+p{margin:0 0 7px}
+p:last-child{margin-bottom:0}
+ul,ol{margin:0 0 7px; padding-inline-start:20px}
+li{margin:0 0 3px}
+li:last-child{margin-bottom:0}
+a{color:var(--accent); text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere;direction:ltr;unicode-bidi:isolate}
+code.k{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);border-radius:6px;padding:0 5px}
+code.f{background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:6px;padding:0 5px}
+kbd{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:var(--surface);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1060px;margin:0 auto;padding:7px 18px;display:flex;align-items:center;gap:10px}
+.brand{font-size:12px;font-weight:600;white-space:nowrap;color:var(--text)}
+.brand span{color:var(--text-3);font-weight:400}
+.nav{display:flex;gap:5px;overflow-x:auto;flex:1 1 auto;min-width:0;padding:2px 0;scrollbar-width:thin}
+.nav a{
+  white-space:nowrap;font-size:10.5px;line-height:1.6;padding:1px 7px;border-radius:6px;
+  color:var(--text-2);border:1px solid var(--border);background:var(--bg);
+}
+.nav a:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-soft);text-decoration:none}
+.tbtn{
+  flex:0 0 auto;font:inherit;font-size:10.5px;cursor:pointer;padding:2px 9px;border-radius:6px;
+  background:var(--bg);color:var(--text-2);border:1px solid var(--border-strong);
+  display:inline-flex;align-items:center;gap:5px;
+}
+.tbtn:hover{color:var(--accent);border-color:var(--accent-border)}
+.tbtn svg{display:block}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1060px;margin:0 auto;padding:18px}
+section{scroll-margin-top:54px;margin:0 0 24px}
+h1{font-size:19.5px;line-height:1.3;margin:0 0 5px;font-weight:600;letter-spacing:-.01em}
+h2{font-size:15.5px;line-height:1.3;margin:0 0 9px;font-weight:600}
+h2 small{font-size:11.5px;color:var(--text-3);font-weight:400}
+h3{font-size:12.5px;margin:0 0 5px;font-weight:600}
+.lede{font-size:13px;color:var(--text-2);margin:0 0 10px}
+.muted{color:var(--text-2)}
+.dim{color:var(--text-3)}
+.small{font-size:11.5px}
+.hero-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 16px}
+.note{border:1px solid var(--border);border-inline-start:2px solid var(--accent);background:var(--surface);border-radius:var(--radius);padding:10px 12px}
+.warn{border:1px solid var(--expense);background:var(--expense-soft);border-radius:var(--radius);padding:10px 12px}
+footer{border-top:1px solid var(--border);margin-top:6px;padding:12px 0 30px;font-size:11px;color:var(--text-3);line-height:1.7}
+
+/* ---------- chips ---------- */
+.chip{
+  display:inline-block;font-size:10.5px;line-height:1.65;padding:1px 7px;border-radius:7px;
+  border:1px solid transparent;white-space:nowrap;vertical-align:middle;
+}
+.chip.n{background:var(--bg);color:var(--text-2);border-color:var(--border-strong)}
+.chip.a{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+
+/* ---------- progress rail ---------- */
+#rail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:11px 14px;margin:0 0 18px}
+#railsum{font-size:11.5px;color:var(--text-2);margin:0 0 9px}
+.rail-row{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:14px 2px 4px;scrollbar-width:thin}
+.rail-row + .rail-row{border-top:1px dashed var(--border);margin-top:4px}
+.rail-lbl{flex:0 0 auto;font-size:10.5px;color:var(--text-3);white-space:nowrap;margin-inline-end:4px}
+.rail-div{flex:0 0 auto;font-size:10px;color:var(--text-3);border-inline-start:1px solid var(--border-strong);padding-inline-start:8px;margin-inline-start:2px;white-space:nowrap}
+.dot{
+  flex:0 0 auto;position:relative;display:inline-flex;align-items:center;justify-content:center;
+  min-width:34px;height:22px;padding:0 6px;border-radius:7px;
+  font-family:var(--mono);font-size:10.5px;text-decoration:none;
+  border:1px solid var(--border-strong);color:var(--text-2);background:var(--bg);
+  direction:ltr;unicode-bidi:isolate;
+}
+.dot:hover{text-decoration:none;border-color:var(--accent-border)}
+.dot.done{background:var(--income-soft);color:var(--income);border-color:var(--income)}
+.dot.cur{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.dot.blocked{background:var(--expense-soft);color:var(--expense);border-color:var(--expense);box-shadow:0 0 0 2px var(--expense-soft)}
+.dot.cur::after,.dot.blocked::after{
+  position:absolute;top:-13px;inset-inline-start:50%;transform:translateX(50%);
+  font-family:"Rubik","Segoe UI",system-ui,sans-serif;font-size:9.5px;white-space:nowrap;direction:rtl;
+}
+.dot.cur::after{content:"אתה כאן";color:var(--accent)}
+.dot.blocked::after{content:"חסום";color:var(--expense)}
+
+/* ---------- stage cards ---------- */
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:11px 13px;margin:0 0 11px;scroll-margin-top:60px}
+.stage.is-current{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft), var(--shadow)}
+.stage[data-status="done"]{opacity:.72}
+.stage[data-status="blocked"]{border-color:var(--expense)}
+.stage-h{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0 0 6px}
+.sid{
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text-2);
+  background:var(--bg);border:1px solid var(--border-strong);border-radius:6px;padding:0 6px;
+  direction:ltr;unicode-bidi:isolate;
+}
+.stage.is-current .sid{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-border)}
+.stage-h h3{margin:0;font-size:13px}
+.chip.status::before{content:"ממתין"}
+.stage[data-status="done"] .chip.status{background:var(--income-soft);color:var(--income);border-color:var(--income)}
+.stage[data-status="done"] .chip.status::before{content:"הושלם"}
+.stage[data-status="pending"] .chip.status{background:var(--bg);color:var(--text-2);border-color:var(--border-strong)}
+.stage.is-current .chip.status{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+.stage.is-current[data-status="pending"] .chip.status::before{content:"השלב הנוכחי"}
+.stage[data-status="blocked"] .chip.status{background:var(--expense-soft);color:var(--expense);border-color:var(--expense)}
+.stage[data-status="blocked"] .chip.status::before{content:"חסום"}
+.chip.count{background:var(--owner-soft);color:var(--owner);border-color:var(--owner);font-family:var(--mono)}
+.chip.count:empty{display:none}
+.chip.repeat{background:transparent;color:var(--ghost);border-color:var(--border-strong)}
+.skill-line{font-size:11px;color:var(--text-3);margin-inline-start:auto}
+.why{color:var(--text-2);margin:0 0 7px}
+.stage details{border:1px solid var(--border);border-radius:8px;background:var(--bg);margin:0 0 6px}
+.stage details:last-child{margin-bottom:0}
+.stage summary{
+  cursor:pointer;font-size:11.5px;font-weight:500;color:var(--text-2);
+  padding:5px 10px;user-select:none;list-style-position:inside;
+}
+.stage summary:hover{color:var(--accent)}
+.stage details[open]>summary{border-bottom:1px solid var(--border)}
+.dbody{padding:8px 11px}
+.lbl{font-size:10.5px;font-weight:600;color:var(--text-3);margin:6px 0 3px;text-transform:none}
+.lbl:first-child{margin-top:0}
+ul.checks{list-style:none;padding-inline-start:2px}
+ul.checks li{position:relative;padding-inline-start:16px}
+ul.checks li::before{content:"";position:absolute;inset-inline-start:0;top:.42em;width:7px;height:7px;border:1.5px solid var(--accent);border-radius:2px}
+.pbar{display:flex;align-items:center;gap:9px;padding:7px 11px;border-bottom:1px solid var(--border)}
+.copy{
+  font:inherit;font-size:11px;font-weight:600;cursor:pointer;padding:3px 11px;border-radius:7px;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);
+}
+.copy:hover{border-color:var(--accent)}
+.pnote{font-size:10.5px;color:var(--text-3)}
+.stage pre{
+  margin:0;padding:10px 12px;font-family:var(--mono);font-size:11.5px;line-height:1.55;
+  color:var(--text);white-space:pre;direction:ltr;text-align:left;overflow-x:auto;max-width:100%;
+}
+ol.loglist{direction:ltr;text-align:left;font-family:var(--mono);font-size:11px;color:var(--text-2);margin:0;padding:8px 11px 8px 28px}
+ol.loglist li{margin:0 0 4px}
+ol.loglist time{color:var(--text-3);margin-right:6px}
+ol.loglist:not(:has(li))::after{content:"— אין רשומות עדיין —";direction:rtl;display:block;color:var(--text-3);font-family:"Rubik","Segoe UI",system-ui,sans-serif}
+
+/* ---------- header cards ---------- */
+.hdr-details{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);margin:0 0 10px}
+.hdr-details summary{cursor:pointer;font-size:12.5px;font-weight:600;padding:9px 13px;user-select:none}
+.hdr-details summary:hover{color:var(--accent)}
+.hdr-details[open]>summary{border-bottom:1px solid var(--border)}
+.hdr-details .dbody{padding:10px 13px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-size:11px;font-weight:500;color:var(--text-2);text-align:right;padding:6px 10px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tbody tr:last-child>td{border-bottom:0}
+#protocol pre{
+  margin:0;padding:10px 12px;font-family:var(--mono);font-size:11px;line-height:1.55;
+  color:var(--text-2);white-space:pre;direction:ltr;text-align:left;overflow-x:auto;
+}
+.repair{font-size:11.5px;color:var(--text-2);border-inline-start:2px solid var(--accent-border);padding:2px 9px;margin:8px 0 0}
+
+@media (max-width:520px){
+  .wrap{padding:14px}
+  .brand{display:none}
+  h1{font-size:18px}
+  .skill-line{margin-inline-start:0;flex-basis:100%}
+}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem("fos-console-theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">FOS V2 <span>· קונסולת הבנייה</span></div>
+    <nav class="nav" aria-label="ניווט בעמוד">
+      <a href="#phase-a">שלב א — יסודות</a>
+      <a href="#phase-b">שלב ב — ביצוע</a>
+      <a href="#parallel">מסלולים מקבילים</a>
+      <a href="#triggers">טריגרים</a>
+      <a href="#protocol">הפרוטוקול</a>
+    </nav>
+    <button class="tbtn" id="themeBtn" type="button" aria-label="החלפת ערכת נושא">
+      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4.25" fill="none" stroke="currentColor" stroke-width="1"/><path d="M5 .75A4.25 4.25 0 0 1 5 9.25z" fill="currentColor"/></svg>
+      <span id="themeLbl">כהה</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ========== HEADER ========== -->
+<section id="top">
+  <div class="hero-card">
+    <h1>קונסולת הבנייה של FOS V2</h1>
+    <p class="lede">משטח הניהול החי של הבנייה. הקובץ הזה — בגיט — הוא מקור האמת למצב ההתקדמות: כל שלב מעדכן אותו בסיום, ולכן מה שאתה רואה כאן הוא תמיד איפה שעצרת.</p>
+    <p><b>איך עובדים:</b> נכנסים לעמוד ← מזהים את השלב המסומן <span class="chip a">אתה כאן</span> ← לוחצים <b>העתק פרומפט</b> ← מדביקים בחלון Claude Code חדש בריפו. הסוכן מבצע את השלב, מעדכן את הקונסולה הזו, ועושה קומיט. הפרומפטים באנגלית בכוונה — זו שפת העבודה של הסקילים.</p>
+    <p class="small dim">התוכנית הקנונית כאן היא מיזוג מוכרע של שני ספרי ההרצה: <a href="bmad-playbook-fable.html">Fable</a> · <a href="bmad-playbook-opus.html">Opus</a> — שם ההרחבות, הנימוקים והראיות. הקונסולה מחזיקה רק את השלבים לפי הסדר.</p>
+    <p class="repair">המצב נגזר, לא נשמר: השלב הנוכחי בכל מסלול הוא הראשון שאינו <code>done</code>. תיקון ידני: עורכים את <code>data-status</code> (או <code>data-done</code>) בתגית ה-<code>&lt;article&gt;</code> של השלב עצמו — ותו לא. שום דבר אחר בקובץ לא מקודד מצב.</p>
+  </div>
+</section>
+
+<!-- ========== PROGRESS RAIL ========== -->
+<nav id="rail" aria-label="מפת התקדמות">
+  <p id="railsum"></p>
+  <noscript><p class="small dim">מפת ההתקדמות דורשת JavaScript; הכרטיסים למטה עובדים גם בלעדיו.</p></noscript>
+</nav>
+
+<!-- ========== STANDING TRIGGERS ========== -->
+<details class="hdr-details" id="triggers">
+  <summary>טריגרים קבועים — כשקורה X, מריצים Y (לא תלוי-שלב)</summary>
+  <div class="dbody">
+    <div class="tw"><table>
+      <thead><tr><th>המצב</th><th>הפעולה</th></tr></thead>
+      <tbody>
+        <tr><td>לא יודע מה הצעד הבא</td><td><code class="k">bmad-help</code> · <code class="k">bmad-sprint-status</code> · <code class="f">bmad-loop status</code></td></tr>
+        <tr><td>דרישה השתנתה, או שהחלטה נעולה נשברה</td><td><code class="k">bmad-correct-course</code>, ואז לעדכן את <code>docs/v2</code> עצמו — הוא משטח הניהול היחיד של V2</td></tr>
+        <tr><td>תיקון קטן מחוץ לספרינט</td><td><code class="k">bmad-quick-dev</code></td></tr>
+        <tr><td>הלופ עצר על escalation</td><td><code class="f">/bmad-loop-resolve &lt;story-key&gt;</code></td></tr>
+        <tr><td>שער אפיק נפל (מעבר אפיק בלופ)</td><td>ביקורת אנושית + <code class="k">bmad-retrospective</code>, ואז <code class="f">bmad-loop resume &lt;run_id&gt;</code></td></tr>
+        <tr><td>עבודה נדחית הצטברה ב-<code>deferred-work.md</code></td><td><code class="f">bmad-loop sweep</code> (רק אחרי שלב B3)</td></tr>
+        <tr><td>טקסטים בעברית ל-UI</td><td>הסקילים <code class="f">story</code> / <code class="f">ben-tone</code> — לא BMAD</td></tr>
+      </tbody>
+    </table></div>
+    <p class="lbl">אסור להריץ</p>
+    <ul>
+      <li><code>bmad-document-project</code> — כותב שבעה קבצים לתוך <code>docs/</code>, ליד החבילה המאושרת. <code>02-current-state.md</code> כבר עדיף ממנו.</li>
+      <li>מודולי CIS ו-WDS — ההחלטות נעולות. חריג יחיד: <code>bmad-cis-problem-solving</code> על פער 6 (שלב P2).</li>
+      <li>השימים הנטושים <code>bmad-create-prd</code> · <code>bmad-edit-prd</code> · <code>bmad-validate-prd</code> · <code>bmad-create-architecture</code> — מפנים הלאה ומיועדים להסרה ב-v7.</li>
+      <li><code>bmad-dev-auto</code> ו-<code>bmad-loop-sweep</code> — פרימיטיבים של האורקסטרטור; לא מריצים ידנית.</li>
+    </ul>
+  </div>
+</details>
+
+<!-- ========== PROTOCOL REFERENCE ========== -->
+<details class="hdr-details" id="protocol">
+  <summary>פרוטוקול עדכון הקונסולה — מצורף אוטומטית לכל פרומפט בלחיצת ההעתקה</summary>
+  <div class="dbody">
+    <p class="small muted">זה הטקסט שכל סוכן מבצע מקבל בסוף הפרומפט שלו (עם מזהה השלב במקום <code>__STAGE__</code>). הוא שמור בקובץ פעם אחת בלבד.</p>
+    <pre id="protoView"></pre>
+  </div>
+</details>
+
+<!-- ========== PHASE A — FOUNDATION ========== -->
+<section id="phase-a">
+  <h2>שלב א — יסודות <small>· שבעה שלבים חד-פעמיים: מהחבילה הנעולה ב-docs/v2 עד תור עבודה נקי</small></h2>
+
+<article id="stage-A0" class="stage" data-stage="A0" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A0</span>
+    <h3>ארכוב ארטיפקטי V1</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="f">git mv</code> — בלי סקיל</span>
+  </div>
+  <p class="why">סקילי התכנון מגלים קלט בגלובים עמומים בדיוק איפה שארטיפקטי V1 יושבים — והם ייקראו כאמת, יידרסו, ויזרעו התנגשויות מפתחות. הזזה אחת בקומיט אחד סוגרת את כל המלכודות לפני שסקיל כלשהו רץ.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li><code>_bmad-output/</code> במצבו הנוכחי (42 קבצי V1 במעקב גיט)</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li><code>_bmad-output/v1-archive/</code> מכיל את שתי התיקיות; <code>planning-artifacts/</code> ו-<code>implementation-artifacts/</code> ריקות</li>
+        <li><code>test-artifacts/</code> ומאגר הידע נשארו במקומם; קומיט נקי</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A0 (Archive V1 artifacts)
+==============================================
+CONTEXT
+Repo: tailor-played-fos (you are in it). FOS V2 is the approved rebuild of Ben's
+financial OS. The plan is locked in docs/v2/ (8 files — the source of truth).
+BMAD v6.10 skills drive the build. This prompt executes exactly ONE stage of the
+build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+WHY THIS STAGE EXISTS
+BMAD planning skills discover inputs with fuzzy globs rooted at
+_bmad-output/planning-artifacts/ (*prd*.md, *architecture*.md, *epic*.md). The V1
+artifacts sit exactly there and would be read as truth. Worse: epics creation
+INITIALIZES {planning_artifacts}/epics.md in place (destroys V1's file), the V1
+prd-validation-report.md matches *prd*.md and ignites a false &quot;CRITICAL ISSUE:
+Duplicate document formats&quot;, and sprint-planning's preservation rule would keep all
+32 V1 stories as done and collide V1/V2 epic keys. Archiving BEFORE any skill runs
+closes all of this in one commit. git mv preserves history — nothing is deleted.
+
+EXECUTE (PowerShell, from repo root)
+New-Item -ItemType Directory _bmad-output\v1-archive
+git mv _bmad-output/planning-artifacts _bmad-output/v1-archive/planning-artifacts
+git mv _bmad-output/implementation-artifacts _bmad-output/v1-archive/implementation-artifacts
+New-Item -ItemType Directory _bmad-output\planning-artifacts, _bmad-output\implementation-artifacts
+
+LEAVE IN PLACE (do not move)
+- _bmad-output/test-artifacts/                          (live TEA output dir)
+- _bmad-output/tp-fos-comprehensive-knowledge-base.md   (input for stage A1)
+
+HARD RULES
+- NEVER create or leave a file named project-context.md inside v1-archive/ — the
+  glob **/project-context.md is auto-injected into every future BMAD session.
+- Move BOTH directories. The 32 story files must go too: a story file at
+  implementation-artifacts/{story-key}.md both force-promotes status and leaks V1
+  content into dev sessions.
+
+DONE CHECKS
+- ls _bmad-output/  →  v1-archive/, planning-artifacts/ (empty),
+  implementation-artifacts/ (empty), test-artifacts/, the knowledge-base file.
+- git ls-files _bmad-output/v1-archive  →  42 files.
+- git status clean after the protocol commit below.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A0-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A1" class="stage" data-stage="A1" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A1</span>
+    <h3>קונטקסט הפרויקט — הזיכרון הקבוע</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-generate-project-context</code></span>
+  </div>
+  <p class="why">קובץ אחד שמוזרק אוטומטית לכל סשן BMAD בהמשך. שמונה מטענים חייבים להיכנס אליו — ובראשם האנטידוט להטיית האשרור: האנום הישן בקוד נידון להריסה ואסור שיאושרר כקונבנציה.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A0 הושלם (נתיב הגילוי ריק)</li><li><code>docs/v2/*</code> + <code>tp-fos-comprehensive-knowledge-base.md</code> (עם הסתייגות האנום הישן)</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li><code>_bmad-output/project-context.md</code> קיים ומכיל את שמונת המטענים</li>
+        <li>חוק הסדר של פער 1 מופיע במילים מפורשות</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A1 (Project context — the persistent memory)
+=================================================================
+CONTEXT
+Repo: tailor-played-fos (you are in it). FOS V2 is the approved rebuild of Ben's
+financial OS; the plan is locked in docs/v2/. This prompt executes ONE stage of the
+build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A0 (archive) is done — verify _bmad-output/planning-artifacts/ is empty.
+
+STAGE OBJECTIVE
+Produce _bmad-output/project-context.md via bmad-generate-project-context. This
+file is auto-injected into every downstream BMAD session as persistent facts — it
+is the single most load-bearing artifact of the build.
+
+EXECUTE
+Fresh session. Invoke: bmad-generate-project-context
+(trigger phrase: &quot;generate project context&quot;)
+Feed docs/v2/* as the brownfield source package, plus
+_bmad-output/tp-fos-comprehensive-knowledge-base.md as background — WITH an
+explicit note that the knowledge base's vocabulary is the OLD enum (pre-migration).
+
+THE EIGHT PAYLOADS (verify each landed before finishing)
+1. The five Governing Rules of docs/v2/00-START-HERE.md, verbatim.
+2. The condemned enum: the current category vocabulary in src/ and functions/
+   (DirectCost, InventoryRestock, Overhead, Revenue, Personal, OwnerContribution,
+   OwnerWithdrawal) is scheduled for demolition in Epic E1 and must NOT be
+   ratified as a convention. Brownfield skills are instructed to ratify the
+   conventions already there — this line overrides that instinct.
+3. The locked target vocabulary: revenue, production, materials, developing,
+   expenses, owner-contribution, owner-withdrawal, owner-personal. Mapping:
+   DirectCost→production, InventoryRestock→materials, Personal→owner-personal,
+   Revenue→revenue, owner values 1:1 kebab-case; Overhead splits PER ROW into
+   developing/expenses (human judgment; ~dozens of rows exist).
+4. The silent-failure trap: WO_FIELD_MAP in
+   functions/src/triggers/onTransactionApproved.ts:9-13 keys cost↔order rollups
+   on category strings and dies silently on unknown strings. Iron rule 2: nothing
+   writes the new vocabulary to Firestore before the migration (Epic E1) completes.
+5. docs/v2/ supersedes _bmad-output/ V1 artifacts on any conflict (iron rule 3);
+   V1 is history and background, not requirements.
+6. The Firebase project tailor-played is shared with the public submissions app;
+   firestore.rules in THIS repo is the single source of truth for both.
+7. The fos-mcp write contract: every write requires actor + idempotency_key;
+   Dumbbell never writes to email_log; fos-mcp enforces NO schema and NO
+   vocabulary — correctness is writer discipline.
+8. The write-back rule: every decision made during the build is recorded back
+   into docs/v2/ — it is the single management surface of V2.
+
+HARD RULES
+- The file lives at _bmad-output/project-context.md and NOWHERE else — the
+  injection glob is **/project-context.md, so a stray copy would be injected too.
+
+DONE CHECKS
+- _bmad-output/project-context.md exists; each of the eight payloads is present
+  (open the file and check one by one).
+- The Gap-1 ordering law (payload 4) appears in explicit words.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A1-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A2" class="stage" data-stage="A2" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A2</span>
+    <h3>PRD — תמלול, לא דיון מחדש</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-prd</code></span>
+  </div>
+  <p class="why">ההחלטות נעולות מ-2026-07-02; תפקיד ה-PRD הוא להמיר אותן לצורת דרישות ממוספרות, לא לפתוח אותן מחדש. בסוף — העתקה שטוחה, כי הגלובים במורד הזרם לא רואים שתי רמות עומק.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A1 הושלם</li><li><code>01</code> + <code>03</code> + <code>04</code> (הזרע) + <code>06</code> מתוך <code>docs/v2/</code></li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li>PRD במצב final; תשעת הפערים מכוסים; אף דרישה לא סותרת החלטה נעולה</li>
+        <li>העותק השטוח <code>_bmad-output/planning-artifacts/prd.md</code> קיים</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A2 (PRD — transcription, not elicitation)
+==============================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A1 done — _bmad-output/project-context.md exists.
+
+STAGE OBJECTIVE
+A V2 PRD produced by bmad-prd from the locked planning package. This is a
+TRANSCRIPTION session: convert locked decisions into numbered-FR PRD form.
+
+EXECUTE
+Fresh session. Invoke: bmad-prd
+Open with this instruction: &quot;These decisions are locked by Ben since 2026-07-02.
+Transcribe them into PRD form; do not reopen them; do not invent functional
+requirements the documents do not support.&quot;
+Inputs (feed as the brain dump):
+- docs/v2/01-locked-decisions.md   (hard constraints)
+- docs/v2/03-target-vision.md      (target system + IA)
+- docs/v2/04-gap-analysis.md       (the seed — 9 gaps in 4 waves)
+- docs/v2/06-external-contracts.md (hard constraints)
+Stakes calibration: internal (v6.10 has hobby / internal / launch — there is no
+&quot;level 0-4&quot; concept). NO web research — the decisions are locked.
+PRD frontmatter must declare docs/v2/ normative and the PRD as its projection.
+
+ARTIFACTS + THE FLATTEN COPY (mandatory)
+The skill writes to a nested run folder:
+_bmad-output/planning-artifacts/prds/prd-tailor-played-fos-&lt;date&gt;/prd.md
+Downstream discovery globs are FLAT and do not see two levels deep. After the PRD
+reaches status: final, copy it up:
+cp _bmad-output/planning-artifacts/prds/prd-tailor-played-fos-&lt;date&gt;/prd.md _bmad-output/planning-artifacts/prd.md
+
+DONE CHECKS
+- PRD status: final; the 9 gaps of 04-gap-analysis are all covered by FRs; no FR
+  contradicts a locked decision; no FR exists without a docs/v2 source.
+- The flat copy _bmad-output/planning-artifacts/prd.md exists.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A2-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A3" class="stage" data-stage="A3" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A3</span>
+    <h3>ארכיטקטורה — השלב היחיד שבאמת פתוח</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-architecture</code></span>
+  </div>
+  <p class="why">שמונה הכרעות ש-docs/v2 השאיר פתוחות במפורש — ממנגנון המיגרציה ועד ה-Shell וספריית הגרפים. כל הכרעה נכתבת בחזרה ל-docs/v2, והקונטקסט מתרענן. זה גם השלב שקובע איפה יחיו הפידים של פערים 5–6.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A2 הושלם (עותק שטוח של PRD)</li><li><code>02-current-state.md</code> + הקוד החי</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li>שמונה ההכרעות נענו בנימוק; docs/v2 עודכן; הקונטקסט רוענן</li>
+        <li>העותק השטוח <code>architecture.md</code> קיים</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A3 (Architecture — the only genuinely open stage)
+======================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A2 done — the flat _bmad-output/planning-artifacts/prd.md exists.
+
+RATIFICATION-BIAS WARNING
+Brownfield mode ratifies existing conventions — but V1's conventions include the
+exact category enum condemned in Epic E1. project-context.md carries the antidote
+(payload 2); restate it at session start. The old enum must NOT become a ratified
+convention.
+
+EXECUTE
+Fresh session. Invoke: bmad-architecture  (trigger: &quot;create the architecture&quot;)
+Inputs: docs/v2/02-current-state.md (verified, file:line anchors) + the live code
++ _bmad-output/planning-artifacts/prd.md.
+
+THE EIGHT DECISIONS TO CLOSE
+1. Gap-1 migration mechanism: one-off script vs Cloud Function vs manual via
+   fos-mcp. Production is nearly empty (2 work orders, dozens of rows) — that
+   changes the answer. Iron rule 2 makes the ordering critical.
+2. Fate of the Firestore overhead collection — 03-target-vision calls it
+   &quot;a migration-wave decision&quot;.
+3. useDashboardData.ts rewrite: from month-bucket-on-a-single-date to month-rule
+   aggregation over eventDate/valueDate — a time-model change for every dashboard
+   view (locked decision 11 defines the month rule).
+4. The expected↔actual matching algorithm (amount + date proximity) and the rule
+   that marks bank card-settlement debits as transfers (kills double-counting —
+   exactly the risk stated in Gap 3).
+5. Server-side vocabulary validation in fos-mcp: separate repo, coordinated, only
+   after Gap 1 (today it &quot;enforces NO schema and NO vocabulary&quot;).
+6. The shell: desktop-first sidebar vs top-tabs — 03-target-vision §5 says
+   &quot;BMAD decides the shell&quot;.
+7. Charts: hand-rolled SVG vs a small library (e.g. Recharts) — 05-ui-spec §4:
+   &quot;implementer decides; avoid heavy charting suites&quot;.
+8. WHERE the Gap-5 (SUMIT) and Gap-6 (bank) feed components live — this repo or
+   external components. This decides whether they stay in coordination epic E9 or
+   get in-repo epics later (console stage P2 depends on this answer).
+
+POST-DECISION OBLIGATIONS (all mandatory)
+a. Write every decision BACK into docs/v2/: update 03-target-vision §5 and
+   05-ui-spec §4, and add dated decision entries to 01-locked-decisions.md.
+b. Refresh _bmad-output/project-context.md with the decisions.
+c. Flatten-copy the spine (downstream globs are flat):
+cp &quot;_bmad-output/planning-artifacts/architecture/architecture-tailor-played-fos-&lt;date&gt;/ARCHITECTURE-SPINE.md&quot; _bmad-output/planning-artifacts/architecture.md
+
+DONE CHECKS
+- All eight decisions answered with reasoning.
+- docs/v2 updated + project-context refreshed + flat architecture.md exists.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A3-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A4" class="stage" data-stage="A4" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A4</span>
+    <h3>אפיקים וסטוריז — מאכילים את הפיצול</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-create-epics-and-stories</code></span>
+  </div>
+  <p class="why">תשעה אפיקים: E1–E2 יסודות וסכימה, E3–E7 פיצול פער 7 (שער אישור לכל מסך), E8 אבטחה בריפו, E9 אפיק תיאום בלי סטוריז שהלופ מריץ. הסקיל לא ינחש את הפיצול — מאכילים אותו במפורש.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A3 הושלם</li><li>העותקים השטוחים: <code>prd.md</code> + <code>architecture.md</code></li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li><code>epics.md</code> מכיל תשעה אפיקים בדיוק, בסדר הגלים</li>
+        <li>E9 מסומן במפורש כתיאום בלבד; רצף E1 מכבד את חוק הסדר</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A4 (Epics and stories — feed the split, don't let it guess)
+================================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A3 done — flat prd.md AND architecture.md exist.
+
+STAGE OBJECTIVE
+_bmad-output/planning-artifacts/epics.md holding EXACTLY the nine-epic structure
+below. The skill will not guess this split — it does not know Gap 7 is L-sized or
+that E9 must hold no runnable stories. Feed it explicitly.
+
+EXECUTE
+Fresh session. Invoke: bmad-create-epics-and-stories
+(trigger: &quot;create the epics and stories list&quot;)
+Inputs: the FLAT copies — _bmad-output/planning-artifacts/prd.md and
+architecture.md. The skill draws architecture decisions; it must not invent new
+ones.
+
+THE NINE EPICS (canonical split — hand this to the skill)
+E1  Gap 1 — vocabulary migration + production-data cleanup       wave 1  (M)
+E2  Gap 3 — schema: domain, eventDate/valueDate, expected        wave 2  (M)
+E3  Gap 7a — shell + navigation + app-wide dense restyle         wave 4  (L-part)
+E4  Gap 7b — cash-flow screen: daily register + running balance
+    + expected overlay (month rule)                              wave 4
+E5  Gap 7c — month-vs-month (P&amp;L per domain) + charts area       wave 4
+E6  Gap 7d — Review restyle + domain chip + expected manager
+    + domains screen (incl. shared-services view)                wave 4
+E7  Gap 7e — free transaction search + date-range filter         wave 4  (S)
+E8  Gap 9 items 3-4 (in-repo security): per-agent fos-mcp tokens;
+    align src/services/auth.ts:16-18 with firestore.rules:6-10   parallel (S)
+E9  OUT-OF-REPO COORDINATION — gaps 2, 4, 5, 6, 8. A tracking epic with NO
+    stories BMAD executes. Keeps un-dispatchable work out of the loop's path.
+
+WHY THIS SPLIT (context for the skill)
+gates = per-epic makes epic granularity the approval granularity. Gap 7 as one
+epic would be ~30 stories behind a single gate — violating iron rule 1 (&quot;Build it
+right, no build-then-fix&quot;). Five epics = five stop points where Ben sees a real
+screen.
+
+DONE CHECKS
+- epics.md contains the nine epics exactly as above, in wave order.
+- E9 is explicitly marked coordination-only (no dispatchable stories).
+- Stories inside E1 are sequenced so nothing writes the new vocabulary before the
+  migration story lands (iron rule 2).
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A4-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A5" class="stage" data-stage="A5" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A5</span>
+    <h3>שער מוכנות — go / no-go</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-check-implementation-readiness</code></span>
+  </div>
+  <p class="why">השער שלפני כתיבת קוד — לא אחרי. בדיקת כיסוי צולבת בין PRD, ארכיטקטורה ואפיקים, ועליה בדיקה ידנית אחת שהכלי לא יודע לעשות: שאף אפיק לא מפר את חוק הסדר של פער 1.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A4 הושלם</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li>דוח מוכנות קיים בלי בעיות CRITICAL פתוחות</li>
+        <li>הבדיקה הידנית של חוק הסדר עברה; בן אמר GO</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A5 (Readiness gate — go / no-go)
+=====================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A4 done — epics.md exists with the nine-epic structure.
+
+STAGE OBJECTIVE
+The go/no-go gate BEFORE any code: cross-check PRD ↔ architecture ↔ epics
+coverage, produce the readiness report, and run one manual check the tool cannot.
+
+EXECUTE
+Fresh session. Invoke: bmad-check-implementation-readiness
+It discovers the flat prd.md, architecture.md, epics.md — this works only because
+stage A0 cleared the discovery path.
+
+THE MANUAL CHECK (the tool cannot do this)
+Walk the nine epics and verify each honors iron rule 2: NOTHING writes the new
+category vocabulary to Firestore before Epic E1 completes. Any story touching
+Firestore writes must sit inside E1's sequence or depend on it explicitly.
+
+DONE CHECKS
+- _bmad-output/planning-artifacts/implementation-readiness-report-&lt;date&gt;.md
+  exists, with no open CRITICAL issues.
+- The manual ordering check passed; its result is stated in your report to Ben.
+- Ben has seen the report and said GO. If NO-GO: fix upstream stages first — do
+  NOT proceed to stage A6, and do not mark this stage done.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A5-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-A6" class="stage" data-stage="A6" data-status="pending" data-track="main" data-phase="A">
+  <div class="stage-h">
+    <span class="sid">A6</span>
+    <h3>תכנון ספרינט — תור V2 נקי</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="k">bmad-sprint-planning</code></span>
+  </div>
+  <p class="why">קובץ sprint-status חדש ונקי — בלי אף מפתח של V1. יוצא נקי רק בזכות A0: כלל השימור לא מוריד סטטוסים, ומפתח שמתנגש היה נשאר done לנצח. בסוף השלב מעדכנים גם את מוני הסטוריז בקונסולה.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A5 עבר עם GO</li><li><code>epics.md</code></li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li><code>sprint-status.yaml</code> חדש תחת <code>implementation-artifacts/</code>, אפס מפתחות V1</li>
+        <li>מוני data-total של B1, B2, B4–B8 עודכנו לפי ספירת הסטוריז</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE A6 (Sprint planning — the V2 queue)
+========================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage A5 passed with GO. The OLD sprint-status.yaml is already archived (stage
+A0) — this matters: sprint-planning's preservation rule never downgrades an
+existing status, so leftover V1 keys would keep colliding V2 entries permanently
+done-skipped.
+
+STAGE OBJECTIVE
+A fresh _bmad-output/implementation-artifacts/sprint-status.yaml holding the V2
+queue only.
+
+EXECUTE
+Fresh session. Invoke: bmad-sprint-planning  (trigger: &quot;run sprint planning&quot;)
+Input: _bmad-output/planning-artifacts/epics.md
+
+EXTRA CONSOLE WORK (part of this stage, before the protocol)
+Story counts per epic are now known. In docs/v2/build-console.html set the
+data-total attribute of each epic stage to its story count:
+stage B1 ← epic E1 count, B2 ← E2, B4 ← E3, B5 ← E4, B6 ← E5, B7 ← E6, B8 ← E7.
+Each attribute lives on that stage's single &lt;article&gt; tag. Leave data-done at 0.
+
+DONE CHECKS
+- New sprint-status.yaml exists under implementation-artifacts/.
+- ZERO V1 keys: no story key of the archived 1-1..7-4 family; epic keys belong to
+  the nine-epic V2 structure only.
+- E9 contributes no dispatchable stories.
+- The console data-total counters are set.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:A6-->
+    </ol>
+  </details>
+</article>
+
+</section>
+
+<!-- ========== PHASE B — EXECUTION ========== -->
+<section id="phase-b">
+  <h2>שלב ב — ביצוע <small>· שני אפיקים ידניים, שער הפעלת הלופ, וחמשת אפיקי גל 4</small></h2>
+
+<article id="stage-B1" class="stage" data-stage="B1" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B1</span>
+    <h3>אפיק E1 — מיגרציית אוצר המילים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">atdd</code> ← <code class="k">create → dev → review</code> ← <code class="f">trace</code></span>
+  </div>
+  <p class="why">האפיק הקיומי — הכול תלוי בו. מיגרציה של דאטה פיננסי בפרודקשן עם מצב כשל שקט, ולכן: טסטים אדומים לפני הכול, מחזור סטורי ידני עם ביקורת במודל אחר, ומטריצת עקיבות כשער יציאה. הרצה אחת של הפרומפט = מחזור אחד.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A6 הושלם (תור נקי)</li><li>גל 1 — אין תלות קודמת; הכול תלוי בו</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li>כל סטוריז E1 במצב done; טסטי ה-ATDD ירוקים אחרי המיגרציה</li>
+        <li><code>bmad-testarch-trace</code> החזיר PASS; רטרוספקטיבה נכתבה</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B1 (Epic E1 — vocabulary migration; repeatable story cycle)
+================================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+THIS STAGE IS REPEATABLE
+One run of this prompt = the ATDD setup (first run only) OR one story cycle OR the
+epic close (last run). Check sprint-status.yaml and this stage's console log to
+see where the epic stands, then do the next thing.
+
+IRON RULES FOR THIS EPIC
+- Never fabricate financial data (rule 4): migration scripts and tests use clearly
+  fake fixtures, or real rows traced to their source documents.
+- Iron rule 2 lives INSIDE this epic: nothing writes the new vocabulary to
+  Firestore before the schema/consumer migration story lands. Respect the story
+  sequence from epics.md.
+- The Telegram bot enum (repo tailor-played-agents) is patched with this epic, or
+  the bot stays frozen until it is (locked decision 4).
+
+FIRST RUN ONLY — RED TESTS BEFORE ANYTHING
+Invoke: bmad-testarch-atdd on the migration story. Produce FAILING acceptance
+tests around WO_FIELD_MAP (functions/src/triggers/onTransactionApproved.ts:9-13)
+that prove an unknown category (e.g. &quot;production&quot;) is NOT silently swallowed.
+They must fail today and pass after the migration. Only after they are red and
+committed — story cycles may start.
+
+STORY CYCLE (every subsequent run)
+1. Invoke: bmad-create-story — the next backlog story of epic E1 per
+   sprint-status.yaml.
+2. Fresh window: bmad-dev-story on the created story file.
+3. Fresh window, DIFFERENT model than the dev session (dev-story step 10:
+   &quot;a different LLM than the one that implemented this story&quot;):
+   bmad-code-review  (trigger: &quot;run code review&quot;).
+   Findings land in the story file; rejected findings accumulate in
+   _bmad-output/implementation-artifacts/deferred-work.md.
+
+LAST RUN — EPIC GATE + CLOSE
+- Gate: bmad-testarch-trace — a traceability matrix over EVERY consumer of the
+  old enum strings in BOTH repos (this repo + tailor-played-agents), per string,
+  with a PASS/CONCERNS/FAIL verdict. This is the repo-wide grep checklist that
+  Gap 1's risk line demands. Do NOT close the epic on CONCERNS or FAIL.
+- Also in scope this epic: the production cleanup (14 duplicate Anthropic rows,
+  the approved TEST row, the &quot;hyfghfgh&quot; work order, mixed createdAt types).
+- Close: bmad-retrospective  (trigger: &quot;lets retro the epic epic-1&quot;).
+
+DONE CHECKS (per run)
+- The story reached done in sprint-status.yaml (or the ATDD/gate/retro artifact
+  exists, per run type). Lint + tests green.
+EPIC DONE WHEN all E1 stories are done + trace PASS + the retro file exists —
+only then flip this stage's data-status to done (see protocol).
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B1-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B2" class="stage" data-stage="B2" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B2</span>
+    <h3>אפיק E2 — סכימה: דומיין, שני תאריכים, צפויים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">test-design</code> ← <code class="k">create → dev → review</code></span>
+  </div>
+  <p class="why">שלושת עמודי המודל המאושר: domain, שני תאריכים (eventDate/valueDate), ו-expected כמצב מדרגה ראשונה. נפתח בתכנון בדיקות מבוסס-סיכון סביב כלל החודש וספירה כפולה, ואז מחזורי סטורי ידניים.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>אפיק E1 סגור (אותו משטח סכימה — קטגוריות קודם)</li><li>הכרעות A3 (מס' 3–4)</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li>כל סטוריז E2 במצב done; בדיקות כלל-החודש ירוקות</li>
+        <li>רטרוספקטיבה נכתבה</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B2 (Epic E2 — schema: domain, two dates, expected; repeatable)
+===================================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Epic E1 closed (stage B1 done) — same schema surface, categories land first.
+
+THIS STAGE IS REPEATABLE
+One run = the test-design setup (first run only) OR one story cycle OR the epic
+close. Check sprint-status.yaml + this stage's console log, do the next thing.
+
+FIRST RUN ONLY
+Invoke: bmad-testarch-test-design — a risk-based test plan for:
+- month-rule boundaries: an expense belongs to its eventDate month, income to its
+  valueDate month (locked decision 11); month-edge rows are the risk.
+- the double-count risk on credit-card settlement rows — the transfers rule
+  decided at stage A3 (decision 4).
+Wire the resulting checks into the E2 stories' acceptance criteria.
+
+STORY CYCLE (every subsequent run) — as in B1:
+bmad-create-story (next E2 story) → fresh window bmad-dev-story → fresh window,
+different model, bmad-code-review.
+
+SCOPE NOTES
+- In-repo schema surface only: src types, Zod schemas
+  (functions/src/shared/schemas.ts), review UI, dashboard hooks — including the
+  useDashboardData.ts rewrite per stage-A3 decision 3 — and fos-mcp hydration
+  defaults (normalize.ts). The Dumbbell contract side (domain emission) belongs
+  to console stage P2, item 2.
+- expected is a first-class state, ALWAYS shown as forecast, never counted as
+  balance (locked decision 10).
+
+LAST RUN: bmad-retrospective (trigger: &quot;lets retro the epic epic-2&quot;).
+DONE CHECKS (per run): story done in sprint-status; tests green.
+EPIC DONE WHEN all E2 stories done + retro exists — then flip data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B2-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B3" class="stage" data-stage="B3" data-status="pending" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B3</span>
+    <h3>הפעלת הלופ — צ'קליסט חד-פעמי לפני גל 4</h3>
+    <span class="chip status"></span>
+    <span class="skill-line"><code class="f">winget</code> · <code class="f">bmad-loop validate</code> · <code>policy.toml</code></span>
+  </div>
+  <p class="why">עד כאן כל סקיל אינטראקטיבי עבד; החסימה נגעה רק ללופ האוטונומי. כאן פותחים אותה — שתי התקנות, לא אחת — ממלאים את שער האימות הדטרמיניסטי, וסוגרים שתי הכרעות פתוחות של גל 4.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>לפחות אפיק אחד (E1 או E2) נסגר עם סטוריז שנסקרו ידנית</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks">
+        <li><code>bmad-loop validate</code> ירוק לגמרי; policy.toml מעודכן</li>
+        <li>שתי ההכרעות (UX ממוקד, E2E) נרשמו ב-docs/v2</li>
+      </ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B3 (Loop enablement — one-time checklist before wave 4)
+============================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE stage of the build console at docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+At least one epic (E1 or E2) fully closed with manually-reviewed stories — trust
+in story quality comes before taking hands off the wheel.
+
+STAGE OBJECTIVE
+Make bmad-loop run actually runnable and correctly configured, and close the two
+open wave-4 decisions. Until now the blocker gated ONLY the autonomous loop.
+
+1. INSTALL THE MULTIPLEXER (two installs, not one)
+   The psmux backend requires BOTH binaries on PATH — verified in its source:
+   if not all(shutil.which(exe) for exe in (self._BINARY, &quot;pwsh&quot;)).
+   winget install Microsoft.PowerShell
+   winget search psmux     # find the real package id first — the id
+                           # &quot;marlocarlo.psmux&quot; was suggested but is UNVERIFIED
+   winget install &lt;the-psmux-id&gt;
+   Verify:  bmad-loop mux                    → psmux AVAILABLE=yes
+            bmad-loop validate --project .   → zero FAIL lines
+
+2. POLICY — .bmad-loop/policy.toml (machine-local, gitignored)
+   [verify]
+   commands = [&quot;npm run lint&quot;, &quot;npm run test&quot;, &quot;npm run build&quot;]
+   # CI parity (.github/workflows/ci.yml); npm test = vitest run, so it exits;
+   # npm run build = tsc -b &amp;&amp; vite build. Add the functions package later via
+   # the same mechanism.
+   [scm]
+   isolation = &quot;worktree&quot;
+   # CAVEAT: a fresh git worktree has no node_modules — verify commands will
+   # fail there unless dependency install is handled. Validate on ONE story
+   # first: a supervised bmad-loop run --epic 3, watching the first verify
+   # pass. If install is not handled, fall back to isolation = &quot;none&quot; with
+   # supervised runs only, and note it in this stage's log line.
+
+3. FIRST-RUN TRUST
+   If spawned sessions would hit first-run dialogs: run claude once
+   interactively in the project and accept workspace-trust + hooks approval.
+
+4. TWO DECISIONS TO CLOSE (record both in docs/v2, dated)
+   a. Focused UX session: the mockup covers the five NEW screens; the restyle of
+      Work Orders, Inventory and dialogs/forms has density rules but no visuals.
+      If that gap needs design work, run bmad-ux NOW, scoped to the restyle
+      areas ONLY (trigger: &quot;create UX specifications&quot;); its output feeds the E3
+      stories. Otherwise record the decision to let the mockup + 05-ui-spec
+      carry E3 alone.
+   b. E2E: stand up Playwright now via bmad-testarch-framework (before the five
+      screens), or defer browser E2E to epic E6 (Review screen only). Vitest+RTL
+      already covers unit/component — this decision is about browser E2E only.
+
+DONE CHECKS
+- bmad-loop validate fully green; policy edited as above (or the fallback noted).
+- Both decisions recorded in docs/v2 with dates.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B3-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B4" class="stage" data-stage="B4" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B4</span>
+    <h3>אפיק E3 — מעטפת (Shell), ניווט וריסטייל כלל-אפליקטיבי</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-loop run --epic 3</code></span>
+  </div>
+  <p class="why">כניסת הלופ האוטונומי — הכרעת ה-Shell מ-A3 הופכת אמיתית, וכל המסכים הקיימים עוברים לשפת הצפיפות של המוקאפ. מפקחים על הסטורי הראשון מקצה לקצה לפני שמרפים.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב B3 ירוק; אפיקי E1–E2 סגורים</li><li>פלט ה-UX הממוקד אם הוחלט עליו ב-B3</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל סטוריז E3 במצב done עם ביקורת; רטרוספקטיבה נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B4 (Epic E3 — shell, navigation, app-wide restyle; loop)
+=============================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Stage B3 done (loop green) + epics E1-E2 closed (wave order).
+
+MODE
+Autonomous by default:  bmad-loop run --epic 3
+The loop spawns fresh sessions per story — a dev pass, then a review pass.
+SUPERVISE THE FIRST STORY end-to-end (including the verify gate) before letting
+it run unattended.
+Interactive fallback for any story: the B1 story cycle (bmad-create-story →
+fresh-window bmad-dev-story → fresh-window different-model bmad-code-review).
+
+WHILE THE LOOP RUNS
+- CRITICAL escalation stops it  →  /bmad-loop-resolve &lt;story-key&gt;
+- Epic-boundary gate falls      →  human review + bmad-retrospective, then
+                                    bmad-loop resume &lt;run_id&gt;
+- Deferred work piles up        →  bmad-loop sweep
+
+EPIC SCOPE (E3)
+The shell decision from stage A3 (sidebar vs top-tabs) becomes real; app-wide
+dense restyle per locked decision 18 — Dashboard, Work Orders, Inventory, Review
+shells restyled to the mockup's density. Existing mechanics survive: Ghost-Text,
+batch-approve, NutritionLabel, forward projection (locked decision 20).
+SCOPE GUARD: the mockup is the spec (docs/v2/mockup/fos-mockup.html). The
+05-ui-spec §6 acceptance criteria are the stories' acceptance criteria: 13px base
+text, a 1440px screen shows ~25 rows without inner scroll, RTL with LTR amounts,
+expected rows visually unmistakable and outside actual sums, semantic green/clay
+only.
+
+DONE CHECKS (per run)
+- Dispatched stories reached done with review; the verify gate
+  (lint/test/build) passed.
+EPIC DONE WHEN all E3 stories done + retro exists — then flip data-status, and
+run bmad-testarch-automate to expand coverage against the §6 criteria.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B4-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B5" class="stage" data-stage="B5" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B5</span>
+    <h3>אפיק E4 — מסך תזרים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-loop run --epic 4</code></span>
+  </div>
+  <p class="why">מרשם יומי, יתרה רצה, שכבת צפויים — וכלל החודש חל על כל תצוגה. הצפויים תמיד תחזית, לעולם לא נספרים כיתרה.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>אפיק E3 סגור (ה-Shell קיים); סכימת E2 חיה</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל סטוריז E4 במצב done עם ביקורת; רטרוספקטיבה נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B5 (Epic E4 — the cash-flow screen; loop)
+==============================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Epic E3 closed (the shell exists); the E2 schema is live.
+
+MODE
+Autonomous by default:  bmad-loop run --epic 4
+Supervise the first story. Interactive fallback: the B1 story cycle.
+While running: CRITICAL escalation → /bmad-loop-resolve &lt;story-key&gt;;
+epic gate → human review + bmad-retrospective → bmad-loop resume &lt;run_id&gt;;
+deferred work → bmad-loop sweep.
+
+EPIC SCOPE (E4)
+The cash-flow screen from the approved mockup: daily register, running balance,
+expected overlay. The month rule governs every aggregation: an expense belongs to
+its eventDate month, income to its valueDate month (locked decision 11). Expected
+rows are ALWAYS forecast — visually unmistakable, never counted in balances
+(locked decision 10). Scope guard: the mockup is the spec; 05-ui-spec §6 criteria
+are the acceptance criteria.
+
+DONE CHECKS (per run): stories done with review; verify gate passed.
+EPIC DONE WHEN all E4 stories done + retro exists — then flip data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B5-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B6" class="stage" data-stage="B6" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B6</span>
+    <h3>אפיק E5 — חודש-מול-חודש + גרפים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-loop run --epic 5</code></span>
+  </div>
+  <p class="why">רווח-והפסד לפי דומיין, ואזור הגרפים לפי הכרעת ספריית הגרפים מ-A3. שלוש התצוגות: עוגה לפי קטגוריה, הכנסות לפי דומיין, מגמה חודשית.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>אפיק E4 סגור; הכרעת הגרפים מ-A3 (מס' 7)</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל סטוריז E5 במצב done עם ביקורת; רטרוספקטיבה נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B6 (Epic E5 — month-vs-month + charts; loop)
+=================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Epic E4 closed.
+
+MODE
+Autonomous by default:  bmad-loop run --epic 5
+Supervise the first story. Interactive fallback: the B1 story cycle.
+While running: CRITICAL escalation → /bmad-loop-resolve &lt;story-key&gt;;
+epic gate → human review + bmad-retrospective → bmad-loop resume &lt;run_id&gt;;
+deferred work → bmad-loop sweep.
+
+EPIC SCOPE (E5)
+Month-vs-month view: P&amp;L per domain (TailorPlayed | Benefits | shared | owner —
+locked decision 6), month standing alone per the month rule. The charts area per
+05-ui-spec §Charts: expenses pie by category, income by domain, monthly trend —
+implemented with the chart approach decided at stage A3 (decision 7; avoid heavy
+charting suites). Never fabricate sample figures that could read as real data
+(iron rule 4) — demo data must be clearly fake.
+
+DONE CHECKS (per run): stories done with review; verify gate passed.
+EPIC DONE WHEN all E5 stories done + retro exists — then flip data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B6-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B7" class="stage" data-stage="B7" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B7</span>
+    <h3>אפיק E6 — Review, צפויים ודומיינים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-loop run --epic 6</code></span>
+  </div>
+  <p class="why">ריסטייל מסך ה-Review עם צ'יפ דומיין, מנהל הצפויים, ומסך הדומיינים כולל תצוגת שירותים משותפים. אם הכרעת ה-E2E נדחתה ב-B3 — היא נוחתת כאן, על מסך ה-Review בלבד.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>אפיק E5 סגור; הכרעת ה-E2E מ-B3</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל סטוריז E6 במצב done עם ביקורת; רטרוספקטיבה נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B7 (Epic E6 — Review + expected manager + domains; loop)
+=============================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Epic E5 closed.
+
+MODE
+Autonomous by default:  bmad-loop run --epic 6
+Supervise the first story. Interactive fallback: the B1 story cycle.
+While running: CRITICAL escalation → /bmad-loop-resolve &lt;story-key&gt;;
+epic gate → human review + bmad-retrospective → bmad-loop resume &lt;run_id&gt;;
+deferred work → bmad-loop sweep.
+
+EPIC SCOPE (E6)
+Review screen restyled on the new vocabulary with a domain chip; existing
+mechanics survive — Ghost-Text review, batch-approve at confidence ≥85 (locked
+decision 20). UI copy addresses &quot;the reviewer&quot;, never Gal specifically (locked
+decision 17). The expected-items manager screen; the domains screen including the
+shared-services view. If the E2E decision at stage B3 was &quot;defer&quot;: stand up the
+minimal browser-E2E here, scoped to the Review flow only
+(bmad-testarch-framework, then targeted specs).
+
+DONE CHECKS (per run): stories done with review; verify gate passed.
+EPIC DONE WHEN all E6 stories done + retro exists — then flip data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B7-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-B8" class="stage" data-stage="B8" data-status="pending" data-done="0" data-total="?" data-track="main" data-phase="B">
+  <div class="stage-h">
+    <span class="sid">B8</span>
+    <h3>אפיק E7 — חיפוש וסינון תאריכים</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-loop run --epic 7</code></span>
+  </div>
+  <p class="why">האפיק הקטן שסוגר את גל 4: חיפוש חופשי בתנועות ומסנן טווח תאריכים — לא קיימים היום בכלל. מועמד טבעי לריצה אוטונומית מלאה.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>אפיק E6 סגור</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל סטוריז E7 במצב done עם ביקורת; רטרוספקטיבת סוף-גל נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE B8 (Epic E7 — transaction search + date-range filter; loop)
+================================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+PRECONDITION
+Epic E6 closed.
+
+MODE
+Autonomous by default:  bmad-loop run --epic 7
+Supervise the first story. Interactive fallback: the B1 story cycle.
+While running: CRITICAL escalation → /bmad-loop-resolve &lt;story-key&gt;;
+epic gate → human review + bmad-retrospective → bmad-loop resume &lt;run_id&gt;;
+deferred work → bmad-loop sweep.
+
+EPIC SCOPE (E7)
+Free-text transaction search + a date-range filter — neither exists today. Search
+covers the new vocabulary and the domain field; the date filter respects the
+month rule's two-date model (filter by eventDate or valueDate must be an explicit
+choice, not an ambiguous single date). Dense design per the mockup's language.
+
+WAVE CLOSE
+This is the last wave-4 epic. After the retro, sweep the remaining deferred-work
+ledger (bmad-loop sweep) and review what it triages before calling V2's in-repo
+build complete.
+
+DONE CHECKS (per run): stories done with review; verify gate passed.
+EPIC DONE WHEN all E7 stories done + retro exists — then flip data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:B8-->
+    </ol>
+  </details>
+</article>
+
+</section>
+
+<!-- ========== PARALLEL TRACKS ========== -->
+<section id="parallel">
+  <h2>מסלולים מקבילים <small>· לא מחכים לגלים — רצים לצד המסלול הראשי</small></h2>
+
+<article id="stage-P1" class="stage" data-stage="P1" data-status="pending" data-done="0" data-total="2" data-track="p1" data-phase="P">
+  <div class="stage-h">
+    <span class="sid">P1</span>
+    <h3>אפיק E8 — אבטחה בתוך הריפו</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="k">create → dev → review</code> / <code class="k">bmad-quick-dev</code></span>
+  </div>
+  <p class="why">המפתחות לכספת: טוקנים פר-סוכן מול fos-mcp ומדיניות auth אחת בין הקליינט לחוקים. רץ בכל רגע אחרי A6 — כמה שיותר מוקדם יותר טוב.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>שלב A6 הושלם (יש תור)</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>שני הפריטים שוחררו עם ביקורת; רטרוספקטיבה קצרה נכתבה</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE P1 (Epic E8 — in-repo security; parallel track)
+====================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+TIMING
+Parallel track — runnable ANY time after stage A6, independently of the waves.
+These are the keys to the money data; earlier is better.
+
+SCOPE (Gap 9 items 3-4 — the two IN-REPO items only; one item per run)
+1. fos-mcp access: replace the single shared Bearer + self-declared actor with
+   per-agent tokens at minimum.
+2. One auth policy: resolve the divergence between the client UID whitelist
+   (src/services/auth.ts:16-18) and the rules email-domain check
+   (firestore.rules:6-10). firestore.rules is the single source of truth for
+   BOTH apps on the shared Firebase project — treat any rules change as a
+   production change and test against the second app's access pattern.
+(Gap 9 items 1-2 — Desktop plaintext secrets and the committed Telegram token —
+live outside this repo: console stage P2, item 3. Not here.)
+
+MODE
+Full story cycle for meaningful changes: bmad-create-story → fresh-window
+bmad-dev-story → fresh-window different-model bmad-code-review.
+bmad-quick-dev for small contained fixes.
+
+DONE CHECKS (per run): the item's change is live, reviewed, verify green.
+EPIC DONE WHEN both items shipped (+ a short bmad-retrospective) — then flip
+data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:P1-->
+    </ol>
+  </details>
+</article>
+
+<article id="stage-P2" class="stage" data-stage="P2" data-status="pending" data-done="0" data-total="6" data-track="p2" data-phase="P">
+  <div class="stage-h">
+    <span class="sid">P2</span>
+    <h3>אפיק E9 — תיאום מחוץ לריפו</h3>
+    <span class="chip status"></span>
+    <span class="chip count js-count" dir="ltr"></span>
+    <span class="chip repeat">מחזורי</span>
+    <span class="skill-line"><code class="f">bmad-spec</code> · <code class="f">bmad-cis-problem-solving</code> · ידני</span>
+  </div>
+  <p class="why">ששת הפריטים ש-BMAD לא יכול להריץ מכאן — ריפוזיטורים אחרים, GCP, claude.ai. שום כלי לא יזכיר לך אותם; הקונסולה הזו היא התזכורת. הרצה אחת = קידום פריט אחד.</p>
+  <details class="meta">
+    <summary>קלטים ותנאי סיום</summary>
+    <div class="dbody">
+      <p class="lbl">קלטים</p>
+      <ul><li>תלות פר-פריט (מפורטת בפרומפט); פריט 3 רץ מיד</li><li>הכרעת A3 מס' 8 קובעת אם פריטים 4–5 נשארים כאן</li></ul>
+      <p class="lbl">סיום כאשר</p>
+      <ul class="checks"><li>כל ששת הפריטים סגורים עם צעד האימות שלהם</li></ul>
+    </div>
+  </details>
+  <details class="prompt">
+    <summary>פרומפט הרצה (English)</summary>
+    <div class="pbar"><button class="copy" type="button">העתק פרומפט</button>
+      <span class="pnote">ההעתקה מצרפת אוטומטית את פרוטוקול עדכון הקונסולה</span></div>
+    <pre dir="ltr">
+FOS V2 BUILD — STAGE P2 (Epic E9 — out-of-repo coordination; checklist)
+=======================================================================
+CONTEXT
+Repo: tailor-played-fos. FOS V2 rebuild; plan locked in docs/v2/. This prompt
+executes ONE run of a repeatable stage of the build console at
+docs/v2/build-console.html.
+
+TRUTH HIERARCHY (higher wins on any conflict)
+1) docs/v2/01-locked-decisions.md   2) the rest of docs/v2/
+3) V2 artifacts in _bmad-output/planning-artifacts/   4) this prompt.
+If your judgment says to override any of these: STOP and report instead of acting.
+
+NATURE OF THIS STAGE
+E9 is a TRACKING epic: none of its work is dispatchable by BMAD from this repo —
+it lives in other repos, GCP, Workspace, claude.ai. One run of this prompt =
+advance ONE item. The console counter (data-done of 6) tracks closed items.
+BMAD will never remind you of these; this console is the reminder.
+
+ITEM 1 — Gap 2: legacy intake decommission          (after/with E1)
+In tailor-played-agents + Workspace: disable the 2 Apps Script pollers (BOTH
+accounts) and their Cloud Scheduler jobs; un-deploy emailIntake,
+processEmailDocument, retryEmailProcessing, emailIntakeHeartbeat. In THIS repo:
+retire functions/src/email/* and the processDocument export from
+functions/src/index.ts (this in-repo slice may run as a story or bmad-quick-dev).
+VERIFY: email_log stays silent after the disable — Gap 2's own risk check.
+
+ITEM 2 — Gap 4: Dumbbell amendments + deliver activation      (needs E1+E2)
+Run bmad-spec IN the tailorplayed-dumbbell repo — the skill is portable; run it
+THERE, not here. Scope: archive rule per inbox-zero (locked decision 3); domain
+emission; content-fingerprint dedup (vendor+amount+date — messageId alone proved
+insufficient on May-18); then create the weekly dumbbell-deliver scheduled task
+(its own gate is satisfied once Gap 1 lands). Absorb the 7 frozen Secretary
+finance rules (Shiptanbul→production; hebrew-ai, TTD, Anthropic receipts,
+ElevenLabs→developing). THEN notify Secretary to flip them to migrated: done in
+its state/rules/vendor-rules.json — nothing will remind you of this except this
+console. Resolve the 3 quarantined duplicate pairs in developing@ (Anthropic
+#2819, #2948, Google Cloud 01F7E0). SUPERVISE the first weekly deliver run — it
+meets the historical backlog.
+
+ITEM 3 — Gap 9 items 1-2: secrets rotation          (anytime — do it early)
+Rotate the fos-mcp SA key + Bearer out of plaintext Desktop files into a secret
+store; rotate and purge the committed Telegram bot token in
+tailor-played-agents/TELEGRAM-DATA.txt.
+
+ITEM 4 — Gap 5: SUMIT income feed                   (needs E1+E2; placement per A3)
+FOS has never held a revenue row — this feed creates income truth. If stage A3
+placed it as an external component: spec it via bmad-spec (portable); it emits
+revenue rows (+ expected) with domain; start with a manual-confirm queue for the
+SUMIT-document→domain mapping. If A3 placed it in-repo: run bmad-correct-course
+to give it an in-repo epic instead, and update this console accordingly.
+
+ITEM 5 — Gap 6: bank/card feed                      (needs E1+E2; unsolved problem)
+The ONE place CIS earns its keep: run bmad-cis-problem-solving on the genuinely
+unresolved stack — Cloudflare bot-blocking on Isracard (active 2026; fallback:
+manual XLS import while blocked), One Zero OTP custody (long-lived token vs
+Telegram prompt), One Zero marked experimental in the library, scrapers breaking
+ecosystem-wide every few weeks. Recommended shape: moneyman → Web-Post exporter
+→ Cloud Function → fos-mcp; credentials in GCP Secret Manager; the
+reconciliation pass marks card-settlement debits as transfers (the E2 rule).
+
+ITEM 6 — Gap 8: Rocky re-commissioning              (after gaps 1-5)
+In the Rocky claude.ai project: REWRITE the knowledge files — do not patch. New
+vocabulary, domain model, two-date rule, new pipeline map; fix the long-known
+Gal-pronoun errors. Rocky gets read + gated writes only: expected items and
+corrections (locked decision 21).
+
+DONE CHECKS (per run)
+- The advanced item's own VERIFY step passed; record which item in the log line.
+EPIC DONE WHEN all six items closed (data-done reaches 6) — then flip
+data-status.
+</pre>
+  </details>
+  <details class="log">
+    <summary>יומן</summary>
+    <ol class="loglist" dir="ltr">
+      <!--LOG:P2-->
+    </ol>
+  </details>
+</article>
+
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p>קונסולת הבנייה של FOS V2 · התוכנית הקנונית — מיזוג מוכרע של <a href="bmad-playbook-fable.html">ספר ההרצה Fable</a> ו-<a href="bmad-playbook-opus.html">ספר ההרצה Opus</a>, מאומת מול הריפו והסקילים המותקנים · BMAD v6.10 · נוצר 2026-07-25</p>
+  <p>כל שמות הסקילים אומתו מול <code>.claude/skills/</code>. מצב השלבים חי בתגיות ה-<code>&lt;article&gt;</code> של הקובץ הזה; כל עדכון שלב הוא קומיט.</p>
+</footer>
+
+<script type="text/template" id="protocol-tpl">
+=================== CONSOLE UPDATE PROTOCOL — MANDATORY, LAST ACTION ===================
+The build console at docs/v2/build-console.html is the single source of truth for
+build state. Updating it is part of this stage's definition of done. Do it LAST,
+after all work and done-checks.
+
+FILE:  docs/v2/build-console.html        STAGE:  __STAGE__
+
+1. READ FIRST. Re-read the console file with the Read tool immediately before
+   editing. Never edit from memory — the file may have changed since this prompt
+   was copied.
+
+2. LOCATE. Find the one opening tag containing data-stage="__STAGE__". It appears
+   exactly once in the file, and the same tag carries id="stage-__STAGE__". If it
+   is not found exactly once, or the id does not match: STOP, edit nothing, and
+   report the mismatch. Never touch another stage's tag.
+
+3. FLIP STATE — edit attributes on that one tag, nothing else. Use the compound
+   anchor starting at data-stage so the edit string is unique in the file:
+   a. One-shot stage (the tag has NO data-total): replace
+        data-stage="__STAGE__" data-status="pending"
+      with
+        data-stage="__STAGE__" data-status="done"
+   b. Repeatable stage (the tag HAS data-total): increment data-done by exactly 1
+      for a completed run (story done / item closed), e.g. replace
+        data-stage="__STAGE__" data-status="pending" data-done="2"
+      with
+        data-stage="__STAGE__" data-status="pending" data-done="3"
+      If data-total is "?" and the real total is now known, set it in the same
+      edit. Only when the stage's own EPIC DONE WHEN condition holds (check
+      sprint-status.yaml or the item list), also flip data-status="pending" to
+      data-status="done" on that tag.
+   c. Blocked: if you cannot complete this run, set data-status="blocked"
+      instead, and state the blocker in the log line.
+   Do NOT mark any next stage. "Current" is derived by the page (the first stage
+   per track whose status is not done) — there is nothing else to update.
+
+4. LOG — append exactly one line. The marker <!--LOG:__STAGE__--> appears exactly
+   once in the file. Replace it with:
+        <li><time>YYYY-MM-DD</time> one-line summary</li>
+        <!--LOG:__STAGE__-->
+   Real date. English. Max ~15 words. Name the story/artifact/item (e.g. "E2
+   story 2-3 implemented, review passed"). Before appending, read the lines above
+   the marker: if this exact run is already logged, skip this step.
+
+5. COMMIT — one commit containing both the stage's work and the console edit:
+        git add -A
+        git commit -m "build(__STAGE__): the same one-line summary as the log"
+   Do not push unless this stage's instructions explicitly said to push.
+
+DRIFT RULE: if an exact string above is not found, the console has drifted.
+Re-read, locate the tag by data-stage="__STAGE__", apply the same semantic change
+to the attributes as they actually are, and append " (console drift reconciled)"
+to your log line. Leaving the console un-updated is a protocol violation.
+========================================================================================
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* theme toggle */
+  var root=document.documentElement;
+  var btn=document.getElementById("themeBtn"), lbl=document.getElementById("themeLbl");
+  function isDark(){
+    var t=root.getAttribute("data-theme");
+    if(t) return t==="dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function paintLbl(){ lbl.textContent = isDark() ? "בהיר" : "כהה"; }
+  btn.addEventListener("click", function(){
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try{ localStorage.setItem("fos-console-theme", next); }catch(e){}
+    paintLbl();
+  });
+  paintLbl();
+
+  /* state derivation + rail */
+  var stages=[].slice.call(document.querySelectorAll("article[data-stage]"));
+  var tracks={main:[],p1:[],p2:[]};
+  stages.forEach(function(s){ tracks[s.dataset.track].push(s); });
+  var trackNames={main:"המסלול הראשי",p1:"מקביל · E8 אבטחה",p2:"מקביל · E9 תיאום"};
+  var phaseNames={A:"שלב א · יסודות",B:"שלב ב · ביצוע",P:""};
+  var rail=document.getElementById("rail");
+  var sumParts=[];
+
+  Object.keys(tracks).forEach(function(name){
+    var list=tracks[name];
+    var cur=null;
+    for(var i=0;i<list.length;i++){ if(list[i].dataset.status!=="done"){ cur=list[i]; break; } }
+    if(cur){
+      cur.classList.add("is-current");
+      if(cur.dataset.status!=="blocked"){
+        var dp=cur.querySelector("details.prompt"); if(dp) dp.setAttribute("open","");
+        var dm=cur.querySelector("details.meta"); if(dm) dm.setAttribute("open","");
+      }
+    }
+    var row=document.createElement("div"); row.className="rail-row";
+    var rl=document.createElement("span"); rl.className="rail-lbl"; rl.textContent=trackNames[name]; row.appendChild(rl);
+    var lastPhase=null;
+    list.forEach(function(s){
+      if(name==="main" && s.dataset.phase!==lastPhase){
+        lastPhase=s.dataset.phase;
+        var ph=phaseNames[lastPhase]||"";
+        if(ph){ var d=document.createElement("span"); d.className="rail-div"; d.textContent=ph; row.appendChild(d); }
+      }
+      var a=document.createElement("a");
+      a.href="#stage-"+s.dataset.stage;
+      var cls = s.dataset.status==="done" ? "done" : (s===cur ? (s.dataset.status==="blocked" ? "blocked" : "cur") : "pend");
+      a.className="dot "+cls;
+      var t=s.dataset.stage;
+      if(s===cur && s.dataset.total && s.dataset.total!=="?") t+=" · "+(s.dataset.done||"0")+"/"+s.dataset.total;
+      a.textContent=t;
+      var h=s.querySelector("h3"); if(h) a.title=h.textContent;
+      row.appendChild(a);
+    });
+    rail.appendChild(row);
+    var done=list.filter(function(s){ return s.dataset.status==="done"; }).length;
+    sumParts.push(trackNames[name]+" "+done+"/"+list.length);
+  });
+  document.getElementById("railsum").textContent="הושלמו — "+sumParts.join(" · ");
+
+  /* repeatable counters */
+  stages.forEach(function(s){
+    var c=s.querySelector(".js-count");
+    if(c && s.dataset.total) c.textContent=(s.dataset.done||"0")+"/"+s.dataset.total;
+  });
+
+  /* protocol template: reference view + copy buttons */
+  var tpl=document.getElementById("protocol-tpl").textContent.trim();
+  document.getElementById("protoView").textContent=tpl;
+
+  function fallbackCopy(text){
+    var t=document.createElement("textarea");
+    t.value=text; t.style.position="fixed"; t.style.opacity="0";
+    document.body.appendChild(t); t.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    t.remove();
+  }
+  [].slice.call(document.querySelectorAll(".copy")).forEach(function(b){
+    b.addEventListener("click", function(){
+      var art=b.closest("article");
+      var pre=art.querySelector("details.prompt pre");
+      var text=pre.textContent.trim()+"\n\n"+tpl.split("__STAGE__").join(art.dataset.stage)+"\n";
+      var done=function(){
+        var old=b.textContent;
+        b.textContent="הועתק";
+        setTimeout(function(){ b.textContent=old; },1500);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+      }else{ fallbackCopy(text); done(); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
